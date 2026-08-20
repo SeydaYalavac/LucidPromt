@@ -1,28 +1,20 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Send, ShieldCheck, User, Code2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { Session } from "@supabase/supabase-js";
-import { getBrowserSupabase } from "@/lib/supabase/browser";
 import { useMessages } from "@/hooks/useTrendData";
+import { useAuthSession } from "@/hooks/useAuthSession";
 import type { ChatMessage } from "@/types/trends";
 
 export function TrendChat({ trendId, slug, mode }: { trendId: string; slug: string; mode: "live" | "demo" }) {
   const { data, mutate } = useMessages(slug);
-  const [session, setSession] = useState<Session | null>(null);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const supabase = useMemo(() => getBrowserSupabase(), []);
+  const { supabase, session, isConfigured } = useAuthSession();
   const messages = data?.messages || [];
-
-  useEffect(() => {
-    if (!supabase) return;
-    supabase.auth.getSession().then(({ data: auth }) => setSession(auth.session));
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
-    return () => listener.subscription.unsubscribe();
-  }, [supabase]);
 
   useEffect(() => {
     if (!supabase || mode !== "live") return;
@@ -45,16 +37,6 @@ export function TrendChat({ trendId, slug, mode }: { trendId: string; slug: stri
       void supabase.removeChannel(channel);
     };
   }, [mode, mutate, supabase, trendId]);
-
-  async function signIn() {
-    if (!supabase) {
-      setError("Supabase authentication is not configured yet.");
-      return;
-    }
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/trend/${slug}`)}`;
-    const { error: authError } = await supabase.auth.signInWithOAuth({ provider: "github", options: { redirectTo } });
-    if (authError) setError(authError.message);
-  }
 
   async function sendMessage(event: React.FormEvent) {
     event.preventDefault();
@@ -140,10 +122,20 @@ export function TrendChat({ trendId, slug, mode }: { trendId: string; slug: stri
               <Send size={16} />
             </button>
           </form>
+        ) : !isConfigured ? (
+          <Link
+            href={`/auth?mode=signin&next=${encodeURIComponent(`/trend/${slug}`)}`}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3 text-sm font-semibold text-amber-100/80 hover:bg-amber-300/10"
+          >
+            <Code2 size={16} /> Sign-in setup is in progress
+          </Link>
         ) : (
-          <button onClick={signIn} className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-bold text-black hover:bg-white/90">
-            <Code2 size={16} /> Sign in with GitHub to write
-          </button>
+          <Link
+            href={`/auth?mode=signin&next=${encodeURIComponent(`/trend/${slug}`)}`}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-bold text-black hover:bg-white/90"
+          >
+            <Code2 size={16} /> Sign in to write
+          </Link>
         )}
         {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
       </div>
