@@ -1,138 +1,152 @@
 "use client";
 
-import { useState } from "react";
-import { Send, ShieldCheck, User } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Send, ShieldCheck, User, Code2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import type { Session } from "@supabase/supabase-js";
+import { getBrowserSupabase } from "@/lib/supabase/browser";
+import { useMessages } from "@/hooks/useTrendData";
+import type { ChatMessage } from "@/types/trends";
 
-interface Message {
-  id: string;
-  user: string;
-  text: string;
-  role: "dev" | "user" | "expert";
-}
-
-export function TrendChat() {
-  const [messages, setMessages] = useState<Message[]>([
-    { id: "1", user: "dev_alex", text: "Has anyone tested the new API latency?", role: "dev" },
-    { id: "2", user: "sarah_k", text: "Yes, seeing around 45ms consistently on edge networks.", role: "expert" },
-    { id: "3", user: "jason_99", text: "Are there rate limits on the public endpoint?", role: "user" }
-  ]);
+export function TrendChat({ trendId, slug, mode }: { trendId: string; slug: string; mode: "live" | "demo" }) {
+  const { data, mutate } = useMessages(slug);
+  const [session, setSession] = useState<Session | null>(null);
   const [input, setInput] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = useMemo(() => getBrowserSupabase(), []);
+  const messages = data?.messages || [];
 
-  const handleSend = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getSession().then(({ data: auth }) => setSession(auth.session));
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession));
+    return () => listener.subscription.unsubscribe();
+  }, [supabase]);
 
-    // Simulate AI moderation check
-    const badWords = ["bad", "spam", "hate"];
-    if (badWords.some(word => input.toLowerCase().includes(word))) {
-      alert("⚠️ Mesajınız topluluk kurallarına aykırı kelimeler içeriyor.");
+  useEffect(() => {
+    if (!supabase || mode !== "live") return;
+    const channel = supabase
+      .channel(`trend-chat:${trendId}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "chat_messages", filter: `trend_id=eq.${trendId}` },
+        (payload) => {
+          const incoming = payload.new as ChatMessage;
+          if (incoming.status !== "visible") return;
+          void mutate((current) => {
+            if (!current || current.messages.some((item) => item.id === incoming.id)) return current;
+            return { ...current, messages: [...current.messages, incoming] };
+          }, false);
+        },
+      )
+      .subscribe();
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [mode, mutate, supabase, trendId]);
+
+  async function signIn() {
+    if (!supabase) {
+      setError("Supabase authentication is not configured yet.");
       return;
     }
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(`/trend/${slug}`)}`;
+    const { error: authError } = await supabase.auth.signInWithOAuth({ provider: "github", options: { redirectTo } });
+    if (authError) setError(authError.message);
+  }
 
-    const newMsg: Message = {
-      id: Date.now().toString(),
-      user: "you",
-      text: input,
-      role: "user"
-    };
-
-    setMessages([...messages, newMsg]);
-    setInput("");
-    
-    // Simulate someone replying
-    setIsTyping(true);
-    setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        user: "system_expert",
-        text: "That's a great point! The documentation covers this in the advanced section.",
-        role: "expert"
-      }]);
-      setIsTyping(false);
-    }, 2000);
-  };
+  async function sendMessage(event: React.FormEvent) {
+    event.preventDefault();
+    const body = input.trim();
+    if (!body || !session) return;
+    setSending(true);
+    setError(null);
+    const response = await fetch(`/api/trends/${slug}/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ body }),
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      setError(payload.error || "Message could not be sent");
+    } else {
+      setInput("");
+      await mutate((current) => {
+        if (!current || current.messages.some((item) => item.id === payload.message.id)) return current;
+        return { ...current, messages: [...current.messages, payload.message] };
+      }, false);
+    }
+    setSending(false);
+  }
 
   return (
-    <div className="mt-16 rounded-3xl border border-white/5 bg-[#0B0B0D] overflow-hidden flex flex-col h-[500px]">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/5 bg-[#111114] px-6 py-4">
+    <section className="mt-16 overflow-hidden rounded-3xl border border-white/10 bg-[#0B0B0D]">
+      <div className="flex items-center justify-between border-b border-white/5 bg-[#111114] px-6 py-5">
         <div>
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            Live Discussion
-            <span className="relative flex h-2 w-2 items-center justify-center">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75"></span>
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500"></span>
+          <h2 className="flex items-center gap-2 text-lg font-bold text-white">
+            Developer terminal
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-50" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
             </span>
-          </h3>
-          <p className="text-xs text-[#8B8B93] flex items-center gap-1 mt-1">
-            <ShieldCheck size={14} className="text-[#06b6d4]" /> AI Moderated (Safe Space)
+          </h2>
+          <p className="mt-1 flex items-center gap-1.5 text-xs text-[#8B8B93]">
+            <ShieldCheck size={14} className="text-emerald-400" /> Server moderated · 8 messages per minute
           </p>
         </div>
-        <div className="text-xs font-medium text-[#8B8B93]">
-          42 online
-        </div>
+        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8B8B93]">Realtime room</span>
       </div>
 
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
-        <AnimatePresence>
-          {messages.map((msg) => (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              key={msg.id}
-              className="flex gap-4"
-            >
+      <div className="h-[330px] space-y-5 overflow-y-auto p-6" aria-live="polite">
+        <AnimatePresence initial={false}>
+          {messages.map((message) => (
+            <motion.div key={message.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="flex gap-4">
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-[#8B8B93]">
-                <User size={16} />
+                <User size={15} />
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className={`text-xs font-bold ${msg.role === 'expert' ? 'text-[#06b6d4]' : msg.role === 'dev' ? 'text-[#8b5cf6]' : 'text-[#8B8B93]'}`}>
-                    {msg.user}
-                  </span>
-                  {msg.role === 'expert' && <span className="rounded bg-[#06b6d4]/20 px-1.5 py-0.5 text-[10px] font-bold text-[#06b6d4]">EXPERT</span>}
+              <div className="min-w-0">
+                <div className="flex items-center gap-2 font-mono text-[11px]">
+                  <span className="font-bold text-[#06b6d4]">{message.author_display_name}</span>
+                  <time className="text-[#5f5f66]">{new Date(message.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</time>
                 </div>
-                <p className="mt-1 text-sm text-white/90 leading-relaxed">{msg.text}</p>
+                <p className="mt-1 break-words text-sm leading-relaxed text-white/90">{message.body}</p>
               </div>
             </motion.div>
           ))}
-          {isTyping && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/5 text-[#8B8B93]">
-                <User size={16} />
-              </div>
-              <div className="flex items-center gap-1 text-[#8B8B93]">
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/40" style={{ animationDelay: "0ms" }}></span>
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/40" style={{ animationDelay: "150ms" }}></span>
-                <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white/40" style={{ animationDelay: "300ms" }}></span>
-              </div>
-            </motion.div>
-          )}
         </AnimatePresence>
+        {!messages.length && (
+          <div className="flex h-full items-center justify-center text-center text-sm text-[#8B8B93]">
+            <p>Quiet room. Start the first technical thread about this signal.</p>
+          </div>
+        )}
       </div>
 
-      {/* Input Area */}
       <div className="border-t border-white/5 bg-[#111114] p-4">
-        <form onSubmit={handleSend} className="relative flex items-center">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask a question or share insight..."
-            className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-4 pr-12 text-sm text-white placeholder-white/30 focus:border-[#06b6d4]/50 focus:outline-none focus:ring-1 focus:ring-[#06b6d4]/50 transition-all"
-          />
-          <button
-            type="submit"
-            disabled={!input.trim()}
-            className="absolute right-2 flex h-8 w-8 items-center justify-center rounded-lg bg-[#06b6d4] text-black transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
-          >
-            <Send size={16} />
+        {mode === "demo" ? (
+          <p className="rounded-xl border border-amber-300/20 bg-amber-300/5 px-4 py-3 text-sm text-amber-100/80">
+            Chat writes stay off in demo mode. Connect Supabase to enable authenticated rooms.
+          </p>
+        ) : session ? (
+          <form onSubmit={sendMessage} className="relative flex items-center">
+            <input
+              value={input}
+              onChange={(event) => setInput(event.target.value)}
+              maxLength={1000}
+              placeholder="Ask about the API, benchmark, or implementation…"
+              className="w-full rounded-xl border border-white/10 bg-white/5 py-3 pl-4 pr-12 text-sm text-white placeholder:text-white/30 focus:border-[#06b6d4]/60 focus:outline-none"
+            />
+            <button type="submit" disabled={!input.trim() || sending} aria-label="Send message" className="absolute right-2 flex h-8 w-8 items-center justify-center rounded-lg bg-[#06b6d4] text-black disabled:opacity-40">
+              <Send size={16} />
+            </button>
+          </form>
+        ) : (
+          <button onClick={signIn} className="flex w-full items-center justify-center gap-2 rounded-xl bg-white py-3 text-sm font-bold text-black hover:bg-white/90">
+            <Code2 size={16} /> Sign in with GitHub to write
           </button>
-        </form>
+        )}
+        {error && <p className="mt-3 text-sm text-red-300">{error}</p>}
       </div>
-    </div>
+    </section>
   );
 }

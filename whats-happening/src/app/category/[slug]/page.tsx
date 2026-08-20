@@ -1,5 +1,6 @@
 import { GlobalNavbar } from "@/components/GlobalNavbar";
 import { Footer } from "@/components/Footer";
+import { TrendCollection } from "@/components/TrendCollection";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -14,12 +15,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
           {slug.replace(/-/g, " ")}
         </h1>
         
-        <div className="mt-12 rounded-3xl border border-white/5 bg-[#111114] p-8">
-          <h2 className="text-xl font-semibold text-white">Top Trends in {slug.replace(/-/g, " ")}</h2>
-          <div className="mt-4 text-[#8B8B93]">
-            Category specific feed and charts will appear here.
-          </div>
-        </div>
+        <TrendCollection filter="category" value={slug} />
       </main>
 
       <Footer />

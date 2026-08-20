@@ -1,0 +1,204 @@
+import { XMLParser } from "fast-xml-parser";
+import type { SourceName, SourceSignal } from "../src/types/trends";
+
+export interface SourceAdapter {
+  name: SourceName;
+  fetchSignals(): Promise<SourceSignal[]>;
+}
+
+const iso = (value: string | number | undefined) => {
+  const parsed = value ? new Date(value) : new Date();
+  return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+};
+const text = (value: unknown, max = 500) => String(value || "").replace(/\s+/g, " ").trim().slice(0, max);
+
+async function json<T>(url: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(url, init);
+  if (!response.ok) throw new Error(`${url} returned ${response.status}`);
+  return response.json() as Promise<T>;
+}
+
+export const hackerNews: SourceAdapter = {
+  name: "hacker_news",
+  async fetchSignals() {
+    const ids = await json<number[]>("https://hacker-news.firebaseio.com/v0/newstories.json");
+    const items = await Promise.all(
+      ids.slice(0, 80).map((id) =>
+        json<{ id: number; title?: string; url?: string; by?: string; score?: number; descendants?: number; time?: number }>(
+          `https://hacker-news.firebaseio.com/v0/item/${id}.json`,
+        ),
+      ),
+    );
+    return items
+      .filter((item) => item.title)
+      .map((item) => ({
+        source: "hacker_news" as const,
+        externalId: String(item.id),
+        title: text(item.title, 220),
+        sourceUrl: item.url || `https://news.ycombinator.com/item?id=${item.id}`,
+        authorLabel: text(item.by, 60),
+        engagementCount: (item.score || 0) + (item.descendants || 0),
+        publishedAt: new Date((item.time || Date.now() / 1000) * 1000).toISOString(),
+        metadata: { comments: item.descendants || 0 },
+      }));
+  },
+};
+
+export const github: SourceAdapter = {
+  name: "github",
+  async fetchSignals() {
+    const since = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
+    const headers: HeadersInit = { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
+    if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+    const result = await json<{
+      items: Array<{
+        id: number;
+        full_name: string;
+        html_url: string;
+        description: string | null;
+        stargazers_count: number;
+        forks_count: number;
+        owner: { login: string };
+        created_at: string;
+        language: string | null;
+      }>;
+    }>(`https://api.github.com/search/repositories?q=created:%3E${since}&sort=stars&order=desc&per_page=50`, { headers });
+    return result.items.map((repo) => ({
+      source: "github" as const,
+      externalId: String(repo.id),
+      title: text(repo.full_name, 220),
+      excerpt: text(repo.description, 500),
+      sourceUrl: repo.html_url,
+      authorLabel: repo.owner.login,
+      engagementCount: repo.stargazers_count + repo.forks_count,
+      publishedAt: iso(repo.created_at),
+      metadata: { language: repo.language, stars: repo.stargazers_count, forks: repo.forks_count },
+    }));
+  },
+};
+
+export const googleTrends: SourceAdapter = {
+  name: "google_trends",
+  async fetchSignals() {
+    const geo = process.env.GOOGLE_TRENDS_GEO || "US";
+    const response = await fetch(`https://trends.google.com/trending/rss?geo=${encodeURIComponent(geo)}`);
+    if (!response.ok) throw new Error(`Google Trends RSS returned ${response.status}`);
+    const parsed = new XMLParser({ ignoreAttributes: false }).parse(await response.text()) as {
+      rss?: { channel?: { item?: Array<Record<string, unknown>> | Record<string, unknown> } };
+    };
+    const raw = parsed.rss?.channel?.item;
+    const items = Array.isArray(raw) ? raw : raw ? [raw] : [];
+    return items.map((item, index) => ({
+      source: "google_trends" as const,
+      externalId: `${geo}-${text(item.title, 160)}-${index}`,
+      title: text(item.title, 220),
+      excerpt: text(item["ht:news_item"] && JSON.stringify(item["ht:news_item"]), 500),
+      sourceUrl: `https://trends.google.com/trending?geo=${encodeURIComponent(geo)}`,
+      authorLabel: "Google Trends",
+      engagementCount: Number(String(item["ht:approx_traffic"] || "0").replace(/\D/g, "")) || 0,
+      publishedAt: iso(item.pubDate as string),
+      countryCode: geo,
+      metadata: { approximate_traffic: item["ht:approx_traffic"] || null },
+    }));
+  },
+};
+
+export const reddit: SourceAdapter = {
+  name: "reddit",
+  async fetchSignals() {
+    const clientId = process.env.REDDIT_CLIENT_ID;
+    const secret = process.env.REDDIT_CLIENT_SECRET;
+    if (!clientId || !secret) throw new Error("Reddit credentials are not configured");
+    const tokenResponse = await fetch("https://www.reddit.com/api/v1/access_token", {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${clientId}:${secret}`).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": process.env.REDDIT_USER_AGENT || "whats-happening-trend-worker/1.0",
+      },
+      body: "grant_type=client_credentials",
+    });
+    if (!tokenResponse.ok) throw new Error(`Reddit OAuth returned ${tokenResponse.status}`);
+    const { access_token } = (await tokenResponse.json()) as { access_token: string };
+    const listing = await json<{ data: { children: Array<{ data: Record<string, unknown> }> } }>(
+      "https://oauth.reddit.com/r/all/rising?limit=50&raw_json=1",
+      { headers: { Authorization: `Bearer ${access_token}`, "User-Agent": process.env.REDDIT_USER_AGENT || "whats-happening-trend-worker/1.0" } },
+    );
+    return listing.data.children.map(({ data }) => ({
+      source: "reddit" as const,
+      externalId: text(data.id, 80),
+      title: text(data.title, 220),
+      excerpt: text(data.selftext, 500),
+      sourceUrl: `https://www.reddit.com${text(data.permalink, 300)}`,
+      authorLabel: `r/${text(data.subreddit, 60)}`,
+      engagementCount: Number(data.score || 0) + Number(data.num_comments || 0),
+      publishedAt: new Date(Number(data.created_utc || Date.now() / 1000) * 1000).toISOString(),
+      metadata: { subreddit: data.subreddit, comments: data.num_comments || 0 },
+    }));
+  },
+};
+
+export const xRecent: SourceAdapter = {
+  name: "x",
+  async fetchSignals() {
+    const token = process.env.X_BEARER_TOKEN;
+    const queries = process.env.X_WATCH_QUERIES?.split(",").map((item) => item.trim()).filter(Boolean);
+    if (!token || !queries?.length) throw new Error("X bearer token or watch queries are not configured");
+    const batches = await Promise.all(
+      queries.slice(0, 10).map((query) =>
+        json<{
+          data?: Array<{ id: string; text: string; author_id?: string; created_at?: string; public_metrics?: Record<string, number> }>;
+        }>(
+          `https://api.x.com/2/tweets/search/recent?query=${encodeURIComponent(`${query} -is:retweet`)}&max_results=100&tweet.fields=created_at,public_metrics`,
+          { headers: { Authorization: `Bearer ${token}` } },
+        ),
+      ),
+    );
+    return batches.flatMap((batch) =>
+      (batch.data || []).map((tweet) => ({
+        source: "x" as const,
+        externalId: tweet.id,
+        title: text(tweet.text, 220),
+        excerpt: text(tweet.text, 280),
+        sourceUrl: `https://x.com/i/web/status/${tweet.id}`,
+        authorLabel: tweet.author_id,
+        engagementCount: Object.values(tweet.public_metrics || {}).reduce((sum, value) => sum + value, 0),
+        publishedAt: iso(tweet.created_at),
+        metadata: tweet.public_metrics || {},
+      })),
+    );
+  },
+};
+
+function searchProvider(name: "tavily" | "exa"): SourceAdapter {
+  return {
+    name,
+    async fetchSignals() {
+      const query = process.env.DISCOVERY_QUERY || "breaking technology science culture trends today";
+      if (name === "tavily") {
+        if (!process.env.TAVILY_API_KEY) throw new Error("Tavily API key is not configured");
+        const result = await json<{ results: Array<{ url: string; title: string; content?: string; score?: number; published_date?: string }> }>(
+          "https://api.tavily.com/search",
+          { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ api_key: process.env.TAVILY_API_KEY, query, topic: "news", max_results: 20 }) },
+        );
+        return result.results.map((item) => ({ source: name, externalId: item.url, title: text(item.title, 220), excerpt: text(item.content, 500), sourceUrl: item.url, engagementCount: Math.round((item.score || 0) * 100), publishedAt: iso(item.published_date) }));
+      }
+      if (!process.env.EXA_API_KEY) throw new Error("Exa API key is not configured");
+      const result = await json<{ results: Array<{ id: string; url: string; title: string; publishedDate?: string; text?: string }> }>(
+        "https://api.exa.ai/search",
+        { method: "POST", headers: { "Content-Type": "application/json", "x-api-key": process.env.EXA_API_KEY }, body: JSON.stringify({ query, type: "auto", category: "news", numResults: 20, contents: { text: { maxCharacters: 500 } } }) },
+      );
+      return result.results.map((item) => ({ source: name, externalId: item.id, title: text(item.title, 220), excerpt: text(item.text, 500), sourceUrl: item.url, engagementCount: 1, publishedAt: iso(item.publishedDate) }));
+    },
+  };
+}
+
+export const adapters: Record<SourceName, SourceAdapter> = {
+  hacker_news: hackerNews,
+  github,
+  google_trends: googleTrends,
+  reddit,
+  x: xRecent,
+  tavily: searchProvider("tavily"),
+  exa: searchProvider("exa"),
+};
