@@ -5,7 +5,7 @@ import { getSafeRedirect } from "@/lib/auth-redirect";
 
 export const metadata: Metadata = {
   title: "Sign in | What's Happening",
-  description: "Sign in or create an account to join live developer trend rooms.",
+  description: "Check the availability of account access and recovery.",
 };
 
 const authModes: AuthMode[] = ["signin", "signup", "forgot", "update"];

@@ -29,7 +29,7 @@ export function NewsCard({ trend, featured = false, rank }: { trend: Trend; feat
       </div>
     </div>
     <Link href={`/trend/${trend.slug}`} className="relative mt-auto block pt-12 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
-      <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#8B8B93]">{trend.country?.name || "Worldwide"} · score {trend.score}</p>
+      <p className="font-mono text-xs uppercase tracking-[0.16em] text-[#8B8B93]">{trend.country?.name || "Country not attributed"} · score {trend.score}</p>
       <h2 className={`mt-4 text-balance font-medium leading-[1.02] tracking-[-0.045em] text-white ${featured ? "max-w-4xl text-[clamp(2.5rem,6vw,5rem)]" : "text-2xl sm:text-3xl"}`}>{trend.title}</h2>
       {featured && trend.summary && <p className="mt-6 max-w-[58ch] text-pretty text-base leading-7 text-[#A1A1AA]">{trend.summary}</p>}
       <span className="mt-7 inline-flex items-center gap-2 text-sm font-medium text-white">Follow the evidence <ArrowUpRight size={16} className="transition-transform duration-150 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" /></span>

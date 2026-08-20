@@ -32,6 +32,6 @@ export const homepageFaqs: HomepageFaq[] = [
   {
     question: "How much does What's Happening cost?",
     answer:
-      "What's Happening is free during early access at $0. There is no trial countdown or published usage cap today; live trend availability still depends on the production data service being connected.",
+      "The public product views cost $0. Account-based early access is also priced at $0, but account creation and live trend records are unavailable until the production data service is connected. There is no checkout or paid plan today.",
   },
 ];

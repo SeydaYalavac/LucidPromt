@@ -100,9 +100,9 @@ export function HeroSection() {
             {dataUnavailable ? "Production data unavailable" : "Connected source data"}
           </span>
           <div className="ml-2 flex items-center gap-3 text-xs text-[#8B8B93] font-medium">
-            <span>{signalData?.signals.length ?? "—"} recent signals</span>
+            <span>{signalData ? `${signalData.signals.length} signal records loaded` : "Signal count unavailable"}</span>
             <span className="h-1 w-1 rounded-full bg-white/20"></span>
-            <span>{trendData?.trends.length ?? "—"} active trends</span>
+            <span>{trendData ? `${trendData.trends.length} trend records loaded` : "Trend count unavailable"}</span>
             <span className="h-1 w-1 rounded-full bg-white/20"></span>
             <span>source-linked</span>
           </div>

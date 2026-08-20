@@ -38,7 +38,7 @@ export async function generateWhyLayer(trendId: string, title: string, signals: 
     const response = await openai.responses.create({
       model,
       instructions:
-        "You are an evidence-constrained trend analyst. Use only the supplied signals. Write concise factual English. If origin is uncertain, say so. Never invent people, dates, causal claims, or quotes.",
+        "You are an evidence-constrained trend analyst. Use only the supplied signals. Write concise factual English. The where_started field must describe only the earliest dated source observation in the supplied evidence and must not claim geographic or causal origin. If no earliest observation can be established, say so. Never invent people, dates, causal claims, or quotes.",
       input: JSON.stringify({ trend: title, signals: evidence }),
       text: {
         format: {

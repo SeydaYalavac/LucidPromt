@@ -1,7 +1,7 @@
 import { AlertCircle, Radio } from "lucide-react";
 
 export function TrendLoading({ compact = false }: { compact?: boolean }) {
-  return <div className={`animate-pulse rounded-[1.75rem] border border-white/[0.05] bg-[#0D0D0F] ${compact ? "h-40" : "h-80"}`} aria-label="Loading live trends" />;
+  return <div className={`animate-pulse rounded-[1.75rem] border border-white/[0.05] bg-[#0D0D0F] ${compact ? "h-40" : "h-80"}`} aria-label="Loading trend records" />;
 }
 
 export function TrendUnavailable({ message = "Live trend data is waiting for its production connection." }: { message?: string }) {

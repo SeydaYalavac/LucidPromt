@@ -12,7 +12,7 @@ export function TrendDetail({ slug }: { slug: string }) {
   const [shareNotice, setShareNotice] = useState(false);
   const { data, error, isLoading } = useTrend(slug);
   if (isLoading) return <div className="mx-auto min-h-screen max-w-5xl px-6 pt-32"><div className="h-80 animate-pulse rounded-3xl bg-[#111114]" /></div>;
-  if (error || !data) return <div className="mx-auto min-h-screen max-w-5xl px-6 pt-40 text-[#8B8B93]">This live trend is not available yet.</div>;
+  if (error || !data) return <div className="mx-auto min-h-screen max-w-5xl px-6 pt-40 text-[#8B8B93]">This trend is unavailable because the production data service is not connected.</div>;
   const { trend, signals, mode } = data;
   const firstDetected = new Date(trend.first_seen_at).toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
   const stats = [
@@ -31,8 +31,8 @@ export function TrendDetail({ slug }: { slug: string }) {
           </div>
           <h1 className="mt-6 max-w-4xl text-[clamp(40px,6vw,76px)] font-bold leading-[0.98] tracking-tighter text-white">{trend.title}</h1>
           <div className="mt-5 flex flex-wrap items-center gap-4 text-sm font-medium text-[#8B8B93]">
-            <span className="font-bold text-[#06b6d4]">↑ {Math.round(trend.growth_percent || trend.velocity_score)}%</span>
-            <span>{trend.source_count} independent sources</span>
+            <span className="font-bold text-[#06b6d4]">{trend.growth_percent == null ? `Velocity score ${trend.velocity_score}` : `${trend.growth_percent >= 0 ? "↑" : "↓"} ${Math.abs(Math.round(trend.growth_percent))}% observed growth`}</span>
+            <span>{trend.source_count} linked sources</span>
             <span>First detected {firstDetected}</span>
           </div>
         </div>
@@ -48,7 +48,7 @@ export function TrendDetail({ slug }: { slug: string }) {
             <p className="mb-6 text-sm font-bold uppercase tracking-[0.2em] text-[#8B8B93]">The why layer</p>
             {trend.why_status === "complete" ? (
               <div className="space-y-6">
-                {[{ label: "What happened?", value: trend.what_happened }, { label: "Why now?", value: trend.why_now }, { label: "Where it started?", value: trend.where_started }].map((item, index) => (
+                {[{ label: "What happened?", value: trend.what_happened }, { label: "Why now?", value: trend.why_now }, { label: "Earliest evidence", value: trend.where_started }].map((item, index) => (
                   <article key={item.label} className="border-l-2 border-[#06b6d4] pl-5" style={{ borderColor: index === 1 ? "#8b5cf6" : index === 2 ? "#f97316" : undefined }}>
                     <h2 className="text-xs font-bold uppercase tracking-widest text-[#8B8B93]">{item.label}</h2>
                     <p className="mt-2 text-lg leading-relaxed text-white">{item.value}</p>
