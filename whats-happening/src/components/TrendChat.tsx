@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useMessages } from "@/hooks/useTrendData";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import type { ChatMessage } from "@/types/trends";
+import { captureProductEvent } from "@/lib/analytics";
 
 export function TrendChat({ trendId, slug, mode }: { trendId: string; slug: string; mode: "live" | "demo" }) {
   const { data, mutate } = useMessages(slug);
@@ -52,8 +53,10 @@ export function TrendChat({ trendId, slug, mode }: { trendId: string; slug: stri
     const payload = await response.json();
     if (!response.ok) {
       setError(payload.error || "Message could not be sent");
+      captureProductEvent("developer_chat_message_failed", { trend_slug: slug, status_code: response.status });
     } else {
       setInput("");
+      captureProductEvent("developer_chat_message_sent", { trend_slug: slug });
       await mutate((current) => {
         if (!current || current.messages.some((item) => item.id === payload.message.id)) return current;
         return { ...current, messages: [...current.messages, payload.message] };
