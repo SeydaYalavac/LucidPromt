@@ -15,7 +15,7 @@ const navigationItems = [
   { label: "World", href: "/#world" },
   { label: "Trending", href: "/#trending" },
   { label: "Explore", href: "/#explore" },
-  { label: "Map", href: "/#map" },
+  { label: "How it works", href: "/how-it-works" },
   { label: "Pricing", href: "/pricing" },
 ];
 

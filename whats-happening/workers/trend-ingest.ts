@@ -1,5 +1,5 @@
 import { adapters } from "./sources";
-import { clusterSignals, scoreSignals, slugifyTitle } from "../src/lib/scoring";
+import { clusterSignals, earliestAttributedSignal, scoreSignals, slugifyTitle } from "../src/lib/scoring";
 import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
 import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
@@ -51,6 +51,7 @@ async function run() {
 
   for (const cluster of clusterSignals(signals)) {
     const lead = [...cluster].sort((a, b) => b.engagementCount - a.engagementCount)[0];
+    const originSignal = earliestAttributedSignal(cluster);
     const slug = slugifyTitle(lead.title);
     if (!slug) continue;
     const score = scoreSignals(cluster);
@@ -63,7 +64,7 @@ async function run() {
           title: lead.title,
           category: categoryFor(lead),
           summary: lead.excerpt?.slice(0, 500) || null,
-          country_id: lead.countryCode ? countryIds.get(lead.countryCode) || null : null,
+          country_id: originSignal?.countryCode ? countryIds.get(originSignal.countryCode) || null : null,
           velocity_score: score.velocity,
           reach_score: score.reach,
           novelty_score: score.novelty,

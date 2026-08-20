@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clusterSignals, scoreSignals, slugifyTitle } from "./scoring";
+import { clusterSignals, earliestAttributedSignal, scoreSignals, slugifyTitle } from "./scoring";
 import type { SourceSignal } from "@/types/trends";
 
 const now = Date.parse("2026-08-20T12:00:00Z");
@@ -42,5 +42,15 @@ describe("clustering helpers", () => {
       signal({ externalId: "2", source: "github", title: "AI runtime: local agent" }),
     ]);
     expect(clusters).toHaveLength(1);
+  });
+
+  it("uses the earliest signal with country metadata for origin context", () => {
+    const origin = earliestAttributedSignal([
+      signal({ externalId: "1", countryCode: "US", publishedAt: "2026-08-20T11:00:00Z" }),
+      signal({ externalId: "2", publishedAt: "2026-08-20T08:00:00Z" }),
+      signal({ externalId: "3", countryCode: "TR", publishedAt: "2026-08-20T09:00:00Z" }),
+    ]);
+
+    expect(origin?.countryCode).toBe("TR");
   });
 });
