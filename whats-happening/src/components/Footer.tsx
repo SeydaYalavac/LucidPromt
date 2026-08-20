@@ -18,6 +18,7 @@ export function Footer() {
             { label: "Trending", href: "/#trending" },
             { label: "Countries", href: "/#world" },
             { label: "Categories", href: "/#explore" },
+            { label: "How it works", href: "/how-it-works" },
             { label: "Pricing", href: "/pricing" },
             { label: "About", href: "/" },
             { label: "Privacy", href: "/" },

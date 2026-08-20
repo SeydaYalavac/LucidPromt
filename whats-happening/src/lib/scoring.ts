@@ -55,3 +55,9 @@ export function clusterSignals(signals: SourceSignal[]) {
   }
   return [...clusters.values()];
 }
+
+export function earliestAttributedSignal(signals: SourceSignal[]) {
+  return [...signals]
+    .filter((signal) => signal.countryCode)
+    .sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime())[0];
+}
