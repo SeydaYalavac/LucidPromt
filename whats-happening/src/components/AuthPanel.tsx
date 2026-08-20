@@ -64,11 +64,11 @@ function ProviderMark({ provider }: { provider: SocialProvider }) {
 const modeCopy: Record<AuthMode, { title: string; description: string }> = {
   signin: {
     title: "Welcome back",
-    description: "Sign in to join technical conversations as signals break.",
+    description: "Account access will resume after the production data connection is configured.",
   },
   signup: {
     title: "Create your account",
-    description: "Save your identity across every live developer room.",
+    description: "Account creation is not available on this deployment yet.",
   },
   forgot: {
     title: "Reset your password",
@@ -207,7 +207,7 @@ export function AuthPanel({
       const { error: authError } = await supabase.auth.updateUser({ password });
       if (authError) throw authError;
       captureProductEvent("auth_completed", { mode, provider: "email", success: true });
-      setNotice("Your password is updated. You can continue to the live feed.");
+      setNotice("Your password is updated. You can continue to the public feed.");
     } catch (authError) {
       setError(authError instanceof Error ? authError.message : "Authentication failed. Try again.");
       captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "provider_error" });
@@ -455,30 +455,17 @@ export function AuthContext() {
   return (
     <div className="max-w-[480px]">
       <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.19em] text-[#67e8f9]">
-        <Radio size={14} aria-hidden="true" /> Live developer identity
+        <Radio size={14} aria-hidden="true" /> Account access
       </p>
       <h2 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-white lg:text-6xl">
-        One account for every breaking signal.
+        Identity for source-linked discussion.
       </h2>
       <p className="mt-6 max-w-[46ch] text-pretty text-base leading-7 text-[#92929b]">
-        Join the technical room behind each trend, keep your display name, and continue the
-        conversation as attention moves.
+        Account identity and trend discussion are designed, but unavailable until the production
+        data and authentication services are connected.
       </p>
-      <div className="mt-10 grid grid-cols-3 gap-3" aria-hidden="true">
-        {[82, 91, 76].map((score, index) => (
-          <div
-            key={score}
-            className={`rounded-2xl border border-white/10 bg-white/[0.035] p-4 ${index === 1 ? "translate-y-4" : ""}`}
-          >
-            <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/35">
-              Signal 0{index + 1}
-            </div>
-            <div className="mt-5 font-mono text-2xl font-semibold tabular-nums text-white">{score}</div>
-            <div className="mt-3 h-1 overflow-hidden rounded-full bg-white/5">
-              <div className="h-full rounded-full bg-[#06b6d4]" style={{ width: `${score}%` }} />
-            </div>
-          </div>
-        ))}
+      <div className="mt-10 rounded-2xl border border-amber-300/15 bg-amber-300/[0.045] p-5 text-sm leading-6 text-amber-100/75">
+        Production status: account access unavailable. No credentials entered on this page are submitted.
       </div>
     </div>
   );

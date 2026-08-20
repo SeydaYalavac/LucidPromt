@@ -44,7 +44,7 @@ export function GlobalPulse() {
                   {trends[0].category}
                 </span>
                 <span className="text-[#06b6d4] font-bold text-lg flex items-center gap-1">
-                  <TrendingUp size={20} /> +{Math.round(trends[0].growth_percent || trends[0].velocity_score)}%
+                  <TrendingUp size={20} /> {trends[0].growth_percent == null ? `Velocity ${trends[0].velocity_score}` : `${trends[0].growth_percent >= 0 ? "+" : ""}${Math.round(trends[0].growth_percent)}%`}
                 </span>
               </div>
             </div>
@@ -54,7 +54,7 @@ export function GlobalPulse() {
               </h3>
               <div className="mt-6 flex items-center justify-between text-[#8B8B93]">
                 <div className="flex items-center gap-4 text-sm font-medium">
-                  <span>{trends[0].country?.name || "Worldwide"}</span>
+                  <span>{trends[0].country?.name || "Country not attributed"}</span>
                   <span className="h-1 w-1 rounded-full bg-white/20"></span>
                   <span>Updated {observedAt(trends[0].last_seen_at)}</span>
                 </div>
@@ -71,7 +71,7 @@ export function GlobalPulse() {
               <div className="relative z-10 flex justify-between items-start">
                 <span className="text-3xl font-black text-white/40 group-hover:text-white/60 transition-colors">0{index + 2}</span>
                 <span className="text-[#a78bfa] font-bold flex items-center gap-1">
-                  <TrendingUp size={16} /> +{Math.round(trend.growth_percent || trend.velocity_score)}%
+                  <TrendingUp size={16} /> {trend.growth_percent == null ? `Velocity ${trend.velocity_score}` : `${trend.growth_percent >= 0 ? "+" : ""}${Math.round(trend.growth_percent)}%`}
                 </span>
               </div>
               <div className="relative z-10 mt-4">

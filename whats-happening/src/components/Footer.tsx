@@ -20,6 +20,7 @@ export function Footer() {
             { label: "Map", href: "/map" },
             { label: "How it works", href: "/how-it-works" },
             { label: "Pricing", href: "/pricing" },
+            { label: "Support", href: "mailto:whatshappeninginai@mail.tin.computer" },
           ].map((link) => (
             <Link key={link.label} href={link.href} className="hover:text-white transition-colors">
               {link.label}

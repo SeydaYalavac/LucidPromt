@@ -16,6 +16,16 @@ const sourceFiles = [
   "src/components/TrendingView.tsx",
   "src/components/ExploreView.tsx",
   "src/components/Footer.tsx",
+  "src/components/AuthPanel.tsx",
+  "src/components/AuthScreen.tsx",
+  "src/components/SearchOverlay.tsx",
+  "src/components/TrendDetail.tsx",
+  "src/components/TrendCollection.tsx",
+  "src/components/TrendStates.tsx",
+  "src/app/signup/page.tsx",
+  "src/app/signin/page.tsx",
+  "src/app/auth/page.tsx",
+  "src/app/country/[slug]/page.tsx",
 ];
 
 const publicCopy = sourceFiles
@@ -41,6 +51,14 @@ describe("public capability claims", () => {
       "Return to the live pulse",
       "How is an origin assigned?",
       "What is a predicted breakout topic?",
+      "Search the live signal map",
+      "Where it started?",
+      "One account for every breaking signal.",
+      "Live developer identity",
+      "Get started free",
+      '|| "Worldwide"',
+      "Right Now",
+      "Secure sessions powered by Supabase",
     ]) {
       expect(publicCopy).not.toContain(unsupportedClaim);
     }
@@ -51,6 +69,8 @@ describe("public capability claims", () => {
     expect(publicCopy).toContain("earliest available country-tagged evidence");
     expect(publicCopy).toContain("This is ranking logic, not a forecast of future popularity.");
     expect(publicCopy).toContain("Still $0.");
+    expect(publicCopy).toContain("Account access unavailable");
+    expect(publicCopy).toContain("mailto:whatshappeninginai@mail.tin.computer");
 
     const faqCopy = homepageFaqs.map(({ question, answer }) => `${question} ${answer}`).join(" ");
     expect(faqCopy).toContain("earliest country-tagged evidence");
