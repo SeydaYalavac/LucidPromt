@@ -69,9 +69,9 @@ export function HeroSection() {
               <AnimatePresence mode="wait">
                 <motion.span
                   key={placeholderIndex}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
+                  initial={{ y: 10 }}
+                  animate={{ y: 0 }}
+                  exit={{ y: -10 }}
                   transition={{ duration: 0.4 }}
                   className="text-xl text-[#8B8B93]"
                 >
