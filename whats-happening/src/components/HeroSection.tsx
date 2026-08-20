@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useSignals, useTrends } from "@/hooks/useTrendData";
 
 const placeholders = [
@@ -14,7 +15,9 @@ const placeholders = [
 ];
 
 export function HeroSection() {
+  const router = useRouter();
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const [query, setQuery] = useState("");
   const { data: trendData } = useTrends({ limit: 50 });
   const { data: signalData } = useSignals(100);
 
@@ -49,12 +52,15 @@ export function HeroSection() {
         transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         className="mt-12 w-full max-w-2xl"
       >
-        <div className="group relative flex h-20 w-full items-center overflow-hidden rounded-full border border-white/10 bg-white/[0.03] px-8 shadow-2xl backdrop-blur-xl transition-all hover:bg-white/[0.05] focus-within:border-white/30 focus-within:bg-white/[0.06] focus-within:ring-4 focus-within:ring-white/5">
+        <form onSubmit={(event) => { event.preventDefault(); router.push(query.trim() ? `/trending?q=${encodeURIComponent(query.trim())}` : "/trending"); }} className="group relative flex h-20 w-full items-center overflow-hidden rounded-full border border-white/10 bg-white/[0.03] px-8 shadow-2xl backdrop-blur-xl transition-all hover:bg-white/[0.05] focus-within:border-white/30 focus-within:bg-white/[0.06] focus-within:ring-4 focus-within:ring-white/5">
           <Search className="text-[#8B8B93] transition-colors group-focus-within:text-white" size={28} />
           
           <div className="relative flex-1 h-full ml-6">
             <input
               type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              aria-label="Search trends"
               className="peer absolute inset-0 h-full w-full bg-transparent text-xl text-white placeholder-transparent focus:outline-none"
               placeholder="Search..."
             />
@@ -76,10 +82,9 @@ export function HeroSection() {
           </div>
 
           <div className="hidden sm:flex items-center gap-1 rounded-md border border-white/10 bg-white/5 px-2.5 py-1.5 text-xs text-[#8B8B93]">
-            <kbd className="font-sans font-medium">⌘</kbd>
-            <kbd className="font-sans font-medium">K</kbd>
+            <span className="font-sans font-medium">Enter</span>
           </div>
-        </div>
+        </form>
       </motion.div>
 
       <motion.div
@@ -103,7 +108,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <button className="group mt-12 flex flex-col items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-[#8B8B93] transition-colors hover:text-white">
+        <button type="button" onClick={() => document.getElementById("trending")?.scrollIntoView({ behavior: "smooth" })} className="group mt-12 flex min-h-11 flex-col items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-[#8B8B93] transition-colors hover:text-white">
           <span>Explore</span>
           <ChevronDown size={16} className="animate-bounce" />
         </button>

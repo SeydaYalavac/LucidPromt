@@ -54,6 +54,11 @@ Supabase değerleri yoksa giriş ekranı formu kapatır ve kurulumun sürdüğü
 
 ## Dosya haritası
 
+- `src/app/world`, `trending`, `explore`, `map`: canlı API verisini kullanan keşif sayfaları; veri yoksa bunu açıkça gösterir.
+- `src/app/signin`, `signup`: paylaşılan split-screen kimlik doğrulama düzenini kullanan doğrudan giriş ve kayıt adresleri.
+- `src/components/GlobalNavbar.tsx`: responsive navigasyon, mobil drawer, aktif sayfa göstergesi ve klavye destekli arama katmanı.
+- `src/components/NewsCard.tsx`: yerel kaydetme, sistem paylaşımı/panoya kopyalama ve trend detayına geçiş davranışları.
+- `src/components/SignalMap.tsx`: Natural Earth geometrisi, ülke koordinatları ve gerçek trend verisi için pan/zoom destekli harita.
 - `supabase/migrations/20260820_realtime_trends.sql`: `trends`, `signals`, `countries`, `chat_messages`, `ingestion_runs`, RLS ve Realtime.
 - `workers/sources.ts`: resmi HN, GitHub, Google Trends RSS ve isteğe bağlı Reddit/X/Tavily/Exa adaptörleri.
 - `workers/trend-ingest.ts`: paralel kaynak okuma, normalize etme, kümeleme, skorlama, upsert ve Why Layer tetikleme.
@@ -93,6 +98,8 @@ Worker yeni trend eklediğinde `claim_why_generation(trend_id)` RPC'sini çağı
 | Reddit | Resmi OAuth API, opsiyonel | başlık, en fazla 500 karakter excerpt, permalink, metrikler |
 | X | Resmi recent-search API, opsiyonel | en fazla 280 karakter post, resmi post linki, public metrics |
 | Tavily/Exa | Sağlayıcı API'si, opsiyonel | başlık, link, en fazla 500 karakter sağlayıcı snippet'i |
+
+Harita kıyı ve ülke geometrisi, public-domain Natural Earth verisini paketleyen `world-atlas` üzerinden gelir. Ürün içindeki trend noktaları yalnızca kendi API'sinin ülke koordinatlarını kullanır; örnek veya uydurma canlı sinyal eklenmez.
 
 HTML scraping yoktur. Haber metni, tam Reddit yorumları veya tam makale gövdesi kopyalanmaz. Kaynak URL her sinyalle tutulur; excerpt sınırlandırılır. GitHub'ın resmi “Trending API”si olmadığı için adaptör, son 7 günde oluşturulan ve en çok star alan public repository'leri resmi Search API üzerinden kullanır; bunu “GitHub Trending” diye yanlış etiketlemez.
 

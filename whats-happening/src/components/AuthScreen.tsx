@@ -1,0 +1,9 @@
+import Link from "next/link";
+import { AuthContext, AuthPanel, type AuthMode } from "./AuthPanel";
+
+export function AuthScreen({ mode, next, initialError }: { mode: AuthMode; next: string; initialError?: string }) {
+  return <main className="relative min-h-screen overflow-hidden bg-[#050505] px-5 py-6 sm:px-8 lg:px-12">
+    <div className="pointer-events-none absolute inset-0" aria-hidden="true"><div className="absolute inset-y-0 left-0 w-full bg-[radial-gradient(circle_at_22%_48%,rgba(6,182,212,0.12),transparent_32%)] lg:w-1/2" /><div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.035)_1px,transparent_1px)] [background-size:48px_48px]" /></div>
+    <div className="relative mx-auto flex min-h-[calc(100vh-3rem)] max-w-7xl flex-col"><header className="flex items-center justify-between"><Link href="/" className="text-xs font-semibold uppercase tracking-[0.2em] text-white sm:text-sm">What&apos;s Happening</Link><Link href="/world" className="text-xs font-medium uppercase tracking-[0.14em] text-[#92929B] hover:text-white">Back to live feed</Link></header><div className="grid flex-1 items-center gap-14 py-14 lg:grid-cols-[1fr_470px] lg:py-10"><div className="hidden lg:block"><AuthContext /></div><AuthPanel mode={mode} next={next} initialError={initialError} /></div><footer className="flex flex-wrap items-center justify-between gap-2 border-t border-white/[0.06] pt-5 text-xs text-white/35"><span>Secure sessions powered by Supabase</span><span>GitHub · Email · Recovery</span></footer></div>
+  </main>;
+}

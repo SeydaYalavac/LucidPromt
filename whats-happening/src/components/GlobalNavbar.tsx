@@ -1,131 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ChevronDown, LogOut, Search, User } from "lucide-react";
-import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { usePathname } from "next/navigation";
+import { ChevronDown, LogOut, Menu, Search, User, X } from "lucide-react";
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { isRouteActive, primaryNavigation } from "@/lib/discovery";
 import { useAuthSession } from "@/hooks/useAuthSession";
+import { SearchOverlay } from "./SearchOverlay";
 
-type GlobalNavbarProps = {
-  showPrimaryAuthAction?: boolean;
-};
-
-const navigationItems = [
-  { label: "World", href: "/#world" },
-  { label: "Trending", href: "/#trending" },
-  { label: "Explore", href: "/#explore" },
-  { label: "How it works", href: "/how-it-works" },
-  { label: "Pricing", href: "/pricing" },
-];
+type GlobalNavbarProps = { showPrimaryAuthAction?: boolean };
 
 export function GlobalNavbar({ showPrimaryAuthAction = true }: GlobalNavbarProps) {
+  const pathname = usePathname();
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const { supabase, session, isLoading } = useAuthSession();
 
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    setIsScrolled(latest > 50);
-  });
+  useMotionValueEvent(scrollY, "change", (latest) => setIsScrolled(latest > 32));
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   async function signOut() {
     if (!supabase) return;
     await supabase.auth.signOut();
-    setMenuOpen(false);
+    setAccountOpen(false);
   }
 
-  const displayName =
-    session?.user.user_metadata?.display_name ||
-    session?.user.user_metadata?.name ||
-    session?.user.email?.split("@")[0] ||
-    "Developer";
+  const displayName = session?.user.user_metadata?.display_name || session?.user.user_metadata?.name || session?.user.email?.split("@")[0] || "Developer";
 
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 transition-all duration-500",
-        isScrolled
-          ? "bg-[#050505]/80 backdrop-blur-md border-b border-white/5"
-          : "bg-transparent"
-      )}
-    >
-      <div className="flex items-center gap-12">
-        <Link href="/" className="text-sm font-semibold tracking-[0.2em] text-white uppercase">
-          What&apos;s Happening
-        </Link>
-        <nav className="hidden md:flex items-center gap-8">
-          {navigationItems.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              className="text-xs uppercase tracking-widest text-[#8B8B93] transition-colors hover:text-white"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-
-      <div className="flex items-center gap-3 sm:gap-5">
-        <button className="flex items-center gap-2 text-[#8B8B93] transition-colors hover:text-white group">
-          <Search size={16} className="group-hover:scale-110 transition-transform" />
-          <span className="text-xs font-medium uppercase tracking-wider hidden sm:block">Search</span>
-        </button>
-        {!isLoading && !session && (
-          <>
-            <Link
-              href="/auth?mode=signin"
-              className="hidden text-xs uppercase tracking-widest text-[#a1a1aa] transition-colors hover:text-white sm:block"
-            >
-              Sign in
-            </Link>
-            {showPrimaryAuthAction && (
-              <Link
-                href="/auth?mode=signup"
-                className="flex h-9 items-center rounded-full bg-white px-4 text-xs font-bold uppercase tracking-[0.12em] text-black transition-colors hover:bg-[#e8e8ea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-              >
-                Sign up
-              </Link>
-            )}
-          </>
-        )}
-        {!isLoading && session && (
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setMenuOpen((open) => !open)}
-              aria-expanded={menuOpen}
-              aria-label="Open account menu"
-              className="flex h-10 items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] pl-2 pr-3 text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#06b6d4]/15 text-[#67e8f9]">
-                <User size={13} aria-hidden="true" />
-              </span>
-              <span className="hidden max-w-28 truncate text-xs font-medium sm:block">{displayName}</span>
-              <ChevronDown size={13} className="text-white/45" aria-hidden="true" />
-            </button>
-            {menuOpen && (
-              <div className="absolute right-0 top-12 w-64 overflow-hidden rounded-2xl border border-white/10 bg-[#111114] p-2 shadow-2xl shadow-black/50">
-                <div className="border-b border-white/[0.06] px-3 py-3">
-                  <p className="truncate text-sm font-medium text-white">{displayName}</p>
-                  <p className="mt-1 truncate text-xs text-[#8B8B93]">{session.user.email}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={signOut}
-                  className="mt-2 flex h-10 w-full items-center gap-2 rounded-xl px-3 text-sm text-[#b4b4bb] transition-colors hover:bg-white/[0.06] hover:text-white"
-                >
-                  <LogOut size={15} aria-hidden="true" /> Sign out
-                </button>
-              </div>
-            )}
+    <>
+      <motion.header initial={{ y: -80 }} animate={{ y: 0 }} transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }} className={cn("fixed inset-x-0 top-0 z-50 border-b px-4 py-3 transition-colors sm:px-6", isScrolled || mobileOpen ? "border-white/[0.07] bg-[#050505]/94 backdrop-blur-xl" : "border-transparent bg-[#050505]/35 backdrop-blur-sm")}>
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-5">
+          <div className="flex items-center gap-8 xl:gap-12">
+            <Link href="/" className="relative z-10 text-xs font-semibold uppercase tracking-[0.2em] text-white sm:text-sm">What&apos;s Happening</Link>
+            <nav className="hidden items-center gap-6 lg:flex xl:gap-8" aria-label="Primary navigation">
+              {primaryNavigation.map((item) => {
+                const active = isRouteActive(pathname, item.href);
+                return <Link key={item.href} href={item.href} aria-current={active ? "page" : undefined} className={cn("relative py-3 text-[11px] font-medium uppercase tracking-[0.16em] transition-colors hover:text-white", active ? "text-white" : "text-[#92929B]")}><span>{item.label}</span><span className={cn("absolute inset-x-0 -bottom-0.5 h-px origin-left bg-[#67E8F9] transition-transform", active ? "scale-x-100" : "scale-x-0")} /></Link>;
+              })}
+              <Link href="/how-it-works" className={cn("relative py-3 text-[11px] font-medium uppercase tracking-[0.16em] transition-colors hover:text-white", isRouteActive(pathname, "/how-it-works") ? "text-white" : "text-[#92929B]")}>How it works</Link>
+            </nav>
           </div>
-        )}
-      </div>
-    </motion.header>
+
+          <div className="flex items-center gap-2 sm:gap-4">
+            <button type="button" onClick={() => setSearchOpen(true)} className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-full text-[#A1A1AA] hover:bg-white/[0.05] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" aria-label="Open search"><Search size={17} /><span className="hidden text-[11px] uppercase tracking-widest xl:inline">Search</span></button>
+            {!isLoading && !session && <>
+              <Link href="/signin" className="hidden text-[11px] uppercase tracking-widest text-[#A1A1AA] hover:text-white sm:block">Sign in</Link>
+              {showPrimaryAuthAction && <Link href="/signup" className="hidden min-h-11 items-center rounded-full bg-white px-5 text-[11px] font-bold uppercase tracking-[0.12em] text-black hover:bg-[#E8E8EA] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:flex">Sign up</Link>}
+            </>}
+            {!isLoading && session && <div className="relative hidden sm:block"><button type="button" onClick={() => setAccountOpen((value) => !value)} aria-expanded={accountOpen} aria-label="Open account menu" className="flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-3 text-white"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#06B6D4]/15 text-[#67E8F9]"><User size={13} /></span><span className="max-w-24 truncate text-xs">{displayName}</span><ChevronDown size={13} className="text-white/45" /></button>{accountOpen && <div className="absolute right-0 top-13 w-64 rounded-2xl border border-white/10 bg-[#111114] p-2 shadow-2xl"><p className="truncate border-b border-white/[0.06] px-3 py-3 text-xs text-[#A1A1AA]">{session.user.email}</p><button type="button" onClick={signOut} className="mt-2 flex min-h-11 w-full items-center gap-2 rounded-xl px-3 text-sm text-[#C4C4CA] hover:bg-white/[0.06] hover:text-white"><LogOut size={15} /> Sign out</button></div>}</div>}
+            <button type="button" onClick={() => setMobileOpen((value) => !value)} className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/10 text-white lg:hidden" aria-label={mobileOpen ? "Close navigation" : "Open navigation"} aria-expanded={mobileOpen}>{mobileOpen ? <X size={19} /> : <Menu size={19} />}</button>
+          </div>
+        </div>
+      </motion.header>
+
+      {mobileOpen && <div className="fixed inset-0 z-40 flex flex-col bg-[#050505] px-5 pb-8 pt-24 lg:hidden" role="dialog" aria-modal="true" aria-label="Mobile navigation"><nav className="flex flex-1 flex-col justify-center" aria-label="Mobile navigation links">{[...primaryNavigation, { label: "How it works", href: "/how-it-works" }].map((item, index) => <Link key={item.href} href={item.href} className="group flex items-center justify-between border-b border-white/[0.07] py-5 text-3xl font-medium tracking-[-0.04em] text-white"><span>{item.label}</span><span className="font-mono text-xs text-white/30">0{index + 1}</span></Link>)}</nav><div className="grid grid-cols-2 gap-3 pt-8"><Link href="/signin" className="flex min-h-12 items-center justify-center rounded-full border border-white/10 text-sm text-white">Sign in</Link><Link href="/signup" className="flex min-h-12 items-center justify-center rounded-full bg-white text-sm font-semibold text-black">Sign up</Link></div></div>}
+      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+    </>
   );
 }
