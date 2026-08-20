@@ -38,7 +38,7 @@ export function GlobalPulse() {
           <Link href={`/trend/${trends[0].slug}`} className="md:col-span-8 row-span-2 group relative overflow-hidden rounded-3xl bg-[#111114] border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between p-8">
             <div className="absolute inset-0 bg-gradient-to-br from-[#06b6d4]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
             <div className="relative z-10 flex justify-between items-start">
-              <span className="text-6xl font-black text-white/5 group-hover:text-white/10 transition-colors">01</span>
+              <span className="text-6xl font-black text-white/40 group-hover:text-white/60 transition-colors">01</span>
               <div className="flex flex-col items-end gap-2">
                 <span className="rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white">
                   {trends[0].category}
@@ -69,8 +69,8 @@ export function GlobalPulse() {
             <Link key={trend.id} href={`/trend/${trend.slug}`} className="md:col-span-4 row-span-1 group relative overflow-hidden rounded-3xl bg-[#111114] border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between p-6">
               <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
               <div className="relative z-10 flex justify-between items-start">
-                <span className="text-3xl font-black text-white/5 group-hover:text-white/10 transition-colors">0{index + 2}</span>
-                <span className="text-[#8b5cf6] font-bold flex items-center gap-1">
+                <span className="text-3xl font-black text-white/40 group-hover:text-white/60 transition-colors">0{index + 2}</span>
+                <span className="text-[#a78bfa] font-bold flex items-center gap-1">
                   <TrendingUp size={16} /> +{Math.round(trend.growth_percent || trend.velocity_score)}%
                 </span>
               </div>
