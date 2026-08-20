@@ -1,0 +1,40 @@
+export const metadata = {
+  title: "Feasibility Guard nasıl tasarlanır?",
+  description:
+    "Tarayıcıda çalışan regex ve heuristic tabakası ile riskli istemleri AI çağrısından önce durdurma yaklaşımı.",
+  publishedAt: "2026-08-19",
+  readingTime: "7 dk",
+  tags: ["safety", "frontend", "guardrails"],
+};
+
+# Feasibility Guard nasıl tasarlanır?
+
+Bir guard katmanı yalnızca engellemek için değil, kullanıcıyı **daha uygulanabilir bir isteğe yönlendirmek** için vardır.
+
+## Kırmızı bayrak örnekleri
+
+- Geleceği kesin tahmin et
+- Bağlayıcı hukuki karar ver
+- Gizli veri veya parola çıkar
+
+## Sarı bayrak örnekleri
+
+- Ağır deterministik matematik
+- Henüz gerçekleşmemiş olayların sonucu
+- Yetersiz bağlamla kesin yargı beklentisi
+
+## Neden istemci tarafında?
+
+Çünkü bu yaklaşım:
+
+1. Sunucu maliyetini düşürür.
+2. Gereksiz API çağrılarını keser.
+3. Kullanıcıya anlık geri bildirim verir.
+
+## İyi bir yönlendirme cümlesi
+
+```txt
+Tahmin yerine olası senaryoları, etkileyen değişkenleri ve izlenmesi gereken sinyalleri analiz et.
+```
+
+Guard başarısı, sadece kaç isteği durdurduğuyla değil, kaç kullanıcıyı güvenli bir prompta taşıdığıyla ölçülmelidir.

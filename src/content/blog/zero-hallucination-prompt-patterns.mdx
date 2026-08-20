@@ -1,0 +1,40 @@
+export const metadata = {
+  title: "Halüsinasyonu azaltan prompt kalıpları",
+  description:
+    "Kaynak zorunluluğu, belirsizlik beyanı ve çıktı sözleşmesi ile daha güvenilir AI cevapları üretme rehberi.",
+  publishedAt: "2026-08-20",
+  readingTime: "6 dk",
+  tags: ["prompting", "hallucination", "gemini"],
+};
+
+# Halüsinasyonu azaltan prompt kalıpları
+
+Bir modeli daha güvenilir hale getirmek çoğu zaman daha büyük bir model seçmekten değil, **daha sıkı bir görev sözleşmesi** yazmaktan geçer.
+
+## Üç ana katman
+
+1. Rol: Modelin hangi bakış açısından cevap vereceğini tanımla.
+2. Sınır: Hangi kaynak dışına çıkamayacağını açık yaz.
+3. Çıktı: Belirsizlik varsa nasıl itiraf edeceğini belirt.
+
+## Güçlü bir örnek
+
+```txt
+Rol: Kaynak odaklı teknik özet asistanı.
+Görev: Yalnızca verilen doküman parçalarına dayanarak cevap ver.
+Kurallar:
+- Kaynakta olmayan hiçbir bilgiyi ekleme.
+- Emin değilsen "kaynakta belirtilmemiş" de.
+- Çıktıyı 3 başlık ve en fazla 5 madde ile ver.
+```
+
+> Kısa ama bağlayıcı promptlar, çoğu zaman uzun ve gevşek promptlardan daha iyi çalışır.
+
+## Neyi özellikle istemelisin?
+
+- Kaynak referansı
+- Belirsizlik bildirimi
+- Çıktı formatı
+- Negatif kurallar
+
+Bu platformdaki optimizer modülü, tam da bu sinyalleri skora dönüştürmek için tasarlanıyor.

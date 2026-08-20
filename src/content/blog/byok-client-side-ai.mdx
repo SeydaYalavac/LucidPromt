@@ -1,0 +1,34 @@
+export const metadata = {
+  title: "BYOK ile sıfır maliyetli AI deneyimi",
+  description:
+    "Kullanıcının kendi Gemini veya Groq anahtarını tarayıcı tabanlı akışa getirerek ücretsiz ölçeklenme yaklaşımı.",
+  publishedAt: "2026-08-18",
+  readingTime: "5 dk",
+  tags: ["byok", "architecture", "cost"],
+};
+
+# BYOK ile sıfır maliyetli AI deneyimi
+
+Sıfır sunucu maliyeti hedefleyen ürünlerde en kritik mimari karar, **varsayılan ücretsiz akış ile kullanıcının kendi anahtarını getirebildiği akışı birlikte düşünmektir**.
+
+## BYOK neden güçlü?
+
+- Kurucu için maliyet üretmez.
+- Güç kullanıcıları limitsiz kullanıma taşır.
+- Ürün ücretsiz kalırken derin analiz mümkün olur.
+
+## Dikkat edilmesi gerekenler
+
+1. Anahtarlar istemci tarafında güvenli biçimde saklanmalı.
+2. Kullanıcıya anahtarın nerede kullanıldığı açık anlatılmalı.
+3. Proxy ve BYOK akışları UI içinde net ayrılmalı.
+
+## İyi ürün davranışı
+
+Kota dolduğunda kullanıcıyı durdurmak yerine:
+
+- nedenini açıkla,
+- kendi anahtarını ekleme yolunu göster,
+- mevcut işi kaybetmeden devam etmesini sağla.
+
+Bu yaklaşım, özellikle öğrenci ve bağımsız geliştirici odaklı ürünlerde güven oluşturur.
