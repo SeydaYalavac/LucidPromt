@@ -13,7 +13,7 @@ optional APIs ──┘                                           └─> Realti
 ## Hızlı kurulum
 
 1. Supabase projesi oluşturun ve `supabase/migrations/20260820_realtime_trends.sql` dosyasını SQL Editor'da çalıştırın.
-2. Aşağıdaki Authentication ayarlarını tamamlayın. Email/password, doğrulama, şifre kurtarma ve GitHub OAuth aynı Supabase Auth projesini kullanır.
+2. Aşağıdaki Authentication ayarlarını tamamlayın. Email/password, doğrulama, şifre kurtarma ve Google/GitHub/Apple OAuth aynı Supabase Auth projesini kullanır.
 3. `.env.example` dosyasını `.env.local` olarak kopyalayın ve public/secret anahtarları doldurun.
 4. `npm run ingest` ile ilk veriyi çekin; ardından `npm run dev` ile uygulamayı açın.
 5. GitHub Actions için aynı Supabase/OpenAI değerlerini repository secrets olarak, kaynak seçimlerini repository variables olarak ekleyin.
@@ -38,7 +38,11 @@ Supabase Dashboard > Authentication > URL Configuration altında:
 
 Authentication > Providers altında Email provider'ını açın. Production'da **Confirm email** açık kalmalıdır. Uygulama kayıt sonrası doğrulama mesajını gösterir; doğrulama linki `/auth/callback` üzerinden güvenli oturum cookie'si üretir.
 
-GitHub provider için GitHub'da bir OAuth App oluşturun. GitHub App callback alanına Supabase Dashboard'un provider ekranında verdiği `https://<project-ref>.supabase.co/auth/v1/callback` adresini yazın; Client ID ve Client Secret'ı yalnızca Supabase Dashboard'a ekleyin. Uygulamanın kendi `/auth/callback` adresini GitHub'a doğrudan yazmayın.
+Her sosyal provider için Supabase Dashboard > Authentication > Providers altında ilgili provider'ı etkinleştirin. Üçü de uygulamadaki aynı güvenli `/auth/callback` PKCE akışını kullanır; provider tarafındaki callback ise Supabase'in verdiği `https://<project-ref>.supabase.co/auth/v1/callback` adresidir.
+
+- Google için Google Auth Platform'da Web application OAuth client oluşturun. Site origin'ini ve Supabase callback adresini ekleyip Client ID ve Secret'ı Supabase'in Google provider ekranına girin.
+- GitHub için bir OAuth App oluşturun. Supabase callback adresini GitHub authorization callback olarak, Client ID ve Secret'ı yalnızca Supabase Dashboard'a girin.
+- Apple için Apple Developer hesabında Sign in with Apple açık bir App ID, web Services ID ve signing key oluşturun. Website URL'lerini Supabase domain/callback adresiyle eşleştirin ve Team ID, Services ID ile üretilen secret'ı Supabase Apple provider ekranına girin. Apple web OAuth secret'ı altı ayda bir yenilenmelidir.
 
 Şifre kurtarma linki aynı allowlist içindeki `/auth/callback` üzerinden `/auth?mode=update` sayfasına döner. `next` parametresi yalnızca aynı site içindeki `/` ile başlayan yolları kabul eder; harici alan adlarına yönlendirme yapılmaz.
 
@@ -67,7 +71,7 @@ Supabase değerleri yoksa giriş ekranı formu kapatır ve kurulumun sürdüğü
 - `src/app/api/trends/**`: Edge-cache başlıkları taşıyan trend/sinyal/country okuma route'ları.
 - `src/app/api/trends/[slug]/messages/route.ts`: bearer session doğrulama, server-side moderasyon ve kontrollü chat insert'i.
 - `src/components/TrendChat.tsx`: GitHub OAuth, Supabase Realtime ve canlı mesaj akışı.
-- `src/app/auth/page.tsx`: email/password giriş, kayıt, GitHub OAuth, email doğrulama mesajı ve şifre kurtarma akışı.
+- `src/app/auth/page.tsx`: email/password giriş, kayıt, Google/GitHub/Apple OAuth, email doğrulama mesajı ve şifre kurtarma akışı.
 - `src/app/auth/callback/route.ts`: OAuth/email PKCE kodunu server-side cookie oturumuna çeviren güvenli callback.
 
 ## Global Pulse ve performans
