@@ -13,9 +13,18 @@ export function Footer() {
           </a>
         </div>
         <div className="flex flex-wrap items-center gap-6 text-sm text-[#8B8B93]">
-          {["Explore", "Trending", "Countries", "Categories", "About", "Privacy", "Terms"].map((link) => (
-            <Link key={link} href={link === "Trending" ? "/#trending" : "/"} className="hover:text-white transition-colors">
-              {link}
+          {[
+            { label: "Explore", href: "/#explore" },
+            { label: "Trending", href: "/#trending" },
+            { label: "Countries", href: "/#world" },
+            { label: "Categories", href: "/#explore" },
+            { label: "Pricing", href: "/pricing" },
+            { label: "About", href: "/" },
+            { label: "Privacy", href: "/" },
+            { label: "Terms", href: "/" },
+          ].map((link) => (
+            <Link key={link.label} href={link.href} className="hover:text-white transition-colors">
+              {link.label}
             </Link>
           ))}
         </div>

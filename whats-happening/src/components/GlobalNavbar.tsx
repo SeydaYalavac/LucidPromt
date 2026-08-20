@@ -7,7 +7,19 @@ import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAuthSession } from "@/hooks/useAuthSession";
 
-export function GlobalNavbar() {
+type GlobalNavbarProps = {
+  showPrimaryAuthAction?: boolean;
+};
+
+const navigationItems = [
+  { label: "World", href: "/#world" },
+  { label: "Trending", href: "/#trending" },
+  { label: "Explore", href: "/#explore" },
+  { label: "Map", href: "/#map" },
+  { label: "Pricing", href: "/pricing" },
+];
+
+export function GlobalNavbar({ showPrimaryAuthAction = true }: GlobalNavbarProps) {
   const { scrollY } = useScroll();
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -46,13 +58,13 @@ export function GlobalNavbar() {
           What&apos;s Happening
         </Link>
         <nav className="hidden md:flex items-center gap-8">
-          {["World", "Trending", "Explore", "Map"].map((item) => (
+          {navigationItems.map((item) => (
             <Link
-              key={item}
-              href={`#${item.toLowerCase()}`}
+              key={item.label}
+              href={item.href}
               className="text-xs uppercase tracking-widest text-[#8B8B93] transition-colors hover:text-white"
             >
-              {item}
+              {item.label}
             </Link>
           ))}
         </nav>
@@ -71,12 +83,14 @@ export function GlobalNavbar() {
             >
               Sign in
             </Link>
-            <Link
-              href="/auth?mode=signup"
-              className="flex h-9 items-center rounded-full bg-white px-4 text-xs font-bold uppercase tracking-[0.12em] text-black transition-colors hover:bg-[#e8e8ea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-            >
-              Sign up
-            </Link>
+            {showPrimaryAuthAction && (
+              <Link
+                href="/auth?mode=signup"
+                className="flex h-9 items-center rounded-full bg-white px-4 text-xs font-bold uppercase tracking-[0.12em] text-black transition-colors hover:bg-[#e8e8ea] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              >
+                Sign up
+              </Link>
+            )}
           </>
         )}
         {!isLoading && session && (
