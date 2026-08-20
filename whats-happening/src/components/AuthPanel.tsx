@@ -409,6 +409,19 @@ export function AuthPanel({
           {mode === "update" && "Update password"}
           {!busy && <ArrowRight size={16} aria-hidden="true" />}
         </button>
+        {mode === "signup" && (
+          <p className="px-2 text-center text-xs leading-5 text-white/40">
+            By creating an account, you agree to the{" "}
+            <Link href="/terms" className="text-white/65 underline decoration-white/20 underline-offset-4 hover:text-white">
+              Terms
+            </Link>{" "}
+            and acknowledge the{" "}
+            <Link href="/privacy" className="text-white/65 underline decoration-white/20 underline-offset-4 hover:text-white">
+              Privacy notice
+            </Link>
+            .
+          </p>
+        )}
       </form>
 
       <div aria-live="polite" className="mt-4">
