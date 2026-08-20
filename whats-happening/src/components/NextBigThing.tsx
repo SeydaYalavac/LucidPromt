@@ -37,7 +37,7 @@ export function NextBigThing() {
                 <div className="mt-8">
                   <h3 className="text-2xl font-bold text-white">{item.title}</h3>
                   <div className="mt-4 flex items-center gap-4 text-sm font-medium">
-                    <span className="flex items-center gap-1 text-[#8b5cf6]">
+                    <span className="flex items-center gap-1 text-[#a78bfa]">
                       <ArrowUpRight size={16} /> +{item.growth}%
                     </span>
                     <span className="text-[#8B8B93]">{item.regions}</span>

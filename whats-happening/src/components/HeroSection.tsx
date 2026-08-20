@@ -64,7 +64,7 @@ export function HeroSection() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.4 }}
-                  className="text-xl text-[#8B8B93]/70"
+                  className="text-xl text-[#8B8B93]"
                 >
                   {placeholders[placeholderIndex]}
                 </motion.span>

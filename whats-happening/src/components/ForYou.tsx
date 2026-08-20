@@ -38,12 +38,12 @@ export function ForYou() {
         <div className="mt-16 grid gap-6 md:grid-cols-2">
           {selected.includes("Biology") && (
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="rounded-3xl border border-white/5 bg-[#111114] p-8">
-              <div className="flex items-center gap-2 text-[#8b5cf6] font-bold uppercase tracking-widest text-xs mb-4">
+              <div className="flex items-center gap-2 text-[#a78bfa] font-bold uppercase tracking-widest text-xs mb-4">
                 <Sparkles size={16} /> Biology
               </div>
               <h3 className="text-2xl font-bold text-white leading-tight">A genetics breakthrough is gaining attention.</h3>
               <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4">
-                <span className="flex items-center gap-2 text-[#8b5cf6] font-bold"><TrendingUp size={16} /> +126%</span>
+                <span className="flex items-center gap-2 text-[#a78bfa] font-bold"><TrendingUp size={16} /> +126%</span>
                 <span className="text-sm text-[#8B8B93]">Matches Biology + AI</span>
               </div>
             </motion.div>

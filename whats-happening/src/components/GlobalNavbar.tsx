@@ -51,7 +51,11 @@ export function GlobalNavbar() {
         <button className="text-xs uppercase tracking-widest text-[#8B8B93] transition-colors hover:text-white">
           Sign In
         </button>
-        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors">
+        <button
+          type="button"
+          aria-label="Open profile"
+          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+        >
           <User size={14} className="text-white" />
         </button>
       </div>
