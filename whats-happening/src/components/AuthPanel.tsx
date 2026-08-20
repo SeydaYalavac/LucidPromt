@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { emailSchema, passwordSchema, signinSchema, signupSchema } from "@/lib/auth-validation";
+import { captureProductEvent } from "@/lib/analytics";
 
 export type AuthMode = "signin" | "signup" | "forgot" | "update";
 type SocialProvider = Extract<Provider, "google" | "github" | "apple">;
@@ -134,9 +135,11 @@ export function AuthPanel({
     setActiveProvider(null);
     setError(null);
     setNotice(null);
+    captureProductEvent("auth_attempted", { mode, provider: "email" });
 
     if (!supabase) {
       setError("Authentication isn’t available until Supabase is connected.");
+      captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "not_configured" });
       return;
     }
     const validation = mode === "signup"
@@ -146,14 +149,23 @@ export function AuthPanel({
         : mode === "forgot"
           ? emailSchema.safeParse(email)
           : passwordSchema.safeParse(password);
-    if (!validation.success) { setError(validation.error.issues[0]?.message || "Check the form and try again."); return; }
-    if (mode === "update" && password !== confirmPassword) { setError("The passwords don’t match."); return; }
+    if (!validation.success) {
+      setError(validation.error.issues[0]?.message || "Check the form and try again.");
+      captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "validation" });
+      return;
+    }
+    if (mode === "update" && password !== confirmPassword) {
+      setError("The passwords don’t match.");
+      captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "password_mismatch" });
+      return;
+    }
 
     setBusy(true);
     try {
       if (mode === "signin") {
         const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
         if (authError) throw authError;
+        captureProductEvent("auth_completed", { mode, provider: "email", success: true });
         window.location.assign(next);
         return;
       }
@@ -169,6 +181,7 @@ export function AuthPanel({
           },
         });
         if (authError) throw authError;
+        captureProductEvent("auth_completed", { mode, provider: "email", success: true, requires_email_verification: !data.session });
         if (data.session) {
           window.location.assign(next);
           return;
@@ -181,19 +194,23 @@ export function AuthPanel({
         const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent("/auth?mode=update")}`;
         const { error: authError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
         if (authError) throw authError;
+        captureProductEvent("auth_completed", { mode, provider: "email", success: true });
         setNotice("If an account exists for that address, a recovery link is on its way.");
         return;
       }
 
       if (!session) {
         setError("This recovery session is missing or expired. Request a new password link.");
+        captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "missing_session" });
         return;
       }
       const { error: authError } = await supabase.auth.updateUser({ password });
       if (authError) throw authError;
+      captureProductEvent("auth_completed", { mode, provider: "email", success: true });
       setNotice("Your password is updated. You can continue to the live feed.");
     } catch (authError) {
       setError(authError instanceof Error ? authError.message : "Authentication failed. Try again.");
+      captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "provider_error" });
     } finally {
       setBusy(false);
     }
@@ -202,8 +219,10 @@ export function AuthPanel({
   async function signInWithProvider(provider: SocialProvider) {
     setError(null);
     setNotice(null);
+    captureProductEvent("auth_attempted", { mode, provider });
     if (!supabase) {
       setError("Authentication isn’t available until Supabase is connected.");
+      captureProductEvent("auth_completed", { mode, provider, success: false, failure_type: "not_configured" });
       return;
     }
     setBusy(true);
@@ -215,6 +234,7 @@ export function AuthPanel({
     });
     if (authError) {
       setError(authError.message);
+      captureProductEvent("auth_completed", { mode, provider, success: false, failure_type: "provider_error" });
       setBusy(false);
       setActiveProvider(null);
     }
@@ -408,7 +428,7 @@ export function AuthPanel({
         {mode === "signin" && (
           <p>
             New here?{" "}
-            <Link href={authHref("signup")} className="font-semibold text-white hover:text-[#67e8f9]">
+            <Link href={authHref("signup")} onClick={() => captureProductEvent("signup_cta_clicked", { source: "auth_panel" })} className="font-semibold text-white hover:text-[#67e8f9]">
               Create an account
             </Link>
           </p>

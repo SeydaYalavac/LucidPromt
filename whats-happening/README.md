@@ -78,6 +78,12 @@ Supabase değerleri yoksa giriş ekranı formu kapatır ve kurulumun sürdüğü
 
 `trends.is_global_pulse` PostgreSQL generated column'dur ve `score > 80` olduğunda otomatik `true` olur. Partial index, skora göre sıralı Global Pulse okumalarını hızlandırır. Next route'ları 15 saniyelik CDN cache ve 60 saniyelik stale-while-revalidate başlığı döndürür. SWR görünür ekranda 15–30 saniyede yeniler; chat cache beklemeden Realtime değişikliklerini alır.
 
+## Product analytics
+
+Tin-hosted PostHog, route view'dan ilk geliştirici sohbet mesajına kadar olan aktivasyon akışını ölçer. Uygulama `$pageview`, `signup_cta_clicked`, `auth_attempted`, `auth_completed`, `user_authenticated`, `developer_chat_message_sent` ve `developer_chat_message_failed` event'lerini gönderir. Form alanları, email adresleri, display name ve sohbet mesajı gövdesi analytics'e gönderilmez; yalnızca sabit route, CTA kaynağı, auth modu/provider'ı, sonuç durumu ve public trend slug'ı kullanılır.
+
+Autocapture, otomatik pageleave, exception capture ve session recording kapalıdır. Client varsayılan olarak yönetilen public ingestion ayarlarını kullanır; başka bir PostHog projesine geçişte `NEXT_PUBLIC_POSTHOG_KEY` ve `NEXT_PUBLIC_POSTHOG_HOST` ile bu public hedefler override edilebilir.
+
 ## Why Layer: yalnızca bir defa
 
 Worker yeni trend eklediğinde `claim_why_generation(trend_id)` RPC'sini çağırır. Atomik `pending -> processing` geçişini yalnızca bir process kazanır. Başarılı çıktı veritabanına yazılır; başarısız kayıt kendiliğinden tekrar denenmez. Operatör sebebi çözdükten sonra ilgili satırı bilinçli olarak `pending` durumuna alabilir.
