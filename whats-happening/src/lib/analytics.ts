@@ -26,11 +26,41 @@ let initialized = false;
 
 function withoutQueryOrHash(value: unknown) {
   if (typeof value !== "string") return value;
+  if (value.startsWith("$")) return value;
   try {
     const url = new URL(value, window.location.origin);
     return `${url.origin}${url.pathname}`;
   } catch {
     return value.split(/[?#]/, 1)[0];
+  }
+}
+
+function scrubAutomaticUrlProperties(properties: Record<string, unknown>) {
+  for (const key of [
+    "$current_url",
+    "$initial_current_url",
+    "$referrer",
+    "$initial_referrer",
+    "$session_entry_url",
+    "$session_entry_referrer",
+  ]) {
+    properties[key] = withoutQueryOrHash(properties[key]);
+  }
+
+  const initialPersonInfo = properties.$initial_person_info;
+  if (initialPersonInfo && typeof initialPersonInfo === "object") {
+    const values = initialPersonInfo as Record<string, unknown>;
+    values.r = withoutQueryOrHash(values.r);
+    values.u = withoutQueryOrHash(values.u);
+  }
+
+  const clientSessionProps = properties.$client_session_props;
+  if (clientSessionProps && typeof clientSessionProps === "object") {
+    const values = clientSessionProps as { props?: Record<string, unknown> };
+    if (values.props) {
+      values.props.r = withoutQueryOrHash(values.props.r);
+      values.props.u = withoutQueryOrHash(values.props.u);
+    }
   }
 }
 
@@ -47,11 +77,7 @@ export function initProductAnalytics() {
     person_profiles: "identified_only",
     before_send: (event) => {
       if (!event?.properties) return event;
-      event.properties.$current_url = withoutQueryOrHash(event.properties.$current_url);
-      event.properties.$referrer = withoutQueryOrHash(event.properties.$referrer);
-      event.properties.$initial_referrer = withoutQueryOrHash(
-        event.properties.$initial_referrer,
-      );
+      scrubAutomaticUrlProperties(event.properties);
       return event;
     },
   });
