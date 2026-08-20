@@ -11,8 +11,8 @@ export function WorldView() {
   const trends = data?.trends || [];
   return <div className="mx-auto min-h-screen max-w-[1440px] px-5 pb-24 pt-32 sm:px-8 sm:pt-40">
     <header className="grid gap-8 border-b border-white/[0.08] pb-10 lg:grid-cols-[1fr_auto] lg:items-end">
-      <div><p className="font-mono text-xs uppercase tracking-[0.22em] text-[#67E8F9]">World desk / live attention</p><h1 className="mt-5 max-w-5xl text-balance text-[clamp(3.5rem,9vw,8rem)] font-medium leading-[0.85] tracking-[-0.075em] text-white">One world.<br />Many signals.</h1></div>
-      <div className="max-w-md lg:pb-2"><p className="text-pretty text-base leading-7 text-[#A1A1AA]">The largest current story leads. Every supporting card keeps its source trail and location context attached.</p><Link href="/map" className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-white hover:text-[#67E8F9]">Open the signal map <ArrowRight size={16} /></Link></div>
+      <div><p className="font-mono text-xs uppercase tracking-[0.22em] text-[#67E8F9]">World desk / scored evidence</p><h1 className="mt-5 max-w-5xl text-balance text-[clamp(3.5rem,9vw,8rem)] font-medium leading-[0.85] tracking-[-0.075em] text-white">One world.<br />Many signals.</h1></div>
+      <div className="max-w-md lg:pb-2"><p className="text-pretty text-base leading-7 text-[#A1A1AA]">The highest-scoring available story leads. Every supporting card keeps its source trail and country context attached.</p><Link href="/map" className="mt-5 inline-flex items-center gap-2 text-sm font-medium text-white hover:text-[#67E8F9]">Open the signal map <ArrowRight size={16} /></Link></div>
     </header>
     <section className="pt-12" aria-label="World trends">
       {isLoading && <TrendLoading />}

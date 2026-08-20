@@ -34,7 +34,7 @@ export function TrendingView({ initialQuery = "" }: { initialQuery?: string }) {
   }, [filtered.length]);
 
   return <div className="mx-auto min-h-screen max-w-[1440px] px-5 pb-28 pt-32 sm:px-8 sm:pt-40">
-    <header className="border-b border-white/[0.08] pb-10"><p className="font-mono text-xs uppercase tracking-[0.22em] text-[#67E8F9]">Signal queue</p><h1 className="mt-5 text-[clamp(3.5rem,9vw,8rem)] font-medium leading-[0.86] tracking-[-0.075em] text-white">Trending now.</h1></header>
+    <header className="border-b border-white/[0.08] pb-10"><p className="font-mono text-xs uppercase tracking-[0.22em] text-[#67E8F9]">Signal queue</p><h1 className="mt-5 text-[clamp(3.5rem,9vw,8rem)] font-medium leading-[0.86] tracking-[-0.075em] text-white">Ranked signals.</h1></header>
     <div className="mt-10 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
         <section aria-label="Trending signals">
         {isLoading && <div className="grid gap-4"><TrendLoading compact /><TrendLoading compact /><TrendLoading compact /></div>}

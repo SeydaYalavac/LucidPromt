@@ -13,14 +13,14 @@ import { Footer } from "@/components/Footer";
 import { GlobalNavbar } from "@/components/GlobalNavbar";
 
 export const metadata: Metadata = {
-  title: "How the live signal feed works | What's Happening",
+  title: "How the signal engine works | What's Happening",
   description:
     "See how What's Happening turns official source observations into scored trends, country context, and early breakout watch signals.",
   alternates: {
     canonical: "https://www.whatshappeninginai.com/how-it-works",
   },
   openGraph: {
-    title: "How the live signal feed works | What's Happening",
+    title: "How the signal engine works | What's Happening",
     description:
       "From source observation to scored trend: a plain-language guide to the What's Happening signal engine.",
     url: "https://www.whatshappeninginai.com/how-it-works",
@@ -37,7 +37,7 @@ const questions = [
   {
     question: "What did the old 24,832 signals number mean?",
     answer:
-      "The prototype displayed 24,832 as a fixed sample count. It was not a verified production total. The live product now shows only records returned by the connected data service and shows an unavailable state when that service is not configured.",
+      "The prototype displayed 24,832 as a fixed sample count. It was not a verified production total. The production interface shows only records returned by the connected data service and shows an unavailable state when that service is not configured.",
   },
   {
     question: "How is a country attached to a trend?",
@@ -45,7 +45,7 @@ const questions = [
       "Country context comes from the earliest signal in a cluster that carries usable geographic metadata. It describes where evidence first appeared in the system, not who invented a topic or what caused it.",
   },
   {
-    question: "What is a predicted breakout topic?",
+    question: "What is a breakout watch signal?",
     answer:
       "It is an early trend candidate with rising engagement, useful source reach, and strong novelty that has not crossed the Global Pulse score threshold. It is a watch signal, not a guarantee.",
   },
@@ -141,7 +141,7 @@ export default function HowItWorksPage() {
               href="/#trending"
               className="group mt-9 inline-flex min-h-12 items-center gap-3 rounded-full bg-white px-7 text-sm font-semibold text-black transition-[background-color,transform] duration-150 ease-out hover:bg-[#E8E8EA] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
             >
-              See the live pulse
+              Inspect the public feed
               <ArrowRight size={16} className="transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
           </div>
@@ -246,7 +246,7 @@ export default function HowItWorksPage() {
         <section className="bg-[#0B0B0D]">
           <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[0.82fr_1.18fr] lg:gap-24 lg:py-32">
             <div>
-              <QuestionLabel number="03">How is an origin assigned?</QuestionLabel>
+              <QuestionLabel number="03">How is country context assigned?</QuestionLabel>
               <p className="mt-7 max-w-[34rem] text-pretty text-base leading-7 text-[#A1A1AA]">
                 Country context comes from the earliest observation in a cluster that carries usable geographic metadata. Today, that usually means a feed-level country code such as the selected Google Trends market.
               </p>
@@ -314,7 +314,7 @@ export default function HowItWorksPage() {
               href="/#trending"
               className="group flex shrink-0 items-center gap-2 text-sm text-[#D4D4D8] underline decoration-white/20 underline-offset-4 transition-colors hover:text-white"
             >
-              Return to the live pulse
+              Return to the source-linked feed
               <ArrowRight size={15} className="transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden="true" />
             </Link>
           </div>

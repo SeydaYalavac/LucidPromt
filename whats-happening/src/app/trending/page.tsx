@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/PageShell";
 import { TrendingView } from "@/components/TrendingView";
 
-export const metadata: Metadata = { title: "Trending | What's Happening", description: "Filter and follow live technology trends as attention changes." };
+export const metadata: Metadata = { title: "Trending | What's Happening", description: "Filter scored technology signals and inspect their linked evidence." };
 
 export default async function TrendingPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const query = await searchParams;

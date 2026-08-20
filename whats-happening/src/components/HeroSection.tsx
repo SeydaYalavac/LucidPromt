@@ -7,19 +7,20 @@ import { useRouter } from "next/navigation";
 import { useSignals, useTrends } from "@/hooks/useTrendData";
 
 const placeholders = [
-  "What's trending worldwide?",
-  "Why is everyone talking about AI?",
-  "What's happening in Japan?",
-  "What exploded in the last hour?",
-  "What's trending in science?"
+  "Search the source-linked signal queue",
+  "Which technology topics score highest?",
+  "Show country-tagged evidence from Japan",
+  "Which signals have the fastest velocity?",
+  "Find scored science signals"
 ];
 
 export function HeroSection() {
   const router = useRouter();
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [query, setQuery] = useState("");
-  const { data: trendData } = useTrends({ limit: 50 });
-  const { data: signalData } = useSignals(100);
+  const { data: trendData, error: trendError } = useTrends({ limit: 50 });
+  const { data: signalData, error: signalError } = useSignals(100);
+  const dataUnavailable = Boolean(trendError || signalError);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -39,10 +40,10 @@ export function HeroSection() {
         className="flex w-full max-w-6xl flex-col items-center text-center"
       >
         <h1 className="text-balance text-[clamp(40px,6.5vw,96px)] font-bold leading-[0.9] tracking-tighter text-white">
-          REAL-TIME TREND<br />INTELLIGENCE FOR<br />FOUNDERS &amp; ANALYSTS
+          SOURCE-LINKED TREND<br />INTELLIGENCE FOR<br />FOUNDERS &amp; ANALYSTS
         </h1>
         <p className="mt-8 max-w-2xl text-pretty text-lg font-medium leading-relaxed text-[#A3A3AA] md:text-2xl">
-          Track emerging technology worldwide, see why attention is moving, and find where each trend started.
+          Inspect scored technology signals, see why attention moved, and trace the earliest available country-tagged evidence.
         </p>
       </motion.div>
 
@@ -94,17 +95,16 @@ export function HeroSection() {
         className="mt-16 flex flex-col items-center gap-6"
       >
         <div className="flex items-center gap-3 rounded-full border border-white/5 bg-white/[0.02] px-6 py-2">
-          <div className="relative flex h-2.5 w-2.5 items-center justify-center">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75"></span>
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500"></span>
-          </div>
-          <span className="text-xs font-bold uppercase tracking-widest text-white">Live World</span>
+          <span className={`h-2 w-2 rounded-full ${dataUnavailable ? "bg-amber-300" : "bg-[#67E8F9]"}`} aria-hidden="true" />
+          <span className="text-xs font-bold uppercase tracking-widest text-white">
+            {dataUnavailable ? "Production data unavailable" : "Connected source data"}
+          </span>
           <div className="ml-2 flex items-center gap-3 text-xs text-[#8B8B93] font-medium">
             <span>{signalData?.signals.length ?? "—"} recent signals</span>
             <span className="h-1 w-1 rounded-full bg-white/20"></span>
             <span>{trendData?.trends.length ?? "—"} active trends</span>
             <span className="h-1 w-1 rounded-full bg-white/20"></span>
-            <span>updating now</span>
+            <span>source-linked</span>
           </div>
         </div>
 
