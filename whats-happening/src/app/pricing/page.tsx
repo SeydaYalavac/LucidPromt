@@ -3,7 +3,11 @@ import Link from "next/link";
 import { ArrowRight, Check } from "lucide-react";
 import { PageShell } from "@/components/PageShell";
 
-export const metadata: Metadata = { title: "Pricing | What's Happening", description: "Public access costs $0. Account access and paid plans are not available today." };
+export const metadata: Metadata = {
+  title: "Pricing | What's Happening",
+  description: "Public access costs $0. Account access and paid plans are not available today.",
+  alternates: { canonical: "/pricing" },
+};
 
 const plans = [
   { name: "Public signal", price: "$0", note: "No account needed", description: "Browse the public signal views and open the source trail behind each record when production data is available.", features: ["World and trending views", "Country signal map", "Source-level evidence"], action: "Browse the feed", href: "/world", featured: false },

@@ -2,5 +2,9 @@ import type { Metadata } from "next";
 import { PageShell } from "@/components/PageShell";
 import { ExploreView } from "@/components/ExploreView";
 
-export const metadata: Metadata = { title: "Explore | What's Happening", description: "Browse scored, source-linked trend evidence by category." };
+export const metadata: Metadata = {
+  title: "Explore | What's Happening",
+  description: "Browse scored, source-linked trend evidence by category.",
+  alternates: { canonical: "/explore" },
+};
 export default function ExplorePage() { return <PageShell><ExploreView /></PageShell>; }

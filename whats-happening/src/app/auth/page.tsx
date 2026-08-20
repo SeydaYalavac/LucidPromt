@@ -6,6 +6,7 @@ import { getSafeRedirect } from "@/lib/auth-redirect";
 export const metadata: Metadata = {
   title: "Sign in | What's Happening",
   description: "Check the availability of account access and recovery.",
+  robots: { index: false, follow: false },
 };
 
 const authModes: AuthMode[] = ["signin", "signup", "forgot", "update"];
