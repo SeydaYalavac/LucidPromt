@@ -1,5 +1,6 @@
 import { GlobalNavbar } from "@/components/GlobalNavbar";
 import { Footer } from "@/components/Footer";
+import { TrendCollection } from "@/components/TrendCollection";
 
 export default async function CountryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -14,16 +15,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
           {slug.replace(/-/g, " ")} Right Now
         </h1>
         
-        <div className="mt-12 rounded-3xl border border-white/5 bg-[#111114] p-8">
-          <h2 className="text-xl font-semibold text-white">Trending Topics</h2>
-          <div className="mt-4 space-y-4">
-            <div className="flex items-center gap-4 text-[#8B8B93]">
-              <span>#1</span>
-              <span className="text-white">Local Politics</span>
-              <span className="text-[#06b6d4]">Rising</span>
-            </div>
-          </div>
-        </div>
+        <TrendCollection filter="country" value={slug} />
       </main>
 
       <Footer />

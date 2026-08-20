@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { Search, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useSignals, useTrends } from "@/hooks/useTrendData";
 
 const placeholders = [
   "What's trending worldwide?",
@@ -14,6 +15,8 @@ const placeholders = [
 
 export function HeroSection() {
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
+  const { data: trendData } = useTrends({ limit: 50 });
+  const { data: signalData } = useSignals(100);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -92,9 +95,9 @@ export function HeroSection() {
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-white">Live World</span>
           <div className="ml-2 flex items-center gap-3 text-xs text-[#8B8B93] font-medium">
-            <span>24,832 signals</span>
+            <span>{signalData?.signals.length ?? "—"} recent signals</span>
             <span className="h-1 w-1 rounded-full bg-white/20"></span>
-            <span>128 countries</span>
+            <span>{trendData?.trends.length ?? "—"} active trends</span>
             <span className="h-1 w-1 rounded-full bg-white/20"></span>
             <span>updating now</span>
           </div>
