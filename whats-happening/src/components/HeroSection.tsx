@@ -33,13 +33,13 @@ export function HeroSection() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col items-center text-center w-full max-w-4xl"
+        className="flex w-full max-w-6xl flex-col items-center text-center"
       >
-        <h1 className="text-[clamp(64px,10vw,160px)] font-bold leading-[0.85] tracking-tighter text-white">
-          WHAT&apos;S<br />HAPPENING?
+        <h1 className="text-balance text-[clamp(40px,6.5vw,96px)] font-bold leading-[0.9] tracking-tighter text-white">
+          REAL-TIME TREND<br />INTELLIGENCE FOR<br />FOUNDERS &amp; ANALYSTS
         </h1>
-        <p className="mt-8 text-xl font-medium tracking-wide text-[#8B8B93] md:text-2xl">
-          See what the world is talking about right now.
+        <p className="mt-8 max-w-2xl text-pretty text-lg font-medium leading-relaxed text-[#A3A3AA] md:text-2xl">
+          Track emerging technology worldwide, see why attention is moving, and find where each trend started.
         </p>
       </motion.div>
 
