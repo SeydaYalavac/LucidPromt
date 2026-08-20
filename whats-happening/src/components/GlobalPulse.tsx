@@ -19,7 +19,7 @@ export function GlobalPulse() {
           GLOBAL PULSE
         </h2>
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xl text-[#8B8B93]">
-          <p>The most important trends shaping the world right now.</p>
+          <p>The highest-scoring available trends, with their source trail attached.</p>
           {data?.mode === "demo" && (
             <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-amber-200">
               DEMO DATA

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "What's Happening | Live Global Trend Intelligence",
-  description: "Track emerging global trends, inspect the evidence, and understand why attention is moving now.",
+  title: "What's Happening | Source-Linked Trend Intelligence",
+  description: "Inspect scored technology signals, their source trail, and the earliest available country-tagged evidence.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
