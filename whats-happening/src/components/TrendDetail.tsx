@@ -3,8 +3,13 @@
 import { Share, BookmarkPlus, ExternalLink } from "lucide-react";
 import { TrendChat } from "./TrendChat";
 import { useTrend } from "@/hooks/useTrendData";
+import { useSavedTrends } from "@/hooks/useSavedTrends";
+import { shareUrl } from "@/lib/share";
+import { useState } from "react";
 
 export function TrendDetail({ slug }: { slug: string }) {
+  const { saved, toggleSaved } = useSavedTrends();
+  const [shareNotice, setShareNotice] = useState(false);
   const { data, error, isLoading } = useTrend(slug);
   if (isLoading) return <div className="mx-auto min-h-screen max-w-5xl px-6 pt-32"><div className="h-80 animate-pulse rounded-3xl bg-[#111114]" /></div>;
   if (error || !data) return <div className="mx-auto min-h-screen max-w-5xl px-6 pt-40 text-[#8B8B93]">This live trend is not available yet.</div>;
@@ -32,8 +37,8 @@ export function TrendDetail({ slug }: { slug: string }) {
           </div>
         </div>
         <div className="flex gap-3">
-          <button className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white"><BookmarkPlus size={16} /> Save</button>
-          <button onClick={() => navigator.share?.({ title: trend.title, url: window.location.href })} className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-sm font-medium text-white"><Share size={16} /> Share</button>
+          <button type="button" onClick={() => toggleSaved(slug)} aria-pressed={saved.includes(slug)} className="flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 text-sm font-medium text-white"><BookmarkPlus size={16} /> {saved.includes(slug) ? "Saved" : "Save"}</button>
+          <button type="button" onClick={async () => { try { const result = await shareUrl(trend.title, window.location.href); if (result === "copied") { setShareNotice(true); window.setTimeout(() => setShareNotice(false), 1800); } } catch {} }} className="flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 text-sm font-medium text-white"><Share size={16} /> {shareNotice ? "Link copied" : "Share"}</button>
         </div>
       </div>
 

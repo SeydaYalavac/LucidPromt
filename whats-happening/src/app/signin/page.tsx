@@ -1,0 +1,6 @@
+import type { Metadata } from "next";
+import { AuthScreen } from "@/components/AuthScreen";
+import { getSafeRedirect } from "@/lib/auth-redirect";
+
+export const metadata: Metadata = { title: "Sign in | What's Happening", description: "Sign in to join live developer trend rooms." };
+export default async function SigninPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) { const query = await searchParams; return <AuthScreen mode="signin" next={getSafeRedirect(query.next || null)} initialError={query.error?.slice(0, 240)} />; }

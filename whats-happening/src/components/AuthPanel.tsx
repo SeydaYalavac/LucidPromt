@@ -15,6 +15,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useAuthSession } from "@/hooks/useAuthSession";
+import { emailSchema, passwordSchema, signinSchema, signupSchema } from "@/lib/auth-validation";
 
 export type AuthMode = "signin" | "signup" | "forgot" | "update";
 
@@ -90,8 +91,9 @@ export function AuthPanel({
   const [error, setError] = useState<string | null>(initialError || null);
   const [notice, setNotice] = useState<string | null>(null);
   const copy = modeCopy[mode];
-  const authHref = (nextMode: AuthMode) =>
-    `/auth?mode=${nextMode}&next=${encodeURIComponent(next)}`;
+  const authHref = (nextMode: AuthMode) => nextMode === "signin" || nextMode === "signup"
+    ? `/${nextMode}?next=${encodeURIComponent(next)}`
+    : `/auth?mode=${nextMode}&next=${encodeURIComponent(next)}`;
 
   async function handleEmailAuth(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -102,10 +104,15 @@ export function AuthPanel({
       setError("Authentication isn’t available until Supabase is connected.");
       return;
     }
-    if ((mode === "signup" || mode === "update") && password !== confirmPassword) {
-      setError("The passwords don’t match.");
-      return;
-    }
+    const validation = mode === "signup"
+      ? signupSchema.safeParse({ email, password, confirmPassword, displayName })
+      : mode === "signin"
+        ? signinSchema.safeParse({ email, password })
+        : mode === "forgot"
+          ? emailSchema.safeParse(email)
+          : passwordSchema.safeParse(password);
+    if (!validation.success) { setError(validation.error.issues[0]?.message || "Check the form and try again."); return; }
+    if (mode === "update" && password !== confirmPassword) { setError("The passwords don’t match."); return; }
 
     setBusy(true);
     try {
