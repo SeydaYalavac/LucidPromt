@@ -42,15 +42,22 @@ export function TrendDetail({ slug }: { slug: string }) {
     { label: "Novelty", value: trend.novelty_score },
   ];
   const isSaved = saved.includes(slug);
+  const evidenceStatus = brief?.corroboration === "multi_source"
+    ? `${brief.evidence_source_count} independent source systems`
+    : "Single-source evidence";
 
   return <main className="mx-auto max-w-6xl px-6 pb-24 pt-32 sm:pt-40">
+    <article>
     <header className="border-b border-white/[0.1] pb-12">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[10px] uppercase tracking-[0.15em] text-white/45">
-        <span>{trend.category}</span><span>{trend.country?.name || "Global"}</span><span>Score {trend.score}</span>
+        <span>Trend article</span><span>{trend.category}</span><span>{trend.country?.name || "Global"}</span><span>Score {trend.score}</span>
         {mode === "demo" && <span className="text-amber-200">Demo data</span>}
       </div>
       <h1 className="mt-6 max-w-5xl text-balance text-[clamp(2.8rem,7vw,6.5rem)] font-medium leading-[0.92] tracking-[-0.065em] text-white">{trend.title}</h1>
       <p className="mt-6 max-w-3xl text-pretty text-lg leading-8 text-[#B3B3BA]">{brief?.what_it_is || trend.summary || "Verified source context is not available for this topic yet."}</p>
+      <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white/40">
+        <span>{evidenceStatus}</span><span aria-hidden="true">·</span><time dateTime={brief?.freshest_observed_at || trend.last_seen_at}>Evidence checked {dateLabel(brief?.freshest_observed_at || trend.last_seen_at)}</time>
+      </div>
       <div className="mt-8 flex flex-wrap items-center gap-3">
         {firstEvidence && <a href={firstEvidence.source_url} target="_blank" rel="noreferrer" onClick={() => captureProductEvent("source_evidence_viewed", { trend_slug: slug, source_type: firstEvidence.provider })} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black hover:bg-[#E7E7E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Open newest evidence <ArrowUpRight size={16} /></a>}
         <button type="button" onClick={() => { if (!isSaved) captureProductEvent("trend_saved", { trend_slug: slug, source: "detail" }); toggleSaved(slug); }} aria-pressed={isSaved} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-5 text-sm font-medium text-white hover:bg-white/[0.06]">{isSaved ? <Check size={16} /> : <Bookmark size={16} />} {isSaved ? "Saved" : "Save"}</button>
@@ -58,35 +65,46 @@ export function TrendDetail({ slug }: { slug: string }) {
       </div>
     </header>
 
-    <div className="mt-12 grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_19rem]">
-      <div className="space-y-14">
-        <section aria-labelledby="briefing-heading">
-          <div className="flex flex-wrap items-end justify-between gap-3">
-            <div><p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">Research briefing</p><h2 id="briefing-heading" className="mt-2 text-3xl font-medium tracking-[-0.035em] text-white">Why this matters now</h2></div>
-            {brief && <span className="text-xs text-white/45">{brief.corroboration === "multi_source" ? `${brief.evidence_source_count} independent systems` : "Single-source signal"}</span>}
-          </div>
-          {brief ? <dl className="mt-8 divide-y divide-white/[0.1] border-y border-white/[0.1]">
-            {[
-              ["What it is", brief.what_it_is],
-              ["Why it is trending", brief.why_trending],
-              ["What it is useful for", brief.useful_for],
-              ["What to do next", brief.next_step],
-            ].map(([label, value]) => <div key={label} className="grid gap-3 py-6 sm:grid-cols-[10rem_1fr]"><dt className="text-sm font-medium text-white">{label}</dt><dd className="text-base leading-7 text-[#B3B3BA]">{value}</dd></div>)}
-          </dl> : <div className="mt-8 rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 text-[#A8A8AF]">A source-backed explanation is not available. This topic will stay out of discovery cards until evidence can support it.</div>}
-          {brief && <p className="mt-4 text-sm leading-6 text-white/45">{brief.caution}</p>}
-        </section>
+    <div className="mt-14 grid items-start gap-14 lg:grid-cols-[minmax(0,1fr)_19rem]">
+      <div>
+        {brief ? <div className="max-w-[70ch] space-y-14">
+          <section aria-labelledby="why-heading">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">Why now</p>
+            <h2 id="why-heading" className="mt-3 text-3xl font-medium tracking-[-0.035em] text-white">Why this is trending</h2>
+            <p className="mt-5 text-pretty text-base leading-8 text-[#C2C2C8]">{brief.why_trending}</p>
+          </section>
 
-        <section aria-labelledby="evidence-heading">
+          <section aria-labelledby="use-heading">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">Practical read</p>
+            <h2 id="use-heading" className="mt-3 text-3xl font-medium tracking-[-0.035em] text-white">Where it may be useful</h2>
+            <p className="mt-5 text-pretty text-base leading-8 text-[#C2C2C8]">{brief.useful_for}</p>
+            <p className="mt-5 border-l border-white/20 pl-5 text-pretty text-sm leading-7 text-[#92929A]">{brief.next_step}</p>
+          </section>
+
+          <section aria-labelledby="validation-heading">
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">Validation note</p>
+            <h2 id="validation-heading" className="mt-3 text-3xl font-medium tracking-[-0.035em] text-white">What the evidence does not prove</h2>
+            <p className="mt-5 text-pretty text-base leading-8 text-[#C2C2C8]">{brief.caution}</p>
+          </section>
+        </div> : <div className="rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 text-[#A8A8AF]">A source-backed article is not available. Unsupported sections are intentionally left blank.</div>}
+
+        <section aria-labelledby="evidence-heading" className="mt-16 border-t border-white/[0.1] pt-12">
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">Evidence trail</p>
-          <h2 id="evidence-heading" className="mt-2 text-3xl font-medium tracking-[-0.035em] text-white">Read the underlying sources</h2>
-          <div className="mt-7 grid gap-4">
-            {evidence.map((item) => <a key={`${item.kind}-${item.source_url}`} href={item.source_url} target="_blank" rel="noreferrer" onClick={() => captureProductEvent("source_evidence_viewed", { trend_slug: slug, source_type: item.provider })} className="group rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 hover:border-white/25 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-              <div className="flex items-start justify-between gap-5"><div><div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/40"><span>{item.label}</span><span>·</span><span>{item.kind === "linked_report" ? "Linked report" : "Measured signal"}</span><span>·</span><span>{dateLabel(item.observed_at)}</span></div><h3 className="mt-3 text-lg font-medium leading-6 text-white">{item.source_title}</h3><p className="mt-3 max-w-[70ch] text-sm leading-6 text-[#A8A8AF]">{item.signal_summary}</p></div><ExternalLink className="mt-1 shrink-0 text-white/40 transition-colors group-hover:text-white" size={17} /></div>
-            </a>)}
-          </div>
+          <h2 id="evidence-heading" className="mt-3 text-3xl font-medium tracking-[-0.035em] text-white">Sources behind this article</h2>
+          <ol className="mt-8 divide-y divide-white/[0.1] border-y border-white/[0.1]">
+            {evidence.map((item, index) => <li key={`${item.kind}-${item.source_url}`}>
+              <a href={item.source_url} target="_blank" rel="noreferrer" onClick={() => captureProductEvent("source_evidence_viewed", { trend_slug: slug, source_type: item.provider })} className="group grid gap-4 py-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:grid-cols-[2rem_1fr_auto]">
+                <span className="font-mono text-xs tabular-nums text-white/30">{String(index + 1).padStart(2, "0")}</span>
+                <span><span className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-white/40"><span>{item.label}</span><span>·</span><span>{item.kind === "linked_report" ? "Linked report" : "Measured signal"}</span><span>·</span><span>{dateLabel(item.observed_at)}</span></span><span className="mt-3 block text-lg font-medium leading-6 text-white">{item.source_title}</span><span className="mt-3 block max-w-[68ch] text-sm leading-6 text-[#A8A8AF]">{item.signal_summary}</span></span>
+                <ExternalLink className="mt-1 shrink-0 text-white/35 transition-colors group-hover:text-white" size={17} />
+              </a>
+            </li>)}
+          </ol>
         </section>
 
+        <div className="mt-16 border-t border-white/[0.1] pt-12">
         <TrendChat trendId={trend.id} slug={slug} mode={mode} />
+        </div>
       </div>
 
       <aside className="space-y-5 lg:sticky lg:top-28">
@@ -101,5 +119,6 @@ export function TrendDetail({ slug }: { slug: string }) {
         </section>
       </aside>
     </div>
+    </article>
   </main>;
 }

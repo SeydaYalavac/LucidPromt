@@ -1,7 +1,7 @@
 import type { SourceName, TrendBrief, TrendBriefEvidence, TrendSummarySource } from "@/types/trends";
 
 const MAX_EXCERPT_LENGTH = 500;
-const MAX_CARD_SUMMARY_LENGTH = 280;
+const MAX_CARD_SUMMARY_LENGTH = 180;
 const SUMMARY_WRITE_TOLERANCE_MS = 5_000;
 
 const structuredTextKeys = [

@@ -18,7 +18,7 @@ export function TrendingView({ initialQuery = "" }: { initialQuery?: string }) {
   const [savedOnly, setSavedOnly] = useState(false);
   const [visibleCount, setVisibleCount] = useState(8);
   const loadMoreRef = useRef<HTMLDivElement>(null);
-  const { saved, toggleSaved } = useSavedTrends();
+  const { saved } = useSavedTrends();
 
   const filtered = useMemo(() => {
     const result = (data?.trends || []).filter((trend) => matchesTrend(trend, query, category)).filter((trend) => !savedOnly || saved.includes(trend.slug));
