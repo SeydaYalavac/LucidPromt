@@ -552,9 +552,15 @@ function buildTrendArticle(
   }
 
   const sourceNames = representativeSignals.map((signal) => sourceLabel(signal.source));
+  const whyNowContext = sourceNames.length > 1
+    ? (generatedWhyNow || whyTrending)
+    : `${sourceNames[0] || "One measured signal system"} supplies the measured activity. A separately hosted linked report adds context, not independent momentum, so treat this as a research lead rather than a confirmed shift.`;
   const impactContext = sourceNames.length > 1
     ? `Attention is crossing ${sourceNames.join(" and ")}. That makes the topic more useful as a research lead than a single-platform spike, while still falling short of proof that adoption will continue.`
     : `The evidence spans ${independentSourceCount} independently hosted sites: ${evidence.map((item) => item.label).join(" and ")}. That supports a closer review of the topic and its reception, but not a claim about sustained adoption.`;
+  const counterpointContext = sourceNames.length > 1
+    ? caution
+    : `Only ${sourceNames[0] || "one signal system"} supplies measured trend activity; the separately hosted report is linked context. The cause and durability of the attention therefore remain unconfirmed.`;
 
   return {
     depth: "deep",
@@ -563,8 +569,8 @@ function buildTrendArticle(
     sections: [
       articleSection("background", "Background", "What is happening", backgroundClaims),
       articleSection("why_now", "Why now", "Why attention moved now", [
-        articleClaim(generatedWhyNow || whyTrending, broadSupport, generatedWhyNow ? "analysis" : "measured"),
-        ...(generatedWhyNow ? [articleClaim(whyTrending, broadSupport, "measured")] : []),
+        articleClaim(whyNowContext, broadSupport, sourceNames.length > 1 && !generatedWhyNow ? "measured" : "analysis"),
+        ...(sourceNames.length > 1 && generatedWhyNow ? [articleClaim(whyTrending, broadSupport, "measured")] : []),
       ]),
       articleSection("timeline", "Timeline", "How the signal developed", timelineClaims),
       articleSection("impact", "Impact", "What this could change", [
@@ -576,7 +582,7 @@ function buildTrendArticle(
         articleClaim("Treat source activity as a prompt for verification: compare the dated evidence, inspect the original material, and separate measured attention from claims made inside the linked reports.", broadSupport, "analysis"),
       ]),
       articleSection("counterpoints", "Counterpoints and unknowns", "What the evidence does not prove", [
-        articleClaim(caution, broadSupport, "limitation"),
+        articleClaim(counterpointContext, broadSupport, "limitation"),
         articleClaim(`The current briefing draws on ${independentSourceCount} independently hosted sources. It can show that attention exists and when it was observed; it cannot establish future growth, causation, or the origin of the underlying idea.`, broadSupport, "limitation"),
       ]),
     ],
