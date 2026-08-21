@@ -1,6 +1,11 @@
-import { homepageFaqs } from "@/content/homepage-faq";
+"use client";
+
+import { homepageFaqs, homepageFaqsTr } from "@/content/homepage-faq";
+import { useLocale } from "@/i18n/locale";
 
 export function HomepageFaq() {
+  const { locale, t } = useLocale();
+  const faqs = locale === "tr" ? homepageFaqsTr : homepageFaqs;
   return (
     <section
       id="faq"
@@ -10,21 +15,21 @@ export function HomepageFaq() {
       <div className="mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] lg:gap-24">
         <div className="lg:sticky lg:top-28 lg:self-start">
           <p className="font-mono text-xs font-semibold uppercase tracking-[0.22em] text-[#67e8f9]">
-            Product FAQ
+            {t("faq.kicker")}
           </p>
           <h2
             id="faq-heading"
             className="mt-5 max-w-xl text-balance text-[clamp(42px,5vw,72px)] font-bold leading-[0.94] tracking-[-0.045em] text-white"
           >
-            QUESTIONS,<br />ANSWERED.
+            {t("faq.title").split("\n").map((line, index) => <span key={line}>{line}{index === 0 && <br />}</span>)}
           </h2>
           <p className="mt-7 max-w-md text-pretty text-lg leading-8 text-[#A3A3AA]">
-            How the signal engine works, what its scores mean, and what you can expect during early access.
+            {t("faq.description")}
           </p>
         </div>
 
         <div className="border-t border-white/10">
-          {homepageFaqs.map((item, index) => (
+          {faqs.map((item, index) => (
             <article
               key={item.question}
               className="grid gap-5 border-b border-white/10 py-8 sm:grid-cols-[3rem_minmax(0,1fr)] sm:gap-7 sm:py-10"

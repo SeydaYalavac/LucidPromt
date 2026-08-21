@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, TrendingUp } from "lucide-react";
 import { useTrends } from "@/hooks/useTrendData";
+import { useLocale, localeCategoryLabel } from "@/i18n/locale";
 
 function observedAt(value: string) {
   return new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
@@ -11,25 +12,26 @@ function observedAt(value: string) {
 export function GlobalPulse() {
   const { data, error, isLoading } = useTrends({ globalPulse: true, limit: 5 });
   const trends = data?.trends || [];
+  const { locale, t } = useLocale();
 
   return (
     <section className="w-full py-32 bg-[#050505]" id="trending">
       <div className="mx-auto max-w-7xl px-6">
         <h2 className="text-[clamp(40px,5vw,80px)] font-bold tracking-tighter text-white leading-none">
-          GLOBAL PULSE
+          {t("pulse.title")}
         </h2>
         <div className="mt-4 flex flex-wrap items-center gap-3 text-xl text-[#8B8B93]">
-          <p>The highest-scoring available trends, with their source trail attached.</p>
+          <p>{t("pulse.description")}</p>
           {data?.mode === "demo" && (
             <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-[10px] font-bold tracking-[0.18em] text-amber-200">
-              DEMO DATA
+              {t("pulse.demo")}
             </span>
           )}
         </div>
         
         {error && (
           <div className="mt-16 rounded-3xl border border-white/10 bg-[#111114] p-8 text-[#8B8B93]">
-            Live ingestion is waiting for its Supabase connection.
+            {t("pulse.unavailable")}
           </div>
         )}
         {isLoading && <div className="mt-16 h-[424px] animate-pulse rounded-3xl bg-[#111114]" />}
@@ -41,10 +43,10 @@ export function GlobalPulse() {
               <span className="text-6xl font-black text-white/40 group-hover:text-white/60 transition-colors">01</span>
               <div className="flex flex-col items-end gap-2">
                 <span className="rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white">
-                  {trends[0].category}
+                  {localeCategoryLabel(trends[0].category, locale)}
                 </span>
                 <span className="text-[#06b6d4] font-bold text-lg flex items-center gap-1">
-                  <TrendingUp size={20} /> {trends[0].growth_percent == null ? `Velocity ${trends[0].velocity_score}` : `${trends[0].growth_percent >= 0 ? "+" : ""}${Math.round(trends[0].growth_percent)}%`}
+                  <TrendingUp size={20} /> {trends[0].growth_percent == null ? t("pulse.velocity", { value: trends[0].velocity_score }) : `${trends[0].growth_percent >= 0 ? "+" : ""}${Math.round(trends[0].growth_percent)}%`}
                 </span>
               </div>
             </div>
@@ -54,12 +56,12 @@ export function GlobalPulse() {
               </h3>
               <div className="mt-6 flex items-center justify-between text-[#8B8B93]">
                 <div className="flex items-center gap-4 text-sm font-medium">
-                  <span>{trends[0].country?.name || "Country not attributed"}</span>
+                  <span>{trends[0].country?.name || t("pulse.countryUnknown")}</span>
                   <span className="h-1 w-1 rounded-full bg-white/20"></span>
-                  <span>Updated {observedAt(trends[0].last_seen_at)}</span>
+                  <span>{t("pulse.updated", { time: observedAt(trends[0].last_seen_at) })}</span>
                 </div>
                 <div className="flex items-center gap-2 text-white font-medium group-hover:translate-x-2 transition-transform">
-                  Understand why <ArrowRight size={16} />
+                  {t("pulse.why")} <ArrowRight size={16} />
                 </div>
               </div>
             </div>
@@ -71,11 +73,11 @@ export function GlobalPulse() {
               <div className="relative z-10 flex justify-between items-start">
                 <span className="text-3xl font-black text-white/40 group-hover:text-white/60 transition-colors">0{index + 2}</span>
                 <span className="text-[#a78bfa] font-bold flex items-center gap-1">
-                  <TrendingUp size={16} /> {trend.growth_percent == null ? `Velocity ${trend.velocity_score}` : `${trend.growth_percent >= 0 ? "+" : ""}${Math.round(trend.growth_percent)}%`}
+                  <TrendingUp size={16} /> {trend.growth_percent == null ? t("pulse.velocity", { value: trend.velocity_score }) : `${trend.growth_percent >= 0 ? "+" : ""}${Math.round(trend.growth_percent)}%`}
                 </span>
               </div>
               <div className="relative z-10 mt-4">
-                <span className="text-xs font-bold uppercase tracking-widest text-[#8B8B93]">{trend.category}</span>
+                <span className="text-xs font-bold uppercase tracking-widest text-[#8B8B93]">{localeCategoryLabel(trend.category, locale)}</span>
                 <h3 className="mt-1 text-xl font-bold text-white leading-tight">{trend.title}</h3>
               </div>
             </Link>

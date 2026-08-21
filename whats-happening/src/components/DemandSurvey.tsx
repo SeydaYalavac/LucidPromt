@@ -7,6 +7,7 @@ import {
   demandFeedbackCategories,
   type DemandFeedbackCategory,
 } from "@/lib/feedback";
+import { localeCategoryLabel, useLocale } from "@/i18n/locale";
 
 const STORAGE_KEY = "whats-happening:demand-survey-v1";
 const SURVEY_CHANGE_EVENT = "demand-survey-change";
@@ -21,6 +22,7 @@ function getSnapshot() {
 }
 
 export function DemandSurvey() {
+  const { locale } = useLocale();
   const answered = useSyncExternalStore(subscribe, getSnapshot, () => true);
   const [justAnswered, setJustAnswered] = useState(false);
 
@@ -37,7 +39,7 @@ export function DemandSurvey() {
     return (
       <p className="mt-7 flex min-h-11 items-center gap-2 border-t border-white/[0.08] pt-6 text-sm text-[#C9C9CF]" role="status">
         <Check size={16} className="text-[#67E8F9]" aria-hidden="true" />
-        Thanks. Your category was recorded.
+        {locale === "tr" ? "Teşekkürler. Kategorin kaydedildi." : "Thanks. Your category was recorded."}
       </p>
     );
   }
@@ -45,10 +47,10 @@ export function DemandSurvey() {
   return (
     <fieldset className="mt-7 border-t border-white/[0.08] pt-6">
       <legend className="text-base font-medium text-white">
-        What were you hoping to track?
+        {locale === "tr" ? "Neyi takip etmek istiyordun?" : "What were you hoping to track?"}
       </legend>
       <p className="mt-2 text-sm leading-6 text-[#85858E]">
-        Choose one category. No written response is collected.
+        {locale === "tr" ? "Bir kategori seç. Yazılı yanıt toplanmaz." : "Choose one category. No written response is collected."}
       </p>
       <div className="mt-5 flex flex-wrap gap-2.5">
         {demandFeedbackCategories.map((category) => (
@@ -58,7 +60,7 @@ export function DemandSurvey() {
             onClick={() => submit(category.id)}
             className="min-h-11 rounded-full border border-white/10 bg-white/[0.035] px-4 text-sm font-medium text-[#D0D0D5] transition-colors hover:border-[#67E8F9]/45 hover:bg-[#67E8F9]/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#67E8F9]"
           >
-            {category.label}
+            {localeCategoryLabel(category.label, locale)}
           </button>
         ))}
       </div>
