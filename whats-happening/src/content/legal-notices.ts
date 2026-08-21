@@ -14,7 +14,7 @@ export type LegalNotice = {
   sections: LegalNoticeSection[];
 };
 
-export const noticeDate = "August 20, 2026";
+export const noticeDate = "August 21, 2026";
 export const supportAddress = "whatshappeninginai@mail.tin.computer";
 
 export const privacyNotice: LegalNotice = {
@@ -25,7 +25,7 @@ export const privacyNotice: LegalNotice = {
   currentPractice:
     "This notice describes current product behavior. Public browsing and limited product analytics are active. Account controls are visible but disabled until the production Supabase connection is complete, so the disabled signup form does not submit account data today.",
   atAGlance: [
-    "Analytics excludes form values, email, display name, chat bodies, query strings, and URL hashes.",
+    "Analytics and masked replay exclude form values, email, display name, chat bodies, query strings, URL hashes, and readable page text.",
     "Account and chat data will be handled only when the production account service is connected.",
     "There is no self-serve account deletion control today. Requests go to support.",
   ],
@@ -37,7 +37,7 @@ export const privacyNotice: LegalNotice = {
         "The product handles different information depending on whether you browse public pages, create an account when account access is available, join a discussion, save a trend, or contact support.",
       ],
       bullets: [
-        "Public browsing and product analytics: the route you visit, the page URL limited to its origin and path, signup button source, authentication method and outcome, whether email verification is required, public trend slug for a chat outcome, and response status for a failed chat post.",
+        "Public browsing and product analytics: the route you visit, the page URL limited to its origin and path, signup button source, authentication method and outcome, product value and error states, rage-click signals, and one bounded tracking-interest category if you choose to answer the in-product question.",
         "Account information when enabled: email address, password authentication material, display name, OAuth provider identity, account identifier, and session information handled through Supabase.",
         "Public discussion when enabled: message body, account identifier, display name, trend, timestamp, moderation provider and labels, and whether the message is visible or removed.",
         "Public source records: source name, public source or community label, title, bounded excerpt, source URL, engagement and audience counts where available, timestamps, and available country metadata from official or permissioned feeds.",
@@ -48,8 +48,8 @@ export const privacyNotice: LegalNotice = {
       id: "analytics",
       title: "Privacy-scoped analytics",
       paragraphs: [
-        "The current site uses PostHog to understand whether visitors reach important product steps. Autocapture, automatic page-leave capture, exception capture, and session recording are disabled.",
-        "The analytics code removes query strings and URL hashes from automatic URL fields. It does not send form values, passwords, email addresses, display names, or chat message bodies. If account access is enabled and you sign in, the analytics session is identified by the Supabase user ID rather than by email or display name.",
+        "The current site uses PostHog to understand whether visitors reach important product steps. Privacy-masked session replay and rage-click detection are enabled. Broad click autocapture, automatic page-leave capture, and exception capture are discarded or disabled.",
+        "Recordings mask all readable page text, all inputs, and element attributes, and do not capture request or response bodies. Analytics removes query strings and URL hashes from automatic URL fields. It does not send form values, passwords, email addresses, display names, chat message bodies, or written survey responses. If account access is enabled and you sign in, the analytics session is identified by the Supabase user ID rather than by email or display name.",
       ],
     },
     {

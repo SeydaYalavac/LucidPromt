@@ -6,8 +6,19 @@ import type { Trend } from "@/types/trends";
 import { useSavedTrends } from "@/hooks/useSavedTrends";
 import { shareUrl } from "@/lib/share";
 import { useState } from "react";
+import { captureProductEvent } from "@/lib/analytics";
 
-export function NewsCard({ trend, featured = false, rank }: { trend: Trend; featured?: boolean; rank?: number }) {
+export function NewsCard({
+  trend,
+  featured = false,
+  rank,
+  analyticsSource,
+}: {
+  trend: Trend;
+  featured?: boolean;
+  rank?: number;
+  analyticsSource: "explore" | "world";
+}) {
   const { saved, toggleSaved } = useSavedTrends();
   const [shareState, setShareState] = useState<"idle" | "copied">("idle");
   const isSaved = saved.includes(trend.slug);
@@ -24,7 +35,7 @@ export function NewsCard({ trend, featured = false, rank }: { trend: Trend; feat
     <div className="relative flex items-start justify-between gap-5">
       <div className="flex items-center gap-3"><span className="font-mono text-xs tabular-nums text-white/25">{String(rank || trend.score).padStart(2, "0")}</span><span className="rounded-full border border-white/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.16em] text-[#67E8F9]">{trend.category}</span></div>
       <div className="flex gap-1">
-        <button type="button" onClick={() => toggleSaved(trend.slug)} className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/45 hover:bg-white/[0.07] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" aria-label={isSaved ? `Remove ${trend.title} from saved trends` : `Save ${trend.title}`} aria-pressed={isSaved}>{isSaved ? <Check size={17} className="text-[#67E8F9]" /> : <Bookmark size={17} />}</button>
+        <button type="button" onClick={() => { if (!isSaved) captureProductEvent("trend_saved", { trend_slug: trend.slug, source: analyticsSource }); toggleSaved(trend.slug); }} className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/45 hover:bg-white/[0.07] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" aria-label={isSaved ? `Remove ${trend.title} from saved trends` : `Save ${trend.title}`} aria-pressed={isSaved}>{isSaved ? <Check size={17} className="text-[#67E8F9]" /> : <Bookmark size={17} />}</button>
         <button type="button" onClick={share} className="flex min-h-11 min-w-11 items-center justify-center rounded-full text-white/45 hover:bg-white/[0.07] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" aria-label={`Share ${trend.title}`}>{shareState === "copied" ? <Check size={17} className="text-[#67E8F9]" /> : <Share2 size={17} />}</button>
       </div>
     </div>

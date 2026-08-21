@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { Provider } from "@supabase/supabase-js";
@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { emailSchema, passwordSchema, signinSchema, signupSchema } from "@/lib/auth-validation";
-import { captureProductEvent } from "@/lib/analytics";
+import { captureProductEvent, captureProductEventOnce } from "@/lib/analytics";
 
 export type AuthMode = "signin" | "signup" | "forgot" | "update";
 type SocialProvider = Extract<Provider, "google" | "github" | "apple">;
@@ -254,6 +254,15 @@ export function AuthPanel({
   }
 
   const formDisabled = busy || !isConfigured || (mode === "update" && (sessionLoading || !session));
+
+  useEffect(() => {
+    if (isConfigured) return;
+    captureProductEventOnce(
+      `authentication_unavailable:${mode}`,
+      "authentication_unavailable",
+      { mode },
+    );
+  }, [isConfigured, mode]);
 
   return (
     <div className="w-full max-w-[470px] rounded-[28px] border border-white/10 bg-[#0B0B0D] p-6 shadow-2xl shadow-black/40 sm:p-8">

@@ -9,6 +9,16 @@ const MANAGED_POSTHOG_HOST =
 type ProductEventProperties = {
   "$pageview": { route: string; $current_url: string };
   signup_cta_clicked: { source: "auth_panel" | "global_nav" | "mobile_nav" };
+  source_evidence_viewed: { trend_slug: string; source_type: string };
+  trend_saved: { trend_slug: string; source: "detail" | "explore" | "trending" | "world" };
+  live_data_unavailable: { endpoint: string; route: string; status_code: number };
+  authentication_unavailable: { mode: string };
+  api_error: {
+    endpoint: string;
+    failure_type: "http" | "network" | "invalid_response";
+    status_code: number;
+  };
+  feedback_submitted: { category: string };
   auth_attempted: { mode: string; provider: string };
   auth_completed: {
     mode: string;
@@ -23,6 +33,7 @@ type ProductEventProperties = {
 };
 
 let initialized = false;
+const capturedOnce = new Set<string>();
 
 function withoutQueryOrHash(value: unknown) {
   if (typeof value !== "string") return value;
@@ -69,18 +80,46 @@ export function initProductAnalytics() {
 
   posthog.init(MANAGED_POSTHOG_KEY, {
     api_host: MANAGED_POSTHOG_HOST,
-    autocapture: false,
+    autocapture: {
+      capture_copied_text: false,
+      dom_event_allowlist: ["click"],
+      element_allowlist: ["a", "button"],
+      css_selector_ignorelist: [
+        ".ph-no-autocapture",
+        "[data-ph-no-autocapture]",
+        ".ph-no-capture",
+      ],
+    },
+    rageclick: {
+      content_ignorelist: true,
+      ignore_text_selection: true,
+    },
     capture_exceptions: false,
     capture_pageview: false,
     capture_pageleave: false,
-    disable_session_recording: true,
+    disable_session_recording: false,
+    mask_all_element_attributes: true,
+    mask_all_text: true,
     person_profiles: "identified_only",
+    session_recording: {
+      blockSelector: ".ph-no-capture",
+      maskAllElementAttributes: true,
+      maskAllInputs: true,
+      maskCapturedNetworkRequestFn: () => null,
+      maskTextSelector: "*",
+      recordBody: false,
+      recordHeaders: false,
+    },
     before_send: (event) => {
+      // Autocapture powers PostHog's rage-click detector, but broad click events are
+      // intentionally discarded. Only the privacy-masked $rageclick event is kept.
+      if (event?.event === "$autocapture") return null;
       if (!event?.properties) return event;
       scrubAutomaticUrlProperties(event.properties);
       return event;
     },
   });
+  posthog.startSessionRecording(true);
   initialized = true;
 }
 
@@ -90,6 +129,18 @@ export function captureProductEvent<EventName extends keyof ProductEventProperti
 ) {
   initProductAnalytics();
   posthog.capture(event, properties);
+}
+
+export function captureProductEventOnce<
+  EventName extends keyof ProductEventProperties,
+>(
+  dedupeKey: string,
+  event: EventName,
+  properties: ProductEventProperties[EventName],
+) {
+  if (capturedOnce.has(dedupeKey)) return;
+  capturedOnce.add(dedupeKey);
+  captureProductEvent(event, properties);
 }
 
 export function identifyProductUser(userId: string) {
