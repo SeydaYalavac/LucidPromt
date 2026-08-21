@@ -40,6 +40,7 @@ export interface Trend {
   where_started: string | null;
   updated_at?: string;
   summary_source?: TrendSummarySource | null;
+  brief?: TrendBrief | null;
 }
 
 export interface TrendSummarySource {
@@ -48,6 +49,30 @@ export interface TrendSummarySource {
   source_title: string;
   published_at: string;
   observed_at: string;
+}
+
+export interface TrendBriefEvidence {
+  provider: SourceName;
+  kind: "signal" | "linked_report";
+  label: string;
+  source_url: string;
+  source_title: string;
+  published_at: string;
+  observed_at: string;
+  signal_summary: string;
+}
+
+export interface TrendBrief {
+  what_it_is: string;
+  why_trending: string;
+  useful_for: string;
+  next_step: string;
+  evidence: TrendBriefEvidence[];
+  freshest_observed_at: string;
+  evidence_source_count: number;
+  linked_site_count: number;
+  corroboration: "multi_source" | "single_source";
+  caution: string;
 }
 
 export interface Signal {
