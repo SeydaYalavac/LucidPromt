@@ -25,7 +25,7 @@ export const hackerNews: SourceAdapter = {
     const ids = await json<number[]>("https://hacker-news.firebaseio.com/v0/newstories.json");
     const items = await Promise.all(
       ids.slice(0, 80).map((id) =>
-        json<{ id: number; title?: string; url?: string; by?: string; score?: number; descendants?: number; time?: number }>(
+        json<{ id: number; title?: string; text?: string; url?: string; by?: string; score?: number; descendants?: number; time?: number }>(
           `https://hacker-news.firebaseio.com/v0/item/${id}.json`,
         ),
       ),
@@ -36,11 +36,12 @@ export const hackerNews: SourceAdapter = {
         source: "hacker_news" as const,
         externalId: String(item.id),
         title: text(item.title, 220),
+        excerpt: sanitizeExcerpt(item.text) || undefined,
         sourceUrl: item.url || `https://news.ycombinator.com/item?id=${item.id}`,
         authorLabel: text(item.by, 60),
         engagementCount: (item.score || 0) + (item.descendants || 0),
         publishedAt: new Date((item.time || Date.now() / 1000) * 1000).toISOString(),
-        metadata: { comments: item.descendants || 0 },
+        metadata: { points: item.score || 0, comments: item.descendants || 0 },
       }));
   },
 };

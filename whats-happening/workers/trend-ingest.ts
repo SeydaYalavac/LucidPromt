@@ -1,6 +1,6 @@
 import { adapters } from "./sources";
 import { clusterSignals, earliestAttributedSignal, scoreSignals, slugifyTitle } from "../src/lib/scoring";
-import { isDiscoverableSignal, sanitizeExcerpt } from "../src/lib/trend-content";
+import { isDiscoverableSignal, sanitizeExcerpt, summarizeEvidenceSignal } from "../src/lib/trend-content";
 import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
 import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
@@ -56,10 +56,24 @@ async function run() {
 
   for (const cluster of clusterSignals(signals)) {
     const lead = [...cluster].sort((a, b) => b.engagementCount - a.engagementCount)[0];
+    const newest = [...cluster].sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())[0];
     const originSignal = earliestAttributedSignal(cluster);
     const slug = slugifyTitle(lead.title);
     if (!slug) continue;
     const score = scoreSignals(cluster);
+    const observedAt = new Date().toISOString();
+    const summary = summarizeEvidenceSignal({
+      source: newest.source,
+      external_id: newest.externalId,
+      title: newest.title,
+      excerpt: newest.excerpt,
+      source_url: newest.sourceUrl,
+      engagement_count: newest.engagementCount,
+      audience_count: newest.audienceCount,
+      published_at: newest.publishedAt,
+      observed_at: observedAt,
+      metadata: newest.metadata,
+    });
     const { data: existing } = await supabase.from("trends").select("id").eq("slug", slug).maybeSingle();
     const { data: trend, error: trendError } = await supabase
       .from("trends")
@@ -68,7 +82,7 @@ async function run() {
           slug,
           title: lead.title,
           category: categoryFor(lead),
-          summary: sanitizeExcerpt(lead.excerpt),
+          summary,
           country_id: originSignal?.countryCode ? countryIds.get(originSignal.countryCode) || null : null,
           velocity_score: score.velocity,
           reach_score: score.reach,
@@ -77,7 +91,7 @@ async function run() {
           source_count: new Set(cluster.map((item) => item.source)).size,
           signal_count: cluster.length,
           growth_percent: score.velocity,
-          last_seen_at: new Date().toISOString(),
+          last_seen_at: observedAt,
         },
         { onConflict: "slug" },
       )
@@ -101,7 +115,7 @@ async function run() {
       engagement_count: item.engagementCount,
       audience_count: item.audienceCount || null,
       published_at: item.publishedAt,
-      observed_at: new Date().toISOString(),
+      observed_at: observedAt,
       metadata: item.metadata || {},
     }));
     const { data: inserted, error: signalError } = await supabase

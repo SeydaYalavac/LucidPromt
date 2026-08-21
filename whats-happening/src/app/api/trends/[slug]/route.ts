@@ -3,7 +3,7 @@ import { demoSignals, demoTrends } from "@/lib/demo-data";
 import { edgeReadHeaders, unavailable } from "@/lib/api";
 import { isDemoMode } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isDiscoverableSignal, isDiscoverableTrend, sanitizeSignal, sanitizeTrend } from "@/lib/trend-content";
+import { isDiscoverableTrend, isEligibleEvidenceSignal, resolveTrendContent, sanitizeSignal, sanitizeTrend } from "@/lib/trend-content";
 
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
@@ -30,16 +30,17 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
       .from("signals")
       .select("*")
       .eq("trend_id", trend.id)
+      .order("observed_at", { ascending: false })
       .order("published_at", { ascending: false })
       .limit(30);
     if (signalError) throw signalError;
     const safeTrend = sanitizeTrend(trend);
-    const safeSignals = (signals || []).map(sanitizeSignal).filter(isDiscoverableSignal);
+    const safeSignals = (signals || []).map(sanitizeSignal).filter(isEligibleEvidenceSignal);
     const trendIsDiscoverable = isDiscoverableTrend(safeTrend);
-    if (!trendIsDiscoverable && safeSignals.length === 0) {
+    const responseTrend = resolveTrendContent(safeTrend, safeSignals);
+    if (!trendIsDiscoverable || !responseTrend.summary || !responseTrend.summary_source) {
       return NextResponse.json({ error: "Trend not found" }, { status: 404 });
     }
-    const responseTrend = trendIsDiscoverable ? safeTrend : { ...safeTrend, summary: null };
     return NextResponse.json({ trend: responseTrend, signals: safeSignals, mode: "live" }, { headers: edgeReadHeaders });
   } catch (error) {
     return unavailable(error);

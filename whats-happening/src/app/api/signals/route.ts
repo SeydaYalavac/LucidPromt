@@ -3,7 +3,7 @@ import { demoSignals } from "@/lib/demo-data";
 import { edgeReadHeaders, unavailable } from "@/lib/api";
 import { isDemoMode } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isDiscoverableSignal, sanitizeSignal } from "@/lib/trend-content";
+import { isEligibleEvidenceSignal, sanitizeSignal } from "@/lib/trend-content";
 
 export async function GET(request: NextRequest) {
   const limit = Math.min(100, Math.max(1, Number(request.nextUrl.searchParams.get("limit")) || 20));
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       .order("observed_at", { ascending: false })
       .limit(Math.max(limit * 5, 500));
     if (error) throw error;
-    const signals = (data || []).map(sanitizeSignal).filter(isDiscoverableSignal).slice(0, limit);
+    const signals = (data || []).map(sanitizeSignal).filter(isEligibleEvidenceSignal).slice(0, limit);
     return NextResponse.json({ signals, mode: "live" }, { headers: edgeReadHeaders });
   } catch (error) {
     return unavailable(error);

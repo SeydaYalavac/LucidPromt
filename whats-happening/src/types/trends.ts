@@ -38,6 +38,16 @@ export interface Trend {
   what_happened: string | null;
   why_now: string | null;
   where_started: string | null;
+  updated_at?: string;
+  summary_source?: TrendSummarySource | null;
+}
+
+export interface TrendSummarySource {
+  source: SourceName;
+  source_url: string;
+  source_title: string;
+  published_at: string;
+  observed_at: string;
 }
 
 export interface Signal {
@@ -53,6 +63,7 @@ export interface Signal {
   audience_count: number | null;
   published_at: string;
   observed_at: string;
+  metadata?: Record<string, unknown>;
 }
 
 export interface ChatMessage {
