@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_GOOGLE_TRENDS_MARKETS,
+  DEFAULT_DISCOVERY_QUERY,
   extractGoogleNewsItems,
+  GITHUB_SEARCH_SLICES,
   googleTrendMarkets,
   parseGoogleTrendsRss,
   SOURCE_INTAKE_LIMITS,
@@ -11,6 +13,12 @@ import { MAP_COUNTRIES } from "./map-countries";
 describe("official source intake", () => {
   it("keeps enough first-party capacity for a 100-trend daily target", () => {
     expect(SOURCE_INTAKE_LIMITS).toEqual({ hackerNews: 200, github: 100 });
+    expect(GITHUB_SEARCH_SLICES.reduce((sum, slice) => sum + slice.limit, 0)).toBe(SOURCE_INTAKE_LIMITS.github);
+  });
+
+  it("reserves official discovery capacity for AI sports use cases", () => {
+    expect(GITHUB_SEARCH_SLICES.map(({ query }) => query).join(" ")).toMatch(/AI sports/i);
+    expect(DEFAULT_DISCOVERY_QUERY).toMatch(/performance analytics.*injury prevention.*officiating.*broadcasting.*accessibility.*sports science/i);
   });
 });
 

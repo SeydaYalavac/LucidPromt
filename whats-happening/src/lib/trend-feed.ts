@@ -1,4 +1,5 @@
-import { selectAiScopedTrends } from "./trend-content";
+import { isEligibleEvidenceSignal, selectAiScopedTrends } from "./trend-content";
+import { isAiSportsSignal } from "./trend-category";
 import type { Signal, Trend, TrendListPayload } from "../types/trends";
 
 export const DAILY_TREND_TARGET = 100;
@@ -31,6 +32,17 @@ function timestamp(value: string | undefined) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function isSportsCategory(category: string) {
+  return category.trim().toLocaleLowerCase() === "sports";
+}
+
+function isCurrentAiSportsEvidence(signal: Signal, cutoff: number) {
+  return isEligibleEvidenceSignal(signal)
+    && isAiSportsSignal(signal)
+    && timestamp(signal.published_at) > 0
+    && timestamp(signal.observed_at || signal.published_at) >= cutoff;
+}
+
 function hasUsableTitle(trend: Pick<Trend, "title">) {
   return Boolean(trend.title?.trim());
 }
@@ -50,10 +62,15 @@ export function buildTrendListPayload(
     if (!deduped.has(key)) deduped.set(key, trend);
   }
 
-  const qualified = selectAiScopedTrends([...deduped.values()], signals).map((trend) => ({
-    ...trend,
-    evidence_status: trend.brief?.corroboration || ("single_source" as const),
-  }));
+  const currentSportsTrendIds = new Set(
+    signals.filter((signal) => isCurrentAiSportsEvidence(signal, cutoff)).map((signal) => signal.trend_id),
+  );
+  const qualified = selectAiScopedTrends([...deduped.values()], signals)
+    .filter((trend) => !isSportsCategory(trend.category) || currentSportsTrendIds.has(trend.id))
+    .map((trend) => ({
+      ...trend,
+      evidence_status: trend.brief?.corroboration || ("single_source" as const),
+    }));
   const qualifiedToday = qualified.filter((trend) => timestamp(trend.last_seen_at) >= dayStart.getTime()).length;
   const page = qualified.slice(offset, offset + limit);
 

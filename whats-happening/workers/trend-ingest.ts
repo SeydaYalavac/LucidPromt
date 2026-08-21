@@ -4,6 +4,7 @@ import { sanitizeExcerpt, summarizeEvidenceSignal } from "../src/lib/trend-conte
 import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
 import { DAILY_TREND_TARGET } from "../src/lib/trend-feed";
+import { categoryForSignals } from "../src/lib/trend-category";
 import { prepareSourceSignals } from "./prepare-signals";
 import { MAP_COUNTRIES } from "./map-countries";
 import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
@@ -12,16 +13,6 @@ const sourceNames = (process.env.INGEST_SOURCES || "hacker_news,github,google_tr
   .split(",")
   .map((source) => source.trim())
   .filter((source): source is SourceName => source in adapters);
-
-function categoryFor(signal: SourceSignal) {
-  const value = `${signal.title} ${signal.excerpt || ""}`.toLowerCase();
-  if (/\b(ai|llm|model|agent|machine learning)\b/.test(value)) return "Artificial Intelligence";
-  if (/\b(climate|energy|battery|carbon)\b/.test(value)) return "Climate & Energy";
-  if (/\b(github|api|framework|library|developer)\b/.test(value)) return "Developer Tools";
-  if (/\b(space|nasa|rocket|orbit)\b/.test(value)) return "Space";
-  if (/\b(health|medicine|clinical|drug)\b/.test(value)) return "Health";
-  return "World";
-}
 
 async function run() {
   if (!sourceNames.length) throw new Error("INGEST_SOURCES contains no supported source names");
@@ -85,7 +76,7 @@ async function run() {
         {
           slug,
           title: lead.title,
-          category: categoryFor(lead),
+          category: categoryForSignals(cluster),
           summary,
           country_id: originSignal?.countryCode ? countryIds.get(originSignal.countryCode) || null : null,
           velocity_score: score.velocity,
