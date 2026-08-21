@@ -41,6 +41,7 @@ export interface Trend {
   updated_at?: string;
   summary_source?: TrendSummarySource | null;
   brief?: TrendBrief | null;
+  evidence_status?: "single_source" | "multi_source";
 }
 
 export interface TrendSummarySource {
@@ -113,6 +114,22 @@ export interface TrendDetailPayload {
 export interface TrendListPayload {
   trends: Trend[];
   mode: "live" | "demo";
+  coverage: {
+    target: number;
+    qualified_today: number;
+    active_qualified: number;
+    returned: number;
+    status: "target_met" | "under_supply";
+    utc_day: string;
+    as_of: string;
+    active_window_hours: number;
+  };
+  pagination: {
+    limit: number;
+    offset: number;
+    total: number;
+    has_more: boolean;
+  };
 }
 
 export interface SourceSignal {

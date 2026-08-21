@@ -1,8 +1,10 @@
 import { adapters } from "./sources";
 import { clusterSignals, earliestAttributedSignal, scoreSignals, slugifyTitle } from "../src/lib/scoring";
-import { isAiSignal, sanitizeExcerpt, summarizeEvidenceSignal } from "../src/lib/trend-content";
+import { sanitizeExcerpt, summarizeEvidenceSignal } from "../src/lib/trend-content";
 import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
+import { DAILY_TREND_TARGET } from "../src/lib/trend-feed";
+import { prepareSourceSignals } from "./prepare-signals";
 import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
 
 const sourceNames = (process.env.INGEST_SOURCES || "hacker_news,github,google_trends")
@@ -40,11 +42,7 @@ async function run() {
   results.forEach((result, index) => {
     const name = sourceNames[index];
     if (result.status === "fulfilled") {
-      signals = signals.concat(
-        result.value
-          .map((signal) => ({ ...signal, excerpt: sanitizeExcerpt(signal.excerpt) || undefined }))
-          .filter(isAiSignal),
-      );
+      signals = signals.concat(prepareSourceSignals(result.value));
       succeeded.push(name);
     } else {
       errors.push({ source: name, message: result.reason instanceof Error ? result.reason.message : String(result.reason) });
@@ -120,7 +118,7 @@ async function run() {
     }));
     const { data: inserted, error: signalError } = await supabase
       .from("signals")
-      .upsert(signalRows, { onConflict: "source,external_id", ignoreDuplicates: true })
+      .upsert(signalRows, { onConflict: "source,external_id" })
       .select("*");
     if (signalError) errors.push({ source: lead.source, message: signalError.message });
     insertedSignals += inserted?.length || 0;
@@ -147,7 +145,18 @@ async function run() {
     })
     .eq("id", runRow.id);
   if (finishError) throw finishError;
-  console.log(JSON.stringify({ status, sources: succeeded, signalsSeen: signals.length, insertedSignals, createdTrends, errors }));
+  const qualifiedClustersSeen = clusterSignals(signals).length;
+  console.log(JSON.stringify({
+    status,
+    sources: succeeded,
+    qualifiedSignalsSeen: signals.length,
+    qualifiedClustersSeen,
+    dailyTarget: DAILY_TREND_TARGET,
+    runSupplyStatus: qualifiedClustersSeen >= DAILY_TREND_TARGET ? "target_met" : "under_supply",
+    upsertedSignals: insertedSignals,
+    createdTrends,
+    errors,
+  }));
   if (succeeded.length === 0) process.exitCode = 1;
 }
 

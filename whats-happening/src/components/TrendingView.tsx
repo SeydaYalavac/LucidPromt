@@ -11,7 +11,7 @@ import { NewsCard } from "./NewsCard";
 type SortMode = "score" | "newest" | "velocity";
 
 export function TrendingView({ initialQuery = "" }: { initialQuery?: string }) {
-  const { data, error, isLoading } = useTrends({ limit: 50 });
+  const { data, error, isLoading } = useTrends({ limit: 100 });
   const [query, setQuery] = useState(initialQuery);
   const [category, setCategory] = useState("All");
   const [sort, setSort] = useState<SortMode>("score");
@@ -34,7 +34,7 @@ export function TrendingView({ initialQuery = "" }: { initialQuery?: string }) {
   }, [filtered.length]);
 
   return <div className="mx-auto min-h-screen max-w-[1440px] px-5 pb-28 pt-32 sm:px-8 sm:pt-40">
-    <header className="grid gap-6 border-b border-white/[0.1] pb-10 lg:grid-cols-[1fr_30rem] lg:items-end"><div><p className="font-mono text-xs uppercase tracking-[0.18em] text-white/45">Live research desk</p><h1 className="mt-4 text-[clamp(3rem,7vw,6.5rem)] font-medium leading-[0.9] tracking-[-0.065em] text-white">Trending briefings.</h1></div><p className="max-w-[55ch] text-base leading-7 text-[#A8A8AF]">Each item explains the topic, the evidence behind its rank, who it helps, and where to verify the claim.</p></header>
+    <header className="grid gap-6 border-b border-white/[0.1] pb-10 lg:grid-cols-[1fr_30rem] lg:items-end"><div><p className="font-mono text-xs uppercase tracking-[0.18em] text-white/45">Live research desk</p><h1 className="mt-4 text-[clamp(3rem,7vw,6.5rem)] font-medium leading-[0.9] tracking-[-0.065em] text-white">Trending briefings.</h1></div><div className="max-w-[55ch]"><p className="text-base leading-7 text-[#A8A8AF]">Each item explains the topic, the evidence behind its rank, who it helps, and where to verify the claim.</p>{data?.coverage && <p className="mt-3 font-mono text-xs uppercase tracking-[0.14em] text-white/45"><span className="tabular-nums text-white/70">{data.coverage.qualified_today}</span> source-qualified AI trends today · {data.coverage.status === "target_met" ? "daily target met" : `source supply below ${data.coverage.target} target`}</p>}</div></header>
     <div className="mt-10 grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
         <section aria-label="Trending signals">
         {isLoading && <div className="grid gap-4"><TrendLoading compact /><TrendLoading compact /><TrendLoading compact /></div>}
