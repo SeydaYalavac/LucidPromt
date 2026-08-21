@@ -1,4 +1,12 @@
-import type { SourceName, TrendBrief, TrendBriefEvidence, TrendSummarySource } from "@/types/trends";
+import type {
+  SourceName,
+  TrendArticle,
+  TrendArticleClaim,
+  TrendArticleSection,
+  TrendBrief,
+  TrendBriefEvidence,
+  TrendSummarySource,
+} from "@/types/trends";
 
 const MAX_EXCERPT_LENGTH = 500;
 const MAX_CARD_SUMMARY_LENGTH = 180;
@@ -149,6 +157,9 @@ type EvidenceSignal = {
 type EvidenceTrend = {
   title?: unknown;
   summary?: string | null;
+  what_happened?: string | null;
+  why_now?: string | null;
+  where_started?: string | null;
   updated_at?: string | null;
   last_seen_at?: string | null;
 };
@@ -400,6 +411,7 @@ function linkedReports(signal: EvidenceSignal): TrendBriefEvidence[] {
     const title = sanitizeExcerpt(signal.title);
     if (!url || !title) return [];
     return [{
+      reference_id: "",
       provider: "hacker_news",
       kind: "linked_report",
       label: sourceHost(url),
@@ -418,6 +430,7 @@ function linkedReports(signal: EvidenceSignal): TrendBriefEvidence[] {
     const label = sanitizeExcerpt(item.source) || sourceHost(url);
     const snippet = sanitizeExcerpt(item.snippet);
     return [{
+      reference_id: "",
       provider: "google_trends" as const,
       kind: "linked_report" as const,
       label,
@@ -438,6 +451,7 @@ function evidenceReference(signal: EvidenceSignal): TrendBriefEvidence | null {
   const title = sanitizeExcerpt(signal.title);
   if (!sourceUrl || !title || !signal.source || !(signal.source in sourceLabels)) return null;
   return {
+    reference_id: "",
     provider: signal.source as SourceName,
     kind: "signal",
     label: sourceLabel(signal.source),
@@ -446,6 +460,132 @@ function evidenceReference(signal: EvidenceSignal): TrendBriefEvidence | null {
     published_at: signal.published_at || "",
     observed_at: signal.observed_at || signal.published_at || "",
     signal_summary: sourceActivity(signal),
+  };
+}
+
+function referenceIds(evidence: TrendBriefEvidence[], limit = evidence.length) {
+  return evidence.slice(0, limit).map((item) => item.reference_id);
+}
+
+function articleClaim(
+  text: string,
+  evidenceReferenceIds: string[],
+  kind: TrendArticleClaim["kind"],
+): TrendArticleClaim {
+  return {
+    text: compactSentence(text, 520),
+    evidence_reference_ids: [...new Set(evidenceReferenceIds)].filter(Boolean),
+    kind,
+  };
+}
+
+function articleSection(
+  id: TrendArticleSection["id"],
+  label: string,
+  heading: string,
+  claims: TrendArticleClaim[],
+): TrendArticleSection {
+  return { id, label, heading, claims: claims.filter((claim) => claim.text) };
+}
+
+function evidenceDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Time unavailable";
+  return new Intl.DateTimeFormat("en-US", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+function buildTrendArticle(
+  trend: EvidenceTrend,
+  representativeSignals: EvidenceSignal[],
+  evidence: TrendBriefEvidence[],
+  whatItIs: string,
+  whyTrending: string,
+  usefulFor: string,
+  nextStep: string,
+  caution: string,
+  freshestObservedAt: string,
+): TrendArticle {
+  const independentSourceCount = new Set(evidence.map((item) => sourceHost(item.source_url))).size;
+  const deep = independentSourceCount >= 2 && evidence.length >= 2;
+  const broadSupport = referenceIds(evidence);
+  const leadSupport = referenceIds(evidence, Math.min(2, evidence.length));
+  const whatHappened = sanitizeExcerpt(trend.what_happened);
+  const generatedWhyNow = sanitizeExcerpt(trend.why_now);
+
+  if (!deep) {
+    return {
+      depth: "concise",
+      independent_source_count: independentSourceCount,
+      last_updated_at: freshestObservedAt,
+      sections: [
+        articleSection("background", "Background", "What the evidence shows", [
+          articleClaim(whatItIs, leadSupport, "reported"),
+        ]),
+        articleSection("why_now", "Why now", "Why it is appearing now", [
+          articleClaim(whyTrending, broadSupport, "measured"),
+        ]),
+        articleSection("counterpoints", "Evidence limits", "What remains unknown", [
+          articleClaim(caution, broadSupport, "limitation"),
+          articleClaim("This article stays concise until a second independent source can support a deeper account.", broadSupport, "limitation"),
+        ]),
+      ],
+    };
+  }
+
+  const timelineClaims = [...evidence]
+    .sort((a, b) => signalTimestamp(a) - signalTimestamp(b))
+    .slice(0, 5)
+    .map((item) => articleClaim(
+      `${evidenceDate(item.published_at || item.observed_at)}: ${item.label} recorded “${compactSentence(item.source_title, 150)}”. ${item.signal_summary}`,
+      [item.reference_id],
+      item.kind === "signal" ? "measured" : "reported",
+    ));
+
+  const backgroundClaims = [articleClaim(whatItIs, leadSupport, "reported")];
+  if (whatHappened && whatHappened.toLocaleLowerCase() !== whatItIs.toLocaleLowerCase()) {
+    backgroundClaims.push(articleClaim(whatHappened, broadSupport, "analysis"));
+  }
+
+  const sourceNames = representativeSignals.map((signal) => sourceLabel(signal.source));
+  const whyNowContext = sourceNames.length > 1
+    ? (generatedWhyNow || whyTrending)
+    : `${sourceNames[0] || "One measured signal system"} supplies the measured activity. A separately hosted linked report adds context, not independent momentum, so treat this as a research lead rather than a confirmed shift.`;
+  const impactContext = sourceNames.length > 1
+    ? `Attention is crossing ${sourceNames.join(" and ")}. That makes the topic more useful as a research lead than a single-platform spike, while still falling short of proof that adoption will continue.`
+    : `The evidence spans ${independentSourceCount} independently hosted sites: ${evidence.map((item) => item.label).join(" and ")}. That supports a closer review of the topic and its reception, but not a claim about sustained adoption.`;
+  const counterpointContext = sourceNames.length > 1
+    ? caution
+    : `Only ${sourceNames[0] || "one signal system"} supplies measured trend activity; the separately hosted report is linked context. The cause and durability of the attention therefore remain unconfirmed.`;
+
+  return {
+    depth: "deep",
+    independent_source_count: independentSourceCount,
+    last_updated_at: freshestObservedAt,
+    sections: [
+      articleSection("background", "Background", "What is happening", backgroundClaims),
+      articleSection("why_now", "Why now", "Why attention moved now", [
+        articleClaim(whyNowContext, broadSupport, sourceNames.length > 1 && !generatedWhyNow ? "measured" : "analysis"),
+        ...(sourceNames.length > 1 && generatedWhyNow ? [articleClaim(whyTrending, broadSupport, "measured")] : []),
+      ]),
+      articleSection("timeline", "Timeline", "How the signal developed", timelineClaims),
+      articleSection("impact", "Impact", "What this could change", [
+        articleClaim(impactContext, broadSupport, "analysis"),
+        articleClaim(usefulFor, leadSupport, "analysis"),
+      ]),
+      articleSection("practical_implications", "Practical implications", "How to investigate it", [
+        articleClaim(nextStep, leadSupport, "analysis"),
+        articleClaim("Treat source activity as a prompt for verification: compare the dated evidence, inspect the original material, and separate measured attention from claims made inside the linked reports.", broadSupport, "analysis"),
+      ]),
+      articleSection("counterpoints", "Counterpoints and unknowns", "What the evidence does not prove", [
+        articleClaim(counterpointContext, broadSupport, "limitation"),
+        articleClaim(`The current briefing draws on ${independentSourceCount} independently hosted sources. It can show that attention exists and when it was observed; it cannot establish future growth, causation, or the origin of the underlying idea.`, broadSupport, "limitation"),
+      ]),
+    ],
   };
 }
 
@@ -466,7 +606,8 @@ export function buildTrendBrief(trend: EvidenceTrend, signals: EvidenceSignal[])
     .flatMap((signal) => [evidenceReference(signal), ...linkedReports(signal)])
     .filter((item): item is TrendBriefEvidence => Boolean(item))
     .filter((item, index, items) => items.findIndex((candidate) => candidate.source_url === item.source_url) === index)
-    .slice(0, 5);
+    .slice(0, 7)
+    .map((item, index) => ({ ...item, reference_id: `source-${index + 1}` }));
   if (!evidence.length) return null;
 
   const evidenceSourceCount = representativeSignals.length;
@@ -476,19 +617,36 @@ export function buildTrendBrief(trend: EvidenceTrend, signals: EvidenceSignal[])
     ? `The topic appears across ${representativeSignals.map((signal) => sourceLabel(signal.source)).join(" and ")}. ${activity.join(" ")}`
     : `The current rank is supported by one source only. ${activity[0]} Treat it as an early signal, not corroborated momentum.`;
 
+  const whatItIs = describeTrend(trend, eligible[0]);
+  const compactWhyTrending = compactSentence(whyTrending, 360);
+  const usefulFor = usefulnessFor(representativeSignals);
+  const nextStep = nextStepFor(representativeSignals);
+  const caution = multiSource
+    ? "Multiple source systems show attention, but the evidence does not prove cause or predict future growth."
+    : "One source system is available, so the cause and durability of this attention remain unconfirmed.";
+
   return {
-    what_it_is: describeTrend(trend, eligible[0]),
-    why_trending: compactSentence(whyTrending, 360),
-    useful_for: usefulnessFor(representativeSignals),
-    next_step: nextStepFor(representativeSignals),
+    what_it_is: whatItIs,
+    why_trending: compactWhyTrending,
+    useful_for: usefulFor,
+    next_step: nextStep,
     evidence,
     freshest_observed_at: freshest,
     evidence_source_count: evidenceSourceCount,
     linked_site_count: new Set(evidence.map((item) => sourceHost(item.source_url))).size,
     corroboration: multiSource ? "multi_source" : "single_source",
-    caution: multiSource
-      ? "Multiple source systems show attention, but the evidence does not prove cause or predict future growth."
-      : "One source system is available, so the cause and durability of this attention remain unconfirmed.",
+    caution,
+    article: buildTrendArticle(
+      trend,
+      representativeSignals,
+      evidence,
+      whatItIs,
+      compactWhyTrending,
+      usefulFor,
+      nextStep,
+      caution,
+      freshest,
+    ),
   };
 }
 
