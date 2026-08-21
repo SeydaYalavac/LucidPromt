@@ -3,8 +3,8 @@ import { PageShell } from "@/components/PageShell";
 import { SignalMap } from "@/components/SignalMap";
 
 export const metadata: Metadata = {
-  title: "Signal map | What's Happening",
-  description: "Explore country-attributed technology trends on an interactive world map.",
+  title: "Global AI activity map | What's Happening",
+  description: "Explore current source-attributed AI activity by market, rising topic, evidence count, and freshness.",
   alternates: { canonical: "/map" },
 };
 export default function MapPage() { return <PageShell><SignalMap /></PageShell>; }

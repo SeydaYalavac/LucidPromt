@@ -32,7 +32,7 @@ jobs:
           OPENAI_WHY_MODEL: ${{ vars.OPENAI_WHY_MODEL }}
           GITHUB_TOKEN: ${{ github.token }}
           INGEST_SOURCES: ${{ vars.INGEST_SOURCES }}
-          GOOGLE_TRENDS_GEO: ${{ vars.GOOGLE_TRENDS_GEO }}
+          GOOGLE_TRENDS_GEOS: ${{ vars.GOOGLE_TRENDS_GEOS }}
           REDDIT_CLIENT_ID: ${{ secrets.REDDIT_CLIENT_ID }}
           REDDIT_CLIENT_SECRET: ${{ secrets.REDDIT_CLIENT_SECRET }}
           REDDIT_USER_AGENT: ${{ vars.REDDIT_USER_AGENT }}

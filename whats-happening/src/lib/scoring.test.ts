@@ -53,4 +53,13 @@ describe("clustering helpers", () => {
 
     expect(origin?.countryCode).toBe("TR");
   });
+
+  it("does not choose an earliest geography when market observations are tied", () => {
+    const origin = earliestAttributedSignal([
+      signal({ externalId: "us", countryCode: "US", publishedAt: "2026-08-20T09:00:00Z" }),
+      signal({ externalId: "gb", countryCode: "GB", publishedAt: "2026-08-20T09:00:00Z" }),
+    ]);
+
+    expect(origin).toBeUndefined();
+  });
 });

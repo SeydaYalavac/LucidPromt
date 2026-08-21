@@ -66,9 +66,9 @@ Supabase değerleri yoksa giriş ekranı formu kapatır ve kurulumun sürdüğü
 - `src/app/signin`, `signup`: paylaşılan split-screen kimlik doğrulama düzenini kullanan doğrudan giriş ve kayıt adresleri.
 - `src/components/GlobalNavbar.tsx`: responsive navigasyon, mobil drawer, aktif sayfa göstergesi ve klavye destekli arama katmanı.
 - `src/components/NewsCard.tsx`: yerel kaydetme, sistem paylaşımı/panoya kopyalama ve trend detayına geçiş davranışları.
-- `src/components/SignalMap.tsx`: Natural Earth geometrisi, ülke koordinatları ve gerçek trend verisi için pan/zoom destekli harita.
+- `src/components/SignalMap.tsx`: yalnızca kaynakla ilişkilendirilmiş ülke sinyallerini işaretleyen; arama, filtre, kanıt linkleri, erişilebilir liste ve klavye destekli pan/zoom içeren Natural Earth haritası.
 - `supabase/migrations/20260820_realtime_trends.sql`: `trends`, `signals`, `countries`, `chat_messages`, `ingestion_runs`, RLS ve Realtime.
-- `workers/sources.ts`: resmi HN, GitHub, Google Trends RSS ve isteğe bağlı Reddit/X/Tavily/Exa adaptörleri.
+- `workers/sources.ts`: resmi HN, GitHub, 28 doğrulanmış Google Trends RSS pazarı ve isteğe bağlı Reddit/X/Tavily/Exa adaptörleri.
 - `workers/trend-ingest.ts`: paralel kaynak okuma, normalize etme, kümeleme, skorlama, upsert ve Why Layer tetikleme.
 - `src/lib/scoring.ts`: Velocity %45, Reach %35, Novelty %20 birleşik skoru. Her metrik 0–100 aralığında.
 - `src/lib/why-layer.ts`: OpenAI Responses API Structured Outputs ile `What happened?`, `Why now?`, `Where it started?` alanları.
@@ -121,4 +121,4 @@ Production'a almadan önce gizlilik politikasına veri kaynaklarını, saklama s
 
 ## Operasyon
 
-GitHub Actions workflow'u her 10 dakikada bir çalışır ve aynı anda ikinci ingestion run'ını başlatmaz. Hata alan kaynak diğerlerini durdurmaz; `ingestion_runs` tablosu partial/failed durumunu ve kısa hata metnini kaydeder. Varsayılan kaynak seti anahtarsız HN, GitHub ve Google Trends RSS'tir. Reddit, X, Tavily ve Exa ancak anahtarları verilip `INGEST_SOURCES` içine eklenince çalışır.
+GitHub Actions workflow'u her 10 dakikada bir çalışır ve aynı anda ikinci ingestion run'ını başlatmaz. Hata alan kaynak diğerlerini durdurmaz; `ingestion_runs` tablosu partial/failed durumunu ve kısa hata metnini kaydeder. Varsayılan kaynak seti anahtarsız HN, GitHub ve 28 resmi Google Trends RSS pazarıdır. Worker ülke kataloğunu her çalışmada güvenli biçimde upsert eder. `GOOGLE_TRENDS_GEOS` ile bu küme daraltılabilir. Reddit, X, Tavily ve Exa ancak anahtarları verilip `INGEST_SOURCES` içine eklenince çalışır.

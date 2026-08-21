@@ -248,7 +248,7 @@ export default function HowItWorksPage() {
             <div>
               <QuestionLabel number="03">How is country context assigned?</QuestionLabel>
               <p className="mt-7 max-w-[34rem] text-pretty text-base leading-7 text-[#A1A1AA]">
-                Country context comes from the earliest observation in a cluster that carries usable geographic metadata. Today, that usually means a feed-level country code such as the selected Google Trends market.
+                Country context is assigned only when one source-attributed market has a unique earliest observation in the cluster. If markets tie at the earliest timestamp, the field stays blank. This describes where evidence was observed, not where a topic began.
               </p>
             </div>
 

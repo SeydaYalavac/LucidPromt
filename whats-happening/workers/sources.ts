@@ -12,6 +12,12 @@ export const SOURCE_INTAKE_LIMITS = {
   github: 100,
 } as const;
 
+export const DEFAULT_GOOGLE_TRENDS_MARKETS = [
+  "US", "GB", "CA", "AU", "IN", "SG", "JP", "KR", "DE", "FR", "TR", "BR",
+  "MX", "AR", "ZA", "NG", "AE", "SA", "ID", "PH", "TH", "VN", "NZ", "IT",
+  "ES", "NL", "PL", "SE",
+] as const;
+
 const iso = (value: string | number | undefined) => {
   const parsed = value ? new Date(value) : new Date();
   return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
@@ -108,32 +114,62 @@ export const github: SourceAdapter = {
   },
 };
 
+function stableGoogleTrendId(geo: string, title: string) {
+  return `${geo}-${encodeURIComponent(title.toLocaleLowerCase()).slice(0, 360)}`;
+}
+
+export function googleTrendMarkets(env = process.env) {
+  const configured = env.GOOGLE_TRENDS_GEOS || env.GOOGLE_TRENDS_GEO;
+  const markets = configured
+    ? configured.split(",").map((value) => value.trim().toUpperCase()).filter(Boolean)
+    : [...DEFAULT_GOOGLE_TRENDS_MARKETS];
+  const allowed = new Set(DEFAULT_GOOGLE_TRENDS_MARKETS);
+  return [...new Set(markets)].filter((market) => allowed.has(market as typeof DEFAULT_GOOGLE_TRENDS_MARKETS[number]));
+}
+
+export function parseGoogleTrendsRss(xml: string, geo: string): SourceSignal[] {
+  const parsed = new XMLParser({ ignoreAttributes: false }).parse(xml) as {
+    rss?: { channel?: { item?: Array<Record<string, unknown>> | Record<string, unknown> } };
+  };
+  const raw = parsed.rss?.channel?.item;
+  const items = Array.isArray(raw) ? raw : raw ? [raw] : [];
+  return items.flatMap((item) => {
+    const title = text(item.title, 220);
+    if (!title) return [];
+    const newsItems = extractGoogleNewsItems(item["ht:news_item"]);
+    return [{
+      source: "google_trends" as const,
+      externalId: stableGoogleTrendId(geo, title),
+      title,
+      excerpt: newsItems[0]?.snippet || newsItems[0]?.title || undefined,
+      sourceUrl: `https://trends.google.com/trending?geo=${encodeURIComponent(geo)}`,
+      authorLabel: "Google Trends",
+      engagementCount: Number(String(item["ht:approx_traffic"] || "0").replace(/\D/g, "")) || 0,
+      publishedAt: iso(item.pubDate as string),
+      countryCode: geo,
+      metadata: { approximate_traffic: item["ht:approx_traffic"] || null, news_items: newsItems, market: geo },
+    }];
+  });
+}
+
+async function fetchGoogleTrendMarket(geo: string) {
+  const response = await fetch(`https://trends.google.com/trending/rss?geo=${encodeURIComponent(geo)}`);
+  if (!response.ok) throw new Error(`Google Trends RSS (${geo}) returned ${response.status}`);
+  return parseGoogleTrendsRss(await response.text(), geo);
+}
+
 export const googleTrends: SourceAdapter = {
   name: "google_trends",
   async fetchSignals() {
-    const geo = process.env.GOOGLE_TRENDS_GEO || "US";
-    const response = await fetch(`https://trends.google.com/trending/rss?geo=${encodeURIComponent(geo)}`);
-    if (!response.ok) throw new Error(`Google Trends RSS returned ${response.status}`);
-    const parsed = new XMLParser({ ignoreAttributes: false }).parse(await response.text()) as {
-      rss?: { channel?: { item?: Array<Record<string, unknown>> | Record<string, unknown> } };
-    };
-    const raw = parsed.rss?.channel?.item;
-    const items = Array.isArray(raw) ? raw : raw ? [raw] : [];
-    return items.map((item, index) => {
-      const newsItems = extractGoogleNewsItems(item["ht:news_item"]);
-      return {
-        source: "google_trends" as const,
-        externalId: `${geo}-${text(item.title, 160)}-${index}`,
-        title: text(item.title, 220),
-        excerpt: newsItems[0]?.snippet || newsItems[0]?.title || undefined,
-        sourceUrl: `https://trends.google.com/trending?geo=${encodeURIComponent(geo)}`,
-        authorLabel: "Google Trends",
-        engagementCount: Number(String(item["ht:approx_traffic"] || "0").replace(/\D/g, "")) || 0,
-        publishedAt: iso(item.pubDate as string),
-        countryCode: geo,
-        metadata: { approximate_traffic: item["ht:approx_traffic"] || null, news_items: newsItems },
-      };
-    });
+    const markets = googleTrendMarkets();
+    if (!markets.length) throw new Error("GOOGLE_TRENDS_GEOS contains no supported markets");
+    const results = await Promise.allSettled(markets.map(fetchGoogleTrendMarket));
+    const signals = results.flatMap((result) => result.status === "fulfilled" ? result.value : []);
+    if (!signals.length) {
+      const failures = results.flatMap((result) => result.status === "rejected" ? [String(result.reason)] : []);
+      throw new Error(`Google Trends RSS failed for every market: ${failures.slice(0, 3).join("; ")}`);
+    }
+    return signals;
   },
 };
 

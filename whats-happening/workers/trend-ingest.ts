@@ -5,6 +5,7 @@ import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
 import { DAILY_TREND_TARGET } from "../src/lib/trend-feed";
 import { prepareSourceSignals } from "./prepare-signals";
+import { MAP_COUNTRIES } from "./map-countries";
 import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
 
 const sourceNames = (process.env.INGEST_SOURCES || "hacker_news,github,google_trends")
@@ -25,6 +26,10 @@ function categoryFor(signal: SourceSignal) {
 async function run() {
   if (!sourceNames.length) throw new Error("INGEST_SOURCES contains no supported source names");
   const supabase = getSupabaseAdmin();
+  const { error: countrySeedError } = await supabase
+    .from("countries")
+    .upsert(MAP_COUNTRIES, { onConflict: "code" });
+  if (countrySeedError) throw countrySeedError;
   const { data: runRow, error: runError } = await supabase
     .from("ingestion_runs")
     .insert({ sources_attempted: sourceNames })
@@ -49,7 +54,8 @@ async function run() {
     }
   });
 
-  const { data: countries } = await supabase.from("countries").select("id,code");
+  const { data: countries, error: countriesError } = await supabase.from("countries").select("id,code");
+  if (countriesError) throw countriesError;
   const countryIds = new Map((countries || []).map((country) => [country.code, country.id]));
 
   for (const cluster of clusterSignals(signals)) {

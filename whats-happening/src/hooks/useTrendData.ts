@@ -1,7 +1,7 @@
 "use client";
 
 import useSWR from "swr";
-import type { ChatMessage, Signal, TrendDetailPayload, TrendListPayload } from "@/types/trends";
+import type { ChatMessage, MapActivityPayload, Signal, TrendDetailPayload, TrendListPayload } from "@/types/trends";
 import {
   captureProductEventOnce,
   stableRouteName,
@@ -76,6 +76,10 @@ export function useSignals(limit = 20) {
   return useSWR<{ signals: Signal[]; mode: "live" | "demo" }>(`/api/signals?limit=${limit}`, fetcher, {
     refreshInterval: 15_000,
   });
+}
+
+export function useMapActivity() {
+  return useSWR<MapActivityPayload>("/api/countries", fetcher, { refreshInterval: 30_000 });
 }
 
 export function useMessages(slug: string) {

@@ -57,7 +57,15 @@ export function clusterSignals(signals: SourceSignal[]) {
 }
 
 export function earliestAttributedSignal(signals: SourceSignal[]) {
-  return [...signals]
+  const attributed = [...signals]
     .filter((signal) => signal.countryCode)
-    .sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime())[0];
+    .sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
+      || String(a.countryCode).localeCompare(String(b.countryCode)));
+  const earliest = attributed[0];
+  if (!earliest) return undefined;
+  const earliestTime = new Date(earliest.publishedAt).getTime();
+  const tiedCountries = new Set(attributed
+    .filter((signal) => new Date(signal.publishedAt).getTime() === earliestTime)
+    .map((signal) => signal.countryCode));
+  return tiedCountries.size === 1 ? earliest : undefined;
 }
