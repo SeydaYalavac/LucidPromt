@@ -3,7 +3,9 @@ import { edgeReadHeaders, unavailable } from "@/lib/api";
 import { isDemoMode } from "@/lib/env";
 import { demoTrends } from "@/lib/demo-data";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isAiTrend, sanitizeSignal, sanitizeTrend, selectAiScopedTrends } from "@/lib/trend-content";
+import { sanitizeSignal, sanitizeTrend } from "@/lib/trend-content";
+import { activeTrendCutoff } from "@/lib/trend-feed";
+import { buildMapActivityPayload } from "@/lib/map";
 import type { Signal } from "@/types/trends";
 
 function batches<T>(items: T[], size: number) {
@@ -13,8 +15,9 @@ function batches<T>(items: T[], size: number) {
 }
 
 export async function GET() {
+  const now = new Date();
   if (isDemoMode()) {
-    return NextResponse.json({ countries: [], trends: demoTrends.filter(isAiTrend), mode: "demo" }, { headers: edgeReadHeaders });
+    return NextResponse.json(buildMapActivityPayload([], demoTrends, [], { mode: "demo", now }), { headers: edgeReadHeaders });
   }
   try {
     const supabase = getSupabaseAdmin();
@@ -23,9 +26,10 @@ export async function GET() {
       supabase
         .from("trends")
         .select("*, country:countries(*)")
-        .not("country_id", "is", null)
         .order("score", { ascending: false })
-        .limit(250),
+        .order("last_seen_at", { ascending: false })
+        .gte("last_seen_at", activeTrendCutoff(now).toISOString())
+        .limit(1_000),
     ]);
     if (countries.error) throw countries.error;
     if (trends.error) throw trends.error;
@@ -34,7 +38,7 @@ export async function GET() {
       batches(candidates.map((trend) => trend.id), 100).map((trendIds) =>
         supabase
           .from("signals")
-          .select("*")
+          .select("*, country:countries(*)")
           .in("trend_id", trendIds)
           .order("observed_at", { ascending: false })
           .order("published_at", { ascending: false })
@@ -44,10 +48,7 @@ export async function GET() {
     const signalError = signalResults.find((result) => result.error)?.error;
     if (signalError) throw signalError;
     const signals = signalResults.flatMap((result) => result.data || []).map(sanitizeSignal) as Signal[];
-    return NextResponse.json(
-      { countries: countries.data, trends: selectAiScopedTrends(candidates, signals).slice(0, 50), mode: "live" },
-      { headers: edgeReadHeaders },
-    );
+    return NextResponse.json(buildMapActivityPayload(countries.data || [], candidates, signals, { mode: "live", now }), { headers: edgeReadHeaders });
   } catch (error) {
     return unavailable(error);
   }

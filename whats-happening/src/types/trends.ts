@@ -79,6 +79,8 @@ export interface TrendBrief {
 export interface Signal {
   id: string;
   trend_id: string;
+  country_id?: string | null;
+  country?: Country | null;
   source: SourceName;
   external_id: string;
   title: string;
@@ -129,6 +131,53 @@ export interface TrendListPayload {
     offset: number;
     total: number;
     has_more: boolean;
+  };
+}
+
+export interface MapEvidenceLink {
+  id: string;
+  provider: SourceName;
+  provider_label: string;
+  source_url: string;
+  source_title: string;
+  published_at: string;
+  observed_at: string;
+  signal_summary: string;
+}
+
+export interface MapTrendActivity {
+  id: string;
+  slug: string;
+  title: string;
+  category: string;
+  summary: string | null;
+  score: number;
+  velocity_score: number;
+  last_seen_at: string;
+  evidence_count: number;
+  source_count: number;
+  latest_observed_at: string;
+  evidence: MapEvidenceLink[];
+}
+
+export interface CountryActivity {
+  country: Country;
+  trend_count: number;
+  evidence_count: number;
+  source_count: number;
+  latest_observed_at: string;
+  rising_topics: MapTrendActivity[];
+}
+
+export interface MapActivityPayload {
+  activities: CountryActivity[];
+  mode: "live" | "demo";
+  coverage: {
+    countries_with_evidence: number;
+    countries_available: number;
+    attributed_evidence_count: number;
+    active_window_hours: number;
+    as_of: string;
   };
 }
 

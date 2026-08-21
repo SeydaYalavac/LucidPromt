@@ -1,0 +1,36 @@
+-- Country centroids used only to place source-attributed market activity.
+-- A row does not imply that the country currently has evidence.
+insert into public.countries (code, slug, name, latitude, longitude) values
+  ('US', 'united-states', 'United States', 37.0902, -95.7129),
+  ('GB', 'united-kingdom', 'United Kingdom', 55.3781, -3.4360),
+  ('CA', 'canada', 'Canada', 56.1304, -106.3468),
+  ('AU', 'australia', 'Australia', -25.2744, 133.7751),
+  ('IN', 'india', 'India', 20.5937, 78.9629),
+  ('SG', 'singapore', 'Singapore', 1.3521, 103.8198),
+  ('JP', 'japan', 'Japan', 36.2048, 138.2529),
+  ('KR', 'south-korea', 'South Korea', 35.9078, 127.7669),
+  ('DE', 'germany', 'Germany', 51.1657, 10.4515),
+  ('FR', 'france', 'France', 46.2276, 2.2137),
+  ('TR', 'turkey', 'Türkiye', 38.9637, 35.2433),
+  ('BR', 'brazil', 'Brazil', -14.2350, -51.9253),
+  ('MX', 'mexico', 'Mexico', 23.6345, -102.5528),
+  ('AR', 'argentina', 'Argentina', -38.4161, -63.6167),
+  ('ZA', 'south-africa', 'South Africa', -30.5595, 22.9375),
+  ('NG', 'nigeria', 'Nigeria', 9.0820, 8.6753),
+  ('AE', 'united-arab-emirates', 'United Arab Emirates', 23.4241, 53.8478),
+  ('SA', 'saudi-arabia', 'Saudi Arabia', 23.8859, 45.0792),
+  ('ID', 'indonesia', 'Indonesia', -0.7893, 113.9213),
+  ('PH', 'philippines', 'Philippines', 12.8797, 121.7740),
+  ('TH', 'thailand', 'Thailand', 15.8700, 100.9925),
+  ('VN', 'vietnam', 'Vietnam', 14.0583, 108.2772),
+  ('NZ', 'new-zealand', 'New Zealand', -40.9006, 174.8860),
+  ('IT', 'italy', 'Italy', 41.8719, 12.5674),
+  ('ES', 'spain', 'Spain', 40.4637, -3.7492),
+  ('NL', 'netherlands', 'Netherlands', 52.1326, 5.2913),
+  ('PL', 'poland', 'Poland', 51.9194, 19.1451),
+  ('SE', 'sweden', 'Sweden', 60.1282, 18.6435)
+on conflict (code) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  latitude = excluded.latitude,
+  longitude = excluded.longitude;
