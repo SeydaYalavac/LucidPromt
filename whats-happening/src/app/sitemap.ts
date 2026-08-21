@@ -18,6 +18,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    ...[
+      "compare/exploding-topics-vs-google-trends",
+      "compare/exploding-topics-vs-glimpse",
+    ].map((path) => ({
+      url: `${SITE_URL}/${path}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
     ...["privacy", "terms"].map((path) => ({
       url: `${SITE_URL}/${path}`,
       changeFrequency: "monthly" as const,

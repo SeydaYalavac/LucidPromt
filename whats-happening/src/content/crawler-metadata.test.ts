@@ -18,6 +18,8 @@ describe("crawler metadata", () => {
       SITE_URL,
       `${SITE_URL}/how-it-works`,
       `${SITE_URL}/pricing`,
+      `${SITE_URL}/compare/exploding-topics-vs-google-trends`,
+      `${SITE_URL}/compare/exploding-topics-vs-glimpse`,
       `${SITE_URL}/privacy`,
       `${SITE_URL}/terms`,
       `${SITE_URL}/world`,
