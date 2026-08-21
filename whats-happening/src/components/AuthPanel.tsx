@@ -22,6 +22,7 @@ import {
   SIGNUP_SOURCE_OPTIONS,
   type SignupSource,
 } from "@/lib/signup-attribution";
+import { useLocale } from "@/i18n/locale";
 
 export type AuthMode = "signin" | "signup" | "forgot" | "update";
 type SocialProvider = Extract<Provider, "google" | "github" | "apple">;
@@ -84,6 +85,34 @@ const modeCopy: Record<AuthMode, { title: string; description: string }> = {
   },
 };
 
+const modeCopyTr: Record<AuthMode, { title: string; description: string }> = {
+  signin: {
+    title: "Tekrar hoş geldin",
+    description: "Üretim veri bağlantısı yapılandırıldığında hesap erişimi yeniden açılacak.",
+  },
+  signup: {
+    title: "Hesabını oluştur",
+    description: "Bu dağıtımda hesap oluşturma henüz kullanılamıyor.",
+  },
+  forgot: {
+    title: "Parolanı sıfırla",
+    description: "Hesap adresine güvenli bir kurtarma bağlantısı göndereceğiz.",
+  },
+  update: {
+    title: "Yeni bir parola seç",
+    description: "Başka bir yerde kullanmadığın en az sekiz karakter kullan.",
+  },
+};
+
+const signupSourceLabelsTr: Record<SignupSource, string> = {
+  search_engine: "Arama motoru",
+  ai_assistant: "Yapay zekâ asistanı",
+  friend_or_colleague: "Arkadaş veya iş arkadaşı",
+  social_media: "Sosyal medya",
+  directory_or_review_site: "Dizin veya inceleme sitesi",
+  other: "Diğer",
+};
+
 function InputField({
   label,
   icon: Icon,
@@ -121,6 +150,8 @@ export function AuthPanel({
   initialError?: string;
   signupSourceOptions?: Array<(typeof SIGNUP_SOURCE_OPTIONS)[number]>;
 }) {
+  const { locale } = useLocale();
+  const l = (english: string, turkish: string) => locale === "tr" ? turkish : english;
   const router = useRouter();
   const { supabase, session, isLoading: sessionLoading, isConfigured } = useAuthSession();
   const [email, setEmail] = useState("");
@@ -133,7 +164,7 @@ export function AuthPanel({
   const [activeProvider, setActiveProvider] = useState<SocialProvider | null>(null);
   const [error, setError] = useState<string | null>(initialError || null);
   const [notice, setNotice] = useState<string | null>(null);
-  const copy = modeCopy[mode];
+  const copy = locale === "tr" ? modeCopyTr[mode] : modeCopy[mode];
   const authHref = (nextMode: AuthMode) => nextMode === "signin" || nextMode === "signup"
     ? `/${nextMode}?next=${encodeURIComponent(next)}`
     : `/auth?mode=${nextMode}&next=${encodeURIComponent(next)}`;
@@ -145,13 +176,13 @@ export function AuthPanel({
     setNotice(null);
 
     if (mode === "signup" && !signupSource) {
-      setError("Choose where you found us before creating your account.");
+      setError(l("Choose where you found us before creating your account.", "Hesabını oluşturmadan önce bizi nerede bulduğunu seç."));
       return;
     }
     captureProductEvent("auth_attempted", { mode, provider: "email" });
 
     if (!supabase) {
-      setError("Authentication isn’t available until Supabase is connected.");
+      setError(l("Authentication isn’t available until Supabase is connected.", "Supabase bağlanana kadar kimlik doğrulama kullanılamıyor."));
       captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "not_configured" });
       return;
     }
@@ -163,12 +194,12 @@ export function AuthPanel({
           ? emailSchema.safeParse(email)
           : passwordSchema.safeParse(password);
     if (!validation.success) {
-      setError(validation.error.issues[0]?.message || "Check the form and try again.");
+      setError(locale === "tr" ? "Formdaki bilgileri kontrol edip tekrar dene." : (validation.error.issues[0]?.message || "Check the form and try again."));
       captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "validation" });
       return;
     }
     if (mode === "update" && password !== confirmPassword) {
-      setError("The passwords don’t match.");
+      setError(l("The passwords don’t match.", "Parolalar eşleşmiyor."));
       captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "password_mismatch" });
       return;
     }
@@ -200,7 +231,7 @@ export function AuthPanel({
           window.location.assign(next);
           return;
         }
-        setNotice("Check your inbox to verify your email. The link will finish signing you in.");
+        setNotice(l("Check your inbox to verify your email. The link will finish signing you in.", "E-postanı doğrulamak için gelen kutunu kontrol et. Bağlantı, oturum açma işlemini tamamlayacak."));
         return;
       }
 
@@ -209,21 +240,21 @@ export function AuthPanel({
         const { error: authError } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
         if (authError) throw authError;
         captureProductEvent("auth_completed", { mode, provider: "email", success: true });
-        setNotice("If an account exists for that address, a recovery link is on its way.");
+        setNotice(l("If an account exists for that address, a recovery link is on its way.", "Bu adresle bir hesap varsa kurtarma bağlantısı gönderildi."));
         return;
       }
 
       if (!session) {
-        setError("This recovery session is missing or expired. Request a new password link.");
+        setError(l("This recovery session is missing or expired. Request a new password link.", "Bu kurtarma oturumu eksik veya süresi dolmuş. Yeni bir parola bağlantısı iste."));
         captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "missing_session" });
         return;
       }
       const { error: authError } = await supabase.auth.updateUser({ password });
       if (authError) throw authError;
       captureProductEvent("auth_completed", { mode, provider: "email", success: true });
-      setNotice("Your password is updated. You can continue to the public feed.");
+      setNotice(l("Your password is updated. You can continue to the public feed.", "Parolan güncellendi. Açık akışa devam edebilirsin."));
     } catch (authError) {
-      setError(authError instanceof Error ? authError.message : "Authentication failed. Try again.");
+      setError(locale === "tr" ? "Kimlik doğrulama başarısız oldu. Tekrar dene." : (authError instanceof Error ? authError.message : "Authentication failed. Try again."));
       captureProductEvent("auth_completed", { mode, provider: "email", success: false, failure_type: "provider_error" });
     } finally {
       setBusy(false);
@@ -234,12 +265,12 @@ export function AuthPanel({
     setError(null);
     setNotice(null);
     if (mode === "signup" && !signupSource) {
-      setError("Choose where you found us before continuing.");
+      setError(l("Choose where you found us before continuing.", "Devam etmeden önce bizi nerede bulduğunu seç."));
       return;
     }
     captureProductEvent("auth_attempted", { mode, provider });
     if (!supabase) {
-      setError("Authentication isn’t available until Supabase is connected.");
+      setError(l("Authentication isn’t available until Supabase is connected.", "Supabase bağlanana kadar kimlik doğrulama kullanılamıyor."));
       captureProductEvent("auth_completed", { mode, provider, success: false, failure_type: "not_configured" });
       return;
     }
@@ -252,7 +283,7 @@ export function AuthPanel({
       options: { redirectTo },
     });
     if (authError) {
-      setError(authError.message);
+      setError(locale === "tr" ? "Sağlayıcıyla oturum açma başarısız oldu. Tekrar dene." : authError.message);
       captureProductEvent("auth_completed", { mode, provider, success: false, failure_type: "provider_error" });
       setBusy(false);
       setActiveProvider(null);
@@ -265,7 +296,7 @@ export function AuthPanel({
     const { error: authError } = await supabase.auth.signOut();
     setBusy(false);
     if (authError) {
-      setError(authError.message);
+      setError(locale === "tr" ? "Oturum kapatılamadı. Tekrar dene." : authError.message);
       return;
     }
     router.replace(authHref("signin"));
@@ -299,27 +330,29 @@ export function AuthPanel({
 
       {!isConfigured && (
         <div className="mb-6 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3 text-sm leading-6 text-amber-100/85">
-          Sign-in is safely paused while the production Supabase project is being connected. No
-          account data will be submitted.
+          {l(
+            "Sign-in is safely paused while the production Supabase project is being connected. No account data will be submitted.",
+            "Üretim Supabase projesi bağlanırken oturum açma güvenli biçimde duraklatıldı. Hiçbir hesap verisi gönderilmeyecek.",
+          )}
         </div>
       )}
 
       {session && mode !== "update" && (
         <div className="mb-6 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] p-4">
           <p className="flex items-center gap-2 text-sm font-medium text-emerald-100">
-            <CheckCircle2 size={16} aria-hidden="true" /> Already signed in
+            <CheckCircle2 size={16} aria-hidden="true" /> {l("Already signed in", "Oturum zaten açık")}
           </p>
           <p className="mt-2 truncate text-sm text-emerald-100/65">{session.user.email}</p>
           <div className="mt-4 flex items-center gap-4 text-sm">
             <Link href={next} className="font-semibold text-white hover:text-[#67e8f9]">
-              Continue
+              {l("Continue", "Devam et")}
             </Link>
             <button
               type="button"
               onClick={signOutAndContinue}
               className="text-white/55 hover:text-white"
             >
-              Use another account
+              {l("Use another account", "Başka hesap kullan")}
             </button>
           </div>
         </div>
@@ -327,13 +360,13 @@ export function AuthPanel({
 
       {mode === "update" && !sessionLoading && !session && (
         <div className="mb-6 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3 text-sm leading-6 text-amber-100/85">
-          This recovery link is missing or expired. Request a new link before choosing a password.
+          {l("This recovery link is missing or expired. Request a new link before choosing a password.", "Bu kurtarma bağlantısı eksik veya süresi dolmuş. Parola seçmeden önce yeni bir bağlantı iste.")}
         </div>
       )}
 
       {mode === "signup" && (
         <fieldset className="mb-6 ph-no-capture">
-          <legend className="text-sm font-medium text-white/85">Where did you find us?</legend>
+          <legend className="text-sm font-medium text-white/85">{l("Where did you find us?", "Bizi nerede buldun?")}</legend>
           <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
             {signupSourceOptions.map((option) => (
               <label
@@ -353,13 +386,13 @@ export function AuthPanel({
                   disabled={busy}
                   className="h-4 w-4 accent-[#06b6d4]"
                 />
-                <span>{option.label}</span>
+                <span>{locale === "tr" ? signupSourceLabelsTr[option.value] : option.label}</span>
               </label>
             ))}
           </div>
           {signupSource === "ai_assistant" && (
             <label className="mt-4 block text-sm font-medium text-white/85">
-              What did you ask it?
+              {l("What did you ask it?", "Ona ne sordun?")}
               <textarea
                 name="aiPromptText"
                 value={aiPromptText}
@@ -367,7 +400,7 @@ export function AuthPanel({
                 maxLength={200}
                 rows={3}
                 disabled={busy}
-                placeholder="Optional, up to 200 characters"
+                placeholder={l("Optional, up to 200 characters", "İsteğe bağlı, en fazla 200 karakter")}
                 className="mt-2 w-full resize-none rounded-xl border border-white/10 bg-white/[0.045] px-4 py-3 text-[15px] leading-6 text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#06b6d4]/70 focus:bg-white/[0.065] disabled:cursor-not-allowed disabled:opacity-45"
               />
               <span className="mt-1.5 block text-right font-mono text-[11px] tabular-nums text-white/35">
@@ -380,14 +413,14 @@ export function AuthPanel({
 
       {mode !== "forgot" && mode !== "update" && (
         <>
-          <div className="grid grid-cols-3 gap-2.5" aria-label="Social sign-in options">
+          <div className="grid grid-cols-3 gap-2.5" aria-label={l("Social sign-in options", "Sosyal hesapla oturum açma seçenekleri")}>
             {socialProviders.map((provider) => (
               <button
                 key={provider.id}
                 type="button"
                 onClick={() => signInWithProvider(provider.id)}
                 disabled={busy || !isConfigured}
-                aria-label={`Continue with ${provider.label}`}
+                aria-label={l(`Continue with ${provider.label}`, `${provider.label} ile devam et`)}
                 className="flex h-12 items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/[0.045] px-2 text-xs font-semibold text-white transition-colors hover:border-white/25 hover:bg-white/[0.08] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {activeProvider === provider.id ? (
@@ -400,7 +433,7 @@ export function AuthPanel({
             ))}
           </div>
           <div className="my-6 flex items-center gap-3 text-[11px] font-medium uppercase tracking-[0.16em] text-white/30">
-            <span className="h-px flex-1 bg-white/10" /> or use email <span className="h-px flex-1 bg-white/10" />
+            <span className="h-px flex-1 bg-white/10" /> {l("or use email", "veya e-posta kullan")} <span className="h-px flex-1 bg-white/10" />
           </div>
         </>
       )}
@@ -408,11 +441,11 @@ export function AuthPanel({
       <form onSubmit={handleEmailAuth} className="space-y-4">
         {mode === "signup" && (
           <InputField
-            label="Display name"
+            label={l("Display name", "Görünen ad")}
             icon={UserRound}
             name="name"
             autoComplete="name"
-            placeholder="How developers will see you"
+            placeholder={l("How developers will see you", "Geliştiricilerin seni göreceği ad")}
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
             disabled={formDisabled}
@@ -421,7 +454,7 @@ export function AuthPanel({
         )}
         {mode !== "update" && (
           <InputField
-            label="Email"
+            label={l("Email", "E-posta")}
             icon={Mail}
             type="email"
             name="email"
@@ -435,12 +468,12 @@ export function AuthPanel({
         )}
         {mode !== "forgot" && (
           <InputField
-            label={mode === "update" ? "New password" : "Password"}
+            label={mode === "update" ? l("New password", "Yeni parola") : l("Password", "Parola")}
             icon={LockKeyhole}
             type="password"
             name="password"
             autoComplete={mode === "signin" ? "current-password" : "new-password"}
-            placeholder="At least 8 characters"
+            placeholder={l("At least 8 characters", "En az 8 karakter")}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             disabled={formDisabled}
@@ -450,12 +483,12 @@ export function AuthPanel({
         )}
         {(mode === "signup" || mode === "update") && (
           <InputField
-            label="Confirm password"
+            label={l("Confirm password", "Parolayı doğrula")}
             icon={ShieldCheck}
             type="password"
             name="confirmPassword"
             autoComplete="new-password"
-            placeholder="Repeat your password"
+            placeholder={l("Repeat your password", "Parolanı tekrar gir")}
             value={confirmPassword}
             onChange={(event) => setConfirmPassword(event.target.value)}
             disabled={formDisabled}
@@ -467,7 +500,7 @@ export function AuthPanel({
         {mode === "signin" && (
           <div className="flex justify-end">
             <Link href={authHref("forgot")} className="text-xs font-medium text-[#a6a6ae] hover:text-white">
-              Forgot password?
+              {l("Forgot password?", "Parolanı mı unuttun?")}
             </Link>
           </div>
         )}
@@ -478,23 +511,23 @@ export function AuthPanel({
           className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#06b6d4] text-sm font-bold text-[#021013] transition-colors hover:bg-[#22d3ee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#22d3ee] disabled:cursor-not-allowed disabled:opacity-40"
         >
           {busy && !activeProvider && <LoaderCircle size={17} className="animate-spin" />}
-          {mode === "signin" && "Sign in"}
-          {mode === "signup" && "Create account"}
-          {mode === "forgot" && "Send recovery link"}
-          {mode === "update" && "Update password"}
+          {mode === "signin" && l("Sign in", "Oturum aç")}
+          {mode === "signup" && l("Create account", "Hesap oluştur")}
+          {mode === "forgot" && l("Send recovery link", "Kurtarma bağlantısı gönder")}
+          {mode === "update" && l("Update password", "Parolayı güncelle")}
           {!busy && <ArrowRight size={16} aria-hidden="true" />}
         </button>
         {mode === "signup" && (
           <p className="px-2 text-center text-xs leading-5 text-white/40">
-            By creating an account, you agree to the{" "}
+            {l("By creating an account, you agree to the", "Hesap oluşturarak")} {" "}
             <Link href="/terms" className="text-white/65 underline decoration-white/20 underline-offset-4 hover:text-white">
-              Terms
+              {l("Terms", "Koşulları")}
             </Link>{" "}
-            and acknowledge the{" "}
+            {l("and acknowledge the", "kabul eder ve")} {" "}
             <Link href="/privacy" className="text-white/65 underline decoration-white/20 underline-offset-4 hover:text-white">
-              Privacy notice
+              {l("Privacy notice", "Gizlilik bildirimini")}
             </Link>
-            .
+            {l(".", " onaylarsın.")}
           </p>
         )}
       </form>
@@ -515,23 +548,23 @@ export function AuthPanel({
       <div className="mt-7 border-t border-white/10 pt-6 text-center text-sm text-[#8B8B93]">
         {mode === "signin" && (
           <p>
-            New here?{" "}
+            {l("New here?", "Burada yeni misin?")} {" "}
             <Link href={authHref("signup")} onClick={() => captureProductEvent("signup_cta_clicked", { source: "auth_panel" })} className="font-semibold text-white hover:text-[#67e8f9]">
-              Create an account
+              {l("Create an account", "Hesap oluştur")}
             </Link>
           </p>
         )}
         {mode === "signup" && (
           <p>
-            Already have an account?{" "}
+            {l("Already have an account?", "Zaten hesabın var mı?")} {" "}
             <Link href={authHref("signin")} className="font-semibold text-white hover:text-[#67e8f9]">
-              Sign in
+              {l("Sign in", "Oturum aç")}
             </Link>
           </p>
         )}
         {(mode === "forgot" || mode === "update") && (
           <Link href={authHref("signin")} className="font-semibold text-white hover:text-[#67e8f9]">
-            Back to sign in
+            {l("Back to sign in", "Oturum açmaya dön")}
           </Link>
         )}
       </div>
@@ -540,20 +573,24 @@ export function AuthPanel({
 }
 
 export function AuthContext() {
+  const { locale } = useLocale();
+  const l = (english: string, turkish: string) => locale === "tr" ? turkish : english;
   return (
     <div className="max-w-[480px]">
       <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.19em] text-[#67e8f9]">
-        <Radio size={14} aria-hidden="true" /> Account access
+        <Radio size={14} aria-hidden="true" /> {l("Account access", "Hesap erişimi")}
       </p>
       <h2 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-white lg:text-6xl">
-        Identity for source-linked discussion.
+        {l("Identity for source-linked discussion.", "Kaynak bağlantılı tartışmalar için kimlik.")}
       </h2>
       <p className="mt-6 max-w-[46ch] text-pretty text-base leading-7 text-[#92929b]">
-        Account identity and trend discussion are designed, but unavailable until the production
-        data and authentication services are connected.
+        {l(
+          "Account identity and trend discussion are designed, but unavailable until the production data and authentication services are connected.",
+          "Hesap kimliği ve trend tartışmaları hazırlandı, ancak üretim verisi ve kimlik doğrulama hizmetleri bağlanana kadar kullanılamıyor.",
+        )}
       </p>
       <div className="mt-10 rounded-2xl border border-amber-300/15 bg-amber-300/[0.045] p-5 text-sm leading-6 text-amber-100/75">
-        Production status: account access unavailable. No credentials entered on this page are submitted.
+        {l("Production status: account access unavailable. No credentials entered on this page are submitted.", "Üretim durumu: hesap erişimi kullanılamıyor. Bu sayfaya girilen hiçbir kimlik bilgisi gönderilmez.")}
       </div>
     </div>
   );

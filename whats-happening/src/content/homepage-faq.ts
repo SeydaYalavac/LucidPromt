@@ -35,3 +35,12 @@ export const homepageFaqs: HomepageFaq[] = [
       "The public product views cost $0. Account-based early access is also priced at $0, but account creation and live trend records are unavailable until the production data service is connected. There is no checkout or paid plan today.",
   },
 ];
+
+export const homepageFaqsTr: HomepageFaq[] = [
+  { question: "What's Happening in AI nedir?", answer: "What's Happening, gelişen teknolojiyi izleyen kurucular ve analistler için kaynak bağlantılı bir trend istihbaratı ürünüdür. Dağınık kaynak gözlemlerini puanlanmış trendlere, bağlantılı kanıtlara, ülke bağlamına ve ilginin neden değiştiğini açıklayan sade bir özete dönüştürür." },
+  { question: "Kaynak sinyalleri nasıl puanlanır?", answer: "Sistem Hacker News, GitHub ve Google Trends gibi resmi veya izinli kaynakları okur, ardından ilgili sinyalleri trendler halinde gruplar. Her trend puanı hız, erişim ve yeniliği birleştirir; kanıtları inceleyebilmeniz için kaynak bağlantıları korunur." },
+  { question: "Ülke bağlamı ne anlama gelir?", answer: "Ülke bağlamı, bir trend için mevcut en erken ülke etiketli kanıta dayanır. Bir konunun icat edildiği, başladığı veya sebep olduğu yeri değil, atfedilmiş kanıtın sistemde ilk görüldüğü yeri gösterir." },
+  { question: "Yükseliş izleme sinyali nedir?", answer: "Yükseliş izleme sinyali, güçlü yeniliğe ve artan gözlemlenmiş ilgiye sahip ancak Küresel Nabız eşiğini geçmemiş puanlı bir trend adayıdır. Nelerin incelenmeye değer olabileceğini sıralar; gelecekteki popülerliği tahmin etmez." },
+  { question: "Trend verileri ne kadar güncel?", answer: "Canlı veri hizmeti yapılandırıldığında kaynak alımı her 10 dakikada bir çalışacak şekilde tasarlanmıştır ve ana sayfa aktif trendleri 15 ila 30 saniyede bir yeniler. Canlı veri kullanılamıyorsa ürün, demo kayıtlarını güncel etkinlik gibi göstermek yerine bunu açıkça belirtir." },
+  { question: "What's Happening ne kadar?", answer: "Herkese açık ürün görünümleri 0 ABD dolarıdır. Hesap tabanlı erken erişim de 0 ABD doları olarak fiyatlandırılmıştır; üretim veri hizmeti bağlanana kadar hesap oluşturma ve canlı trend kayıtları kullanılamaz. Bugün ödeme veya ücretli plan yoktur." },
+];

@@ -5,15 +5,7 @@ import { Search, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSignals, useTrends } from "@/hooks/useTrendData";
-import { SITE_DESCRIPTION } from "@/lib/site";
-
-const placeholders = [
-  "Search the source-linked signal queue",
-  "Which technology topics score highest?",
-  "Show country-tagged evidence from Japan",
-  "Which signals have the fastest velocity?",
-  "Find scored science signals"
-];
+import { useLocale } from "@/i18n/locale";
 
 export function HeroSection() {
   const router = useRouter();
@@ -22,10 +14,12 @@ export function HeroSection() {
   const { data: trendData, error: trendError } = useTrends({ limit: 50 });
   const { data: signalData, error: signalError } = useSignals(100);
   const dataUnavailable = Boolean(trendError || signalError);
+  const { locale, t } = useLocale();
+  const placeholders = [t("hero.placeholder1"), t("hero.placeholder2"), t("hero.placeholder3"), t("hero.placeholder4"), t("hero.placeholder5")];
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setPlaceholderIndex((prev) => (prev + 1) % placeholders.length);
+      setPlaceholderIndex((prev) => (prev + 1) % 5);
     }, 3000);
     return () => clearInterval(interval);
   }, []);
@@ -41,10 +35,10 @@ export function HeroSection() {
         className="flex w-full max-w-6xl flex-col items-center text-center"
       >
         <h1 className="text-balance text-[clamp(40px,6.5vw,96px)] font-bold leading-[0.9] tracking-tighter text-white">
-          SOURCE-LINKED TREND<br />INTELLIGENCE FOR<br />FOUNDERS &amp; ANALYSTS
+          {t("hero.title").split("\n").map((line, index) => <span key={line}>{line}{index < 2 && <br />}</span>)}
         </h1>
         <p className="mt-8 max-w-2xl text-pretty text-lg font-medium leading-relaxed text-[#A3A3AA] md:text-2xl">
-          {SITE_DESCRIPTION} Inspect the earliest available country-tagged evidence behind each signal.
+          {t("hero.description")}
         </p>
       </motion.div>
 
@@ -62,9 +56,9 @@ export function HeroSection() {
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              aria-label="Search trends"
+              aria-label={t("hero.search")}
               className="peer absolute inset-0 h-full w-full bg-transparent text-xl text-white placeholder-transparent focus:outline-none"
-              placeholder="Search..."
+              placeholder={locale === "tr" ? "Ara..." : "Search..."}
             />
             {/* Rotating Placeholder */}
             <div className="pointer-events-none absolute inset-0 flex items-center peer-focus:hidden">
@@ -98,19 +92,19 @@ export function HeroSection() {
         <div className="flex items-center gap-3 rounded-full border border-white/5 bg-white/[0.02] px-6 py-2">
           <span className={`h-2 w-2 rounded-full ${dataUnavailable ? "bg-amber-300" : "bg-[#67E8F9]"}`} aria-hidden="true" />
           <span className="text-xs font-bold uppercase tracking-widest text-white">
-            {dataUnavailable ? "Production data unavailable" : "Connected source data"}
+            {dataUnavailable ? t("hero.dataUnavailable") : t("hero.dataConnected")}
           </span>
           <div className="ml-2 flex items-center gap-3 text-xs text-[#8B8B93] font-medium">
-            <span>{signalData ? `${signalData.signals.length} signal records loaded` : "Signal count unavailable"}</span>
+            <span>{signalData ? t("hero.signalsLoaded", { count: signalData.signals.length }) : t("hero.signalCountUnavailable")}</span>
             <span className="h-1 w-1 rounded-full bg-white/20"></span>
-            <span>{trendData ? `${trendData.trends.length} trend records loaded` : "Trend count unavailable"}</span>
+            <span>{trendData ? t("hero.trendsLoaded", { count: trendData.trends.length }) : t("hero.trendCountUnavailable")}</span>
             <span className="h-1 w-1 rounded-full bg-white/20"></span>
-            <span>source-linked</span>
+            <span>{t("hero.sourceLinked")}</span>
           </div>
         </div>
 
         <button type="button" onClick={() => document.getElementById("trending")?.scrollIntoView({ behavior: "smooth" })} className="group mt-12 flex min-h-11 flex-col items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-[#8B8B93] transition-colors hover:text-white">
-          <span>Explore</span>
+          <span>{t("hero.explore")}</span>
           <ChevronDown size={16} className="animate-bounce" />
         </button>
       </motion.div>

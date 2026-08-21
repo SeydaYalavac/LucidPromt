@@ -22,6 +22,7 @@ const sourceFiles = [
   "src/components/TrendDetail.tsx",
   "src/components/TrendCollection.tsx",
   "src/components/TrendStates.tsx",
+  "src/i18n/locale.tsx",
   "src/app/signup/page.tsx",
   "src/app/signin/page.tsx",
   "src/app/auth/page.tsx",

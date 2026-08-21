@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useSignals } from "@/hooks/useTrendData";
+import { useLocale } from "@/i18n/locale";
 
 const sourceColor: Record<string, string> = {
   github: "text-[#06b6d4]",
@@ -12,12 +13,13 @@ const sourceColor: Record<string, string> = {
 export function LiveFeed() {
   const { data } = useSignals(8);
   const feed = data?.signals || [];
+  const { t } = useLocale();
   return (
     <section className="w-full py-12 border-t border-white/5 bg-[#050505]">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex items-center gap-3 mb-8">
           <div className="h-2 w-2 rounded-full bg-[#67E8F9]" />
-          <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[#8B8B93]">Source observations</h2>
+          <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[#8B8B93]">{t("feed.title")}</h2>
         </div>
         
         <div className="flex flex-col gap-4">
@@ -34,7 +36,7 @@ export function LiveFeed() {
               <p className={`text-sm font-medium ${sourceColor[item.source] || "text-white"}`}>{item.title}</p>
             </motion.div>
           ))}
-          {!feed.length && <p className="text-sm text-[#8B8B93]">No connected source observations are available yet.</p>}
+          {!feed.length && <p className="text-sm text-[#8B8B93]">{t("feed.empty")}</p>}
         </div>
       </div>
     </section>

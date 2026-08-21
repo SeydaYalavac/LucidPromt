@@ -16,6 +16,7 @@ import { useAuthSession } from "@/hooks/useAuthSession";
 import type { ChatMessage } from "@/types/trends";
 import { captureProductEvent } from "@/lib/analytics";
 import { normalizeChatMessage } from "@/lib/chat-messages";
+import { useLocale } from "@/i18n/locale";
 
 interface ConversationEvidence {
   label: string;
@@ -42,10 +43,10 @@ function initials(name: string) {
     .toUpperCase();
 }
 
-function formattedTime(value: string) {
+function formattedTime(value: string, locale = "en") {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Time unavailable";
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -80,6 +81,8 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
     () => new Map(messages.map((message) => [message.id, message])),
     [messages],
   );
+  const { locale } = useLocale();
+  const l = (en: string, tr: string) => locale === "tr" ? tr : en;
 
   useEffect(() => {
     if (!supabase || mode !== "live") return;
@@ -148,10 +151,10 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({ body, reply_to_id: draftReply?.id || null }),
       });
-      const payload = await response.json().catch(() => ({ error: "The server returned an unreadable response." }));
+      const payload = await response.json().catch(() => ({ error: l("The server returned an unreadable response.", "Sunucu okunamayan bir yanıt döndürdü.") }));
       if (!response.ok) {
         setInput(body);
-        setError(payload.error || "Your note could not be posted. Try again.");
+        setError(payload.error || l("Your note could not be posted. Try again.", "Notunuz yayımlanamadı. Yeniden deneyin."));
         captureProductEvent("developer_chat_message_failed", { trend_slug: slug, status_code: response.status });
         return;
       }
@@ -164,7 +167,7 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
       }, false);
     } catch {
       setInput(body);
-      setError("Your note could not reach the server. Check your connection and try again.");
+      setError(l("Your note could not reach the server. Check your connection and try again.", "Notunuz sunucuya ulaşamadı. Bağlantınızı kontrol edip yeniden deneyin."));
       captureProductEvent("developer_chat_message_failed", { trend_slug: slug, status_code: 0 });
     } finally {
       setPendingMessage(null);
@@ -176,21 +179,21 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
     <section id="discussion" aria-labelledby="discussion-heading" className="scroll-mt-28">
       <header className="border-b border-white/[0.1] pb-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/50">Discussion</p>
+          <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/50">{l("Discussion", "Tartışma")}</p>
           <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/50">
-            {messages.length} {messages.length === 1 ? "contribution" : "contributions"}
+            {messages.length} {l(messages.length === 1 ? "contribution" : "contributions", "katkı")}
           </p>
         </div>
         <h2 id="discussion-heading" className="mt-3 text-3xl font-medium tracking-[-0.035em] text-white">
-          Community notes
+          {l("Community notes", "Topluluk notları")}
         </h2>
         <p className="mt-4 max-w-[62ch] text-pretty text-sm leading-6 text-[#A8A8AF]">
-          Compare interpretations, ask technical questions, and keep factual claims tied to the source trail.
+          {l("Compare interpretations, ask technical questions, and keep factual claims tied to the source trail.", "Yorumları karşılaştırın, teknik sorular sorun ve olgusal iddiaları kaynak izine bağlı tutun.")}
         </p>
 
         <div className="mt-6 grid gap-4 border-y border-white/[0.08] py-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0">
-            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/50">Conversation context</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-white/50">{l("Conversation context", "Konuşma bağlamı")}</p>
             <p className="mt-1 truncate text-sm font-medium text-white">{trendTitle}</p>
           </div>
           {evidence.length > 0 && (
@@ -204,7 +207,7 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
                   title={item.title}
                   className="inline-flex min-h-11 items-center text-xs font-medium text-white/55 underline decoration-white/20 underline-offset-4 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                 >
-                  {item.label} source
+                  {item.label} {l("source", "kaynağı")}
                 </a>
               ))}
             </div>
@@ -217,25 +220,25 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
         className="max-h-[34rem] min-h-64 overflow-y-auto overscroll-contain py-3 sm:py-5"
         aria-live="polite"
         aria-busy={isLoading || sending}
-        aria-label={`Messages about ${trendTitle}`}
+        aria-label={l(`Messages about ${trendTitle}`, `${trendTitle} hakkında mesajlar`)}
       >
         {isLoading && (
           <div className="flex min-h-64 items-center justify-center gap-2 text-sm text-white/50" role="status">
-            <LoaderCircle size={16} className="animate-spin" /> Loading discussion
+            <LoaderCircle size={16} className="animate-spin" /> {l("Loading discussion", "Tartışma yükleniyor")}
           </div>
         )}
         {loadError && !isLoading && (
           <div className="flex min-h-64 items-center justify-center px-6 text-center text-sm text-red-200" role="alert">
-            This discussion could not be loaded. Refresh the page to try again.
+            {l("This discussion could not be loaded. Refresh the page to try again.", "Bu tartışma yüklenemedi. Yeniden denemek için sayfayı yenileyin.")}
           </div>
         )}
         {!isLoading && !loadError && visibleMessages.length === 0 && (
           <div className="flex min-h-64 items-center justify-center px-6 text-center">
             <div>
               <MessageSquareText size={22} className="mx-auto text-white/30" />
-              <p className="mt-4 text-sm font-medium text-white">No community notes yet</p>
+              <p className="mt-4 text-sm font-medium text-white">{l("No community notes yet", "Henüz topluluk notu yok")}</p>
               <p className="mt-2 max-w-sm text-sm leading-6 text-white/50">
-                Add the first source-aware question or observation about this trend.
+                {l("Add the first source-aware question or observation about this trend.", "Bu trend hakkında kaynak bilincine sahip ilk soruyu veya gözlemi ekleyin.")}
               </p>
             </div>
           </div>
@@ -260,7 +263,7 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
                       href={replyParent ? `#message-${replyParent.id}` : undefined}
                       className="mb-3 block max-w-xl truncate text-xs text-white/50 hover:text-white/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                     >
-                      Replying to {replyParent ? `@${replyParent.author_display_name}: ${replyParent.body}` : "an earlier note"}
+                      {l("Replying to", "Yanıtlanan")} {replyParent ? `@${replyParent.author_display_name}: ${replyParent.body}` : l("an earlier note", "önceki bir not")}
                     </a>
                   )}
                   <div className="flex gap-3 sm:gap-4">
@@ -271,9 +274,9 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
                       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                         <p className="text-sm font-semibold text-white">{message.author_display_name}</p>
                         <time dateTime={message.created_at} suppressHydrationWarning className="font-mono text-[10px] uppercase tracking-[0.08em] text-white/50">
-                          {formattedTime(message.created_at)}
+                          {formattedTime(message.created_at, locale)}
                         </time>
-                        {isPending && <span className="text-xs text-white/50">Sending…</span>}
+                        {isPending && <span className="text-xs text-white/50">{l("Sending…", "Gönderiliyor…")}</span>}
                       </div>
                       <p className="mt-2 max-w-[68ch] whitespace-pre-wrap break-words text-sm leading-6 text-[#C7C7CC]">{message.body}</p>
                       {!isPending && session && (
@@ -282,7 +285,7 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
                           onClick={() => startReply(message)}
                           className="-ml-2 mt-2 inline-flex min-h-11 items-center gap-1.5 px-2 text-xs font-medium text-white/50 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                         >
-                          <CornerUpLeft size={13} /> Reply
+                          <CornerUpLeft size={13} /> {l("Reply", "Yanıtla")}
                         </button>
                       )}
                     </div>
@@ -297,26 +300,26 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
       <div className="border-t border-white/[0.1] pt-6">
         {mode === "demo" ? (
           <div className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] px-5 py-4 text-sm leading-6 text-amber-100/80">
-            Discussion is read-only in demo mode. Live posts require the production data connection.
+            {l("Discussion is read-only in demo mode. Live posts require the production data connection.", "Demo modunda tartışma salt okunurdur. Canlı gönderiler üretim veri bağlantısını gerektirir.")}
           </div>
         ) : session ? (
-          <form onSubmit={sendMessage} aria-label="Post a community note">
+          <form onSubmit={sendMessage} aria-label={l("Post a community note", "Topluluk notu yayımla")}>
             {replyingTo && (
               <div className="mb-3 flex items-start justify-between gap-4 border-l border-white/15 pl-4 text-sm">
                 <p className="min-w-0 truncate text-white/55">
-                  Replying to <span className="font-medium text-white">{replyingTo.author_display_name}</span>: {replyingTo.body}
+                  {l("Replying to", "Yanıtlanan")} <span className="font-medium text-white">{replyingTo.author_display_name}</span>: {replyingTo.body}
                 </p>
                 <button
                   type="button"
                   onClick={() => setReplyingTo(null)}
                   className="flex min-h-11 min-w-11 shrink-0 items-center justify-center text-white/50 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
-                  aria-label="Cancel reply"
+                  aria-label={l("Cancel reply", "Yanıtı iptal et")}
                 >
                   <X size={16} />
                 </button>
               </div>
             )}
-            <label htmlFor="discussion-note" className="sr-only">Write a community note</label>
+            <label htmlFor="discussion-note" className="sr-only">{l("Write a community note", "Topluluk notu yaz")}</label>
             <textarea
               ref={textareaRef}
               id="discussion-note"
@@ -335,12 +338,12 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
               required
               disabled={sending}
               aria-describedby="discussion-note-help discussion-note-status"
-              placeholder="Add a source, technical question, or useful interpretation…"
+              placeholder={l("Add a source, technical question, or useful interpretation…", "Bir kaynak, teknik soru veya yararlı yorum ekleyin…")}
               className="w-full resize-none rounded-2xl border border-white/[0.12] bg-[#0B0B0D] px-4 py-3 text-sm leading-6 text-white placeholder:text-white/30 focus:border-white/35 focus:outline-none disabled:opacity-60"
             />
             <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div id="discussion-note-help" className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.08em] text-white/50">
-                <span>Enter to post · Shift + Enter for a new line</span>
+                <span>{l("Enter to post · Shift + Enter for a new line", "Göndermek için Enter · Yeni satır için Shift + Enter")}</span>
                 <span className={input.length > 900 ? "text-amber-200" : undefined}>{input.length}/1000</span>
               </div>
               <button
@@ -349,34 +352,34 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
                 className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black hover:bg-[#E7E7E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-not-allowed disabled:opacity-35"
               >
                 {sending ? <LoaderCircle size={15} className="animate-spin" /> : <Send size={15} />}
-                {sending ? "Posting" : replyingTo ? "Post reply" : "Post note"}
+                {sending ? l("Posting", "Yayımlanıyor") : replyingTo ? l("Post reply", "Yanıtı yayımla") : l("Post note", "Notu yayımla")}
               </button>
             </div>
             <div id="discussion-note-status" className="mt-3 min-h-6" aria-live="assertive">
-              {error ? <p className="text-sm text-red-200" role="alert">{error}</p> : sending ? <p className="text-sm text-white/50">Your note is being moderated and posted.</p> : null}
+              {error ? <p className="text-sm text-red-200" role="alert">{error}</p> : sending ? <p className="text-sm text-white/50">{l("Your note is being moderated and posted.", "Notunuz denetleniyor ve yayımlanıyor.")}</p> : null}
             </div>
           </form>
         ) : !isConfigured ? (
           <div className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.04] px-5 py-4">
-            <p className="text-sm leading-6 text-amber-100/80">Account access is being configured. Public discussion remains readable.</p>
+            <p className="text-sm leading-6 text-amber-100/80">{l("Account access is being configured. Public discussion remains readable.", "Hesap erişimi yapılandırılıyor. Herkese açık tartışma okunabilir kalır.")}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-medium text-white">Join the discussion</p>
-              <p className="mt-1 text-sm text-white/50">A verified account keeps every public note attributable.</p>
+              <p className="text-sm font-medium text-white">{l("Join the discussion", "Tartışmaya katılın")}</p>
+              <p className="mt-1 text-sm text-white/50">{l("A verified account keeps every public note attributable.", "Doğrulanmış bir hesap, herkese açık her notun sahibini belli tutar.")}</p>
             </div>
             <Link
               href={`/auth?mode=signin&next=${encodeURIComponent(`/trend/${slug}#discussion`)}`}
               className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-white px-5 text-sm font-semibold text-black hover:bg-[#E7E7E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
-              Sign in to contribute
+              {l("Sign in to contribute", "Katkıda bulunmak için giriş yapın")}
             </Link>
           </div>
         )}
 
         <p className="mt-5 flex items-center gap-2 text-xs leading-5 text-white/50">
-          <ShieldCheck size={14} aria-hidden="true" /> Public, moderated, and limited to eight posts per minute. Don’t share private information.
+          <ShieldCheck size={14} aria-hidden="true" /> {l("Public, moderated, and limited to eight posts per minute. Don’t share private information.", "Herkese açık, denetlenen ve dakikada sekiz gönderiyle sınırlı. Özel bilgi paylaşmayın.")}
         </p>
       </div>
     </section>
