@@ -1,6 +1,6 @@
 import { adapters } from "./sources";
 import { clusterSignals, earliestAttributedSignal, scoreSignals, slugifyTitle } from "../src/lib/scoring";
-import { isDiscoverableSignal, sanitizeExcerpt, summarizeEvidenceSignal } from "../src/lib/trend-content";
+import { isAiSignal, sanitizeExcerpt, summarizeEvidenceSignal } from "../src/lib/trend-content";
 import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
 import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
@@ -43,7 +43,7 @@ async function run() {
       signals = signals.concat(
         result.value
           .map((signal) => ({ ...signal, excerpt: sanitizeExcerpt(signal.excerpt) || undefined }))
-          .filter(isDiscoverableSignal),
+          .filter(isAiSignal),
       );
       succeeded.push(name);
     } else {

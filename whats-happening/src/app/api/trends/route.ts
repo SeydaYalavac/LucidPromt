@@ -3,7 +3,7 @@ import { demoTrends } from "@/lib/demo-data";
 import { edgeReadHeaders, unavailable } from "@/lib/api";
 import { isDemoMode } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isDiscoverableTrend, resolveTrendContent, sanitizeSignal, sanitizeTrend } from "@/lib/trend-content";
+import { isAiTrend, sanitizeSignal, sanitizeTrend, selectAiScopedTrends } from "@/lib/trend-content";
 import type { Signal } from "@/types/trends";
 
 function batches<T>(items: T[], size: number) {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const country = request.nextUrl.searchParams.get("country");
 
   if (isDemoMode()) {
-    const trends = demoTrends.filter((trend) => !globalPulse || trend.is_global_pulse).slice(0, limit);
+    const trends = demoTrends.filter((trend) => isAiTrend(trend) && (!globalPulse || trend.is_global_pulse)).slice(0, limit);
     return NextResponse.json({ trends, mode: "demo" }, { headers: edgeReadHeaders });
   }
 
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
     if (country) query = query.eq("country.slug", country);
     const { data, error } = await query;
     if (error) throw error;
-    const candidates = (data || []).map(sanitizeTrend).filter(isDiscoverableTrend);
+    const candidates = (data || []).map(sanitizeTrend);
     const signalResults = await Promise.all(
       batches(candidates.map((trend) => trend.id), 100).map((trendIds) =>
         supabase
@@ -51,12 +51,7 @@ export async function GET(request: NextRequest) {
     const signalError = signalResults.find((result) => result.error)?.error;
     if (signalError) throw signalError;
     const signals = signalResults.flatMap((result) => result.data || []).map(sanitizeSignal) as Signal[];
-    const signalsByTrend = new Map<string, Signal[]>();
-    for (const signal of signals) signalsByTrend.set(signal.trend_id, [...(signalsByTrend.get(signal.trend_id) || []), signal]);
-    const trends = candidates
-      .map((trend) => resolveTrendContent(trend, signalsByTrend.get(trend.id) || []))
-      .filter((trend) => trend.summary && trend.summary_source)
-      .slice(0, limit);
+    const trends = selectAiScopedTrends(candidates, signals).slice(0, limit);
     return NextResponse.json({ trends, mode: "live" }, { headers: edgeReadHeaders });
   } catch (error) {
     return unavailable(error);

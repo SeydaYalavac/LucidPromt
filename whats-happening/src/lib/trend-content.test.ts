@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
-  hasTechnologyRelevance,
+  hasAiRelevance,
   buildTrendBrief,
-  isDiscoverableSignal,
-  isDiscoverableTrend,
+  isAiSignal,
+  isAiTrend,
+  isEligibleEvidenceSignal,
   resolveTrendContent,
   sanitizeExcerpt,
+  selectAiScopedTrends,
 } from "./trend-content";
 
 const screenshotExcerpt = `[{"ht:news_item_title":"Carlos Alcaraz to return from wrist injury, defend US Open title","ht:news_item_snippet":"","ht:news_item_url":"https://www.espn.com/tennis/story/_/id/49672571/carlos-alcaraz-return-wrist-injury-defend-us-open-title"},{"ht:news_item_title":"Carlos Alcaraz confirms U.S. Open return via soccer transfer figu`;
@@ -28,23 +30,69 @@ describe("sanitizeExcerpt", () => {
   });
 });
 
-describe("technology relevance", () => {
-  it("quarantines the screenshot sports topic", () => {
-    expect(isDiscoverableTrend({ title: "fabrizio romano", summary: screenshotExcerpt, category: "World" })).toBe(false);
-    expect(isDiscoverableTrend({ title: "fashion week", summary: "A model signs with a new agent", category: "Artificial Intelligence" })).toBe(false);
-    expect(isDiscoverableSignal({ source: "google_trends", title: "college football schedule", excerpt: "Opening week fixtures" })).toBe(false);
+describe("AI-only scope", () => {
+  it.each([
+    "OpenAI releases a new GPT-5 reasoning model",
+    "Anthropic publishes Claude model safety research",
+    "An open-weight language model benchmark",
+    "vLLM adds faster inference for multimodal models",
+    "A coding team ships an AI data extraction assistant",
+    "The EU AI Act enters its next enforcement phase",
+    "Mechanistic interpretability results for a foundation model",
+  ])("accepts verifiable AI evidence: %s", (text) => {
+    expect(hasAiRelevance(text)).toBe(true);
   });
 
-  it("keeps AI, developer, and adjacent technology evidence", () => {
-    expect(hasTechnologyRelevance("OpenAI releases a new coding agent")).toBe(true);
-    expect(isDiscoverableSignal({ source: "google_trends", title: "tesla autopilot", excerpt: "Self-driving crash data" })).toBe(true);
-    expect(isDiscoverableSignal({ source: "github", title: "small-org/unknown-tool", excerpt: null })).toBe(true);
+  it.each([
+    ["fabrizio romano", screenshotExcerpt],
+    ["fashion week", "A model signs with a new agent"],
+    ["college football schedule", "Opening week fixtures"],
+    ["small-org/unknown-tool", "A TypeScript dashboard framework"],
+    ["Nvidia shares rise", "The semiconductor company reports earnings"],
+    ["Gemini season begins", "A horoscope for June"],
+    ["Claude wins the school prize", "A student receives an award"],
+    ["cancer vaccine", "A phase-three clinical trial reports results"],
+    ["Fidelity crypto", "Bitcoin fund inflows increased"],
+    ["Show HN: All your saved articles in one place", "Sort reading by topic and avoid omnipresent AI slop"],
+    ["Show HN: Mini DBA", "Database monitoring with a tasteful amount of AI to help out"],
+  ])("rejects non-AI or name-only evidence: %s", (title, excerpt) => {
+    expect(isAiSignal({ title, excerpt })).toBe(false);
+  });
+
+  it("does not trust a stored AI category without AI evidence", () => {
+    expect(isAiTrend({ title: "fashion week", summary: "A model signs with a new agent" })).toBe(false);
+    expect(isAiTrend({ title: "Local-first AI agents", summary: null })).toBe(true);
+  });
+
+  it("uses the same strict AI boundary for public source evidence", () => {
+    const source_url = "https://news.ycombinator.com/item?id=123";
+    expect(isEligibleEvidenceSignal({ source: "hacker_news", external_id: "123", title: "AI agent safety benchmark", source_url })).toBe(true);
+    expect(isEligibleEvidenceSignal({ source: "hacker_news", external_id: "124", title: "Show HN: a CSS framework", source_url })).toBe(false);
+    expect(isEligibleEvidenceSignal({ source: "github", external_id: "125", title: "small-org/unknown-tool", source_url: "https://github.com/small-org/unknown-tool" })).toBe(false);
+  });
+
+  it("hides stored non-AI trends from public reads without deleting them", () => {
+    const trends = [
+      { id: "ai", title: "AI agent benchmark", summary: null, updated_at: "2026-08-21T14:00:00.000Z" },
+      { id: "sport", title: "fabrizio romano", summary: "Transfer news", updated_at: "2026-08-21T14:00:00.000Z" },
+    ];
+    const shared = {
+      source: "hacker_news",
+      source_url: "https://news.ycombinator.com/item?id=123",
+      observed_at: "2026-08-21T14:00:00.000Z",
+    };
+    const selected = selectAiScopedTrends(trends, [
+      { ...shared, trend_id: "ai", external_id: "123", title: "AI agent benchmark" },
+      { ...shared, trend_id: "sport", external_id: "124", title: "fabrizio romano", excerpt: "Football transfer news" },
+    ]);
+
+    expect(selected.map((trend) => trend.id)).toEqual(["ai"]);
   });
 });
 
 describe("source-backed trend content", () => {
   const trend = {
-    title: "Nvidia reasoning benchmark",
+    title: "Nvidia AI reasoning benchmark",
     summary: null,
     updated_at: "2026-08-21T14:00:00.000Z",
     last_seen_at: "2026-08-21T14:00:00.000Z",
@@ -52,7 +100,7 @@ describe("source-backed trend content", () => {
   const hackerNewsSignal = {
     source: "hacker_news",
     external_id: "123",
-    title: "Nvidia reasoning benchmark",
+    title: "Nvidia AI reasoning benchmark",
     excerpt: null,
     source_url: "https://news.ycombinator.com/item?id=123",
     engagement_count: 34,
@@ -69,20 +117,20 @@ describe("source-backed trend content", () => {
     expect(resolved.summary_source).toMatchObject({
       source: "hacker_news",
       source_url: "https://news.ycombinator.com/item?id=123",
-      source_title: "Nvidia reasoning benchmark",
+      source_title: "Nvidia AI reasoning benchmark",
       observed_at: "2026-08-21T14:04:00.000Z",
     });
   });
 
   it("replaces stale fallback copy with the newest eligible source", () => {
     const resolved = resolveTrendContent(
-      { ...trend, summary: "An older repository description." },
+      { ...trend, summary: "An older AI repository description." },
       [
         {
           source: "github",
           external_id: "old-repo",
-          title: "org/old-repo",
-          excerpt: "An older repository description.",
+          title: "org/old-ai-repo",
+          excerpt: "An older AI repository description.",
           source_url: "https://github.com/org/old-repo",
           engagement_count: 10,
           published_at: "2026-08-21T13:00:00.000Z",
@@ -161,7 +209,7 @@ describe("source-backed trend content", () => {
         source: "github",
         external_id: "repo-1",
         title: "org/reasoning-benchmark",
-        excerpt: "An open benchmark for reasoning models.",
+        excerpt: "An open AI model benchmark for reasoning systems.",
         source_url: "https://github.com/org/reasoning-benchmark",
         engagement_count: 120,
         published_at: "2026-08-21T14:02:00.000Z",

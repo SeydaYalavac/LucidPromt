@@ -3,13 +3,14 @@ import { demoSignals, demoTrends } from "@/lib/demo-data";
 import { edgeReadHeaders, unavailable } from "@/lib/api";
 import { isDemoMode } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { isDiscoverableTrend, isEligibleEvidenceSignal, resolveTrendContent, sanitizeSignal, sanitizeTrend } from "@/lib/trend-content";
+import { isAiTrend, isEligibleEvidenceSignal, resolveTrendContent, sanitizeSignal, sanitizeTrend } from "@/lib/trend-content";
 
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
 
   if (isDemoMode()) {
-    const trend = demoTrends.find((item) => item.slug === slug) || demoTrends[0];
+    const trend = demoTrends.find((item) => item.slug === slug && isAiTrend(item));
+    if (!trend) return NextResponse.json({ error: "Trend not found" }, { status: 404 });
     const signals = demoSignals.filter((signal) => signal.trend_id === trend.id);
     return NextResponse.json({ trend, signals, mode: "demo" }, { headers: edgeReadHeaders });
   }
@@ -36,9 +37,8 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
     if (signalError) throw signalError;
     const safeTrend = sanitizeTrend(trend);
     const safeSignals = (signals || []).map(sanitizeSignal).filter(isEligibleEvidenceSignal);
-    const trendIsDiscoverable = isDiscoverableTrend(safeTrend);
     const responseTrend = resolveTrendContent(safeTrend, safeSignals);
-    if (!trendIsDiscoverable || !responseTrend.summary || !responseTrend.summary_source) {
+    if (!responseTrend.summary || !responseTrend.summary_source) {
       return NextResponse.json({ error: "Trend not found" }, { status: 404 });
     }
     return NextResponse.json({ trend: responseTrend, signals: safeSignals, mode: "live" }, { headers: edgeReadHeaders });

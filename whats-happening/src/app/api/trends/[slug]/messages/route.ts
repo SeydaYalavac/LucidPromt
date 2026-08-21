@@ -5,13 +5,26 @@ import { isDemoMode } from "@/lib/env";
 import { moderateChatMessage } from "@/lib/moderation";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { unavailable } from "@/lib/api";
+import { isAiTrend, isEligibleEvidenceSignal, sanitizeSignal } from "@/lib/trend-content";
 
 const messageSchema = z.object({ body: z.string().trim().min(1).max(1000) });
+
+async function trendHasAiEvidence(supabase: ReturnType<typeof getSupabaseAdmin>, trendId: string) {
+  const { data, error } = await supabase
+    .from("signals")
+    .select("source,external_id,title,excerpt,source_url")
+    .eq("trend_id", trendId)
+    .order("observed_at", { ascending: false })
+    .limit(100);
+  if (error) throw error;
+  return (data || []).map(sanitizeSignal).some(isEligibleEvidenceSignal);
+}
 
 export async function GET(_request: Request, context: { params: Promise<{ slug: string }> }) {
   const { slug } = await context.params;
   if (isDemoMode()) {
-    const trend = demoTrends.find((item) => item.slug === slug) || demoTrends[0];
+    const trend = demoTrends.find((item) => item.slug === slug && isAiTrend(item));
+    if (!trend) return NextResponse.json({ error: "Trend not found" }, { status: 404 });
     return NextResponse.json({ messages: demoMessages.filter((item) => item.trend_id === trend.id), mode: "demo" });
   }
   try {
@@ -19,6 +32,7 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
     const { data: trend, error: trendError } = await supabase.from("trends").select("id").eq("slug", slug).single();
     if (trendError?.code === "PGRST116") return NextResponse.json({ error: "Trend not found" }, { status: 404 });
     if (trendError) throw trendError;
+    if (!await trendHasAiEvidence(supabase, trend.id)) return NextResponse.json({ error: "Trend not found" }, { status: 404 });
     const { data, error } = await supabase
       .from("chat_messages")
       .select("*")
@@ -53,6 +67,7 @@ export async function POST(request: NextRequest, context: { params: Promise<{ sl
     const { data: trend, error: trendError } = await supabase.from("trends").select("id").eq("slug", slug).single();
     if (trendError?.code === "PGRST116") return NextResponse.json({ error: "Trend not found" }, { status: 404 });
     if (trendError) throw trendError;
+    if (!await trendHasAiEvidence(supabase, trend.id)) return NextResponse.json({ error: "Trend not found" }, { status: 404 });
 
     const moderation = await moderateChatMessage(parsed.data.body);
     if (!moderation.allowed) {
