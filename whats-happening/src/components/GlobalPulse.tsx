@@ -30,22 +30,21 @@ export function GlobalPulse() {
         </div>
         
         {error && (
-          <div className="mt-16 rounded-3xl border border-white/10 bg-[#111114] p-8 text-[#8B8B93]">
+          <div className="editorial-card mt-16 rounded-3xl border p-8 text-[#8B8B93]">
             {t("pulse.unavailable")}
           </div>
         )}
-        {isLoading && <div className="mt-16 h-[424px] animate-pulse rounded-3xl bg-[#111114]" />}
+        {isLoading && <div className="editorial-card mt-16 h-[424px] animate-pulse rounded-3xl border" />}
         {!!trends.length && (
         <div className="mt-16 grid grid-cols-1 md:grid-cols-12 gap-6 auto-rows-[200px]">
-          <Link href={`/trend/${trends[0].slug}`} className="md:col-span-8 row-span-2 group relative overflow-hidden rounded-3xl bg-[#111114] border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between p-8">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#06b6d4]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          <Link href={`/trend/${trends[0].slug}`} className="editorial-card editorial-card-interactive group relative row-span-2 flex flex-col justify-between overflow-hidden rounded-3xl border p-8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white md:col-span-8">
             <div className="relative z-10 flex justify-between items-start">
               <span className="text-6xl font-black text-white/40 group-hover:text-white/60 transition-colors">01</span>
               <div className="flex flex-col items-end gap-2">
                 <span className="rounded-full bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-white">
                   {localeCategoryLabel(trends[0].category, locale)}
                 </span>
-                <span className="text-[#06b6d4] font-bold text-lg flex items-center gap-1">
+                <span className="flex items-center gap-1 text-lg font-bold text-[#D8D4CA]">
                   <TrendingUp size={20} /> {trends[0].growth_percent == null ? t("pulse.velocity", { value: trends[0].velocity_score }) : `${trends[0].growth_percent >= 0 ? "+" : ""}${Math.round(trends[0].growth_percent)}%`}
                 </span>
               </div>
@@ -68,11 +67,10 @@ export function GlobalPulse() {
           </Link>
 
           {trends.slice(1, 3).map((trend, index) => (
-            <Link key={trend.id} href={`/trend/${trend.slug}`} className="md:col-span-4 row-span-1 group relative overflow-hidden rounded-3xl bg-[#111114] border border-white/5 hover:border-white/20 transition-all flex flex-col justify-between p-6">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+            <Link key={trend.id} href={`/trend/${trend.slug}`} className="editorial-card editorial-card-interactive group relative row-span-1 flex flex-col justify-between overflow-hidden rounded-3xl border p-6 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white md:col-span-4">
               <div className="relative z-10 flex justify-between items-start">
                 <span className="text-3xl font-black text-white/40 group-hover:text-white/60 transition-colors">0{index + 2}</span>
-                <span className="text-[#a78bfa] font-bold flex items-center gap-1">
+                <span className="flex items-center gap-1 font-bold text-[#C9C5BC]">
                   <TrendingUp size={16} /> {trend.growth_percent == null ? t("pulse.velocity", { value: trend.velocity_score }) : `${trend.growth_percent >= 0 ? "+" : ""}${Math.round(trend.growth_percent)}%`}
                 </span>
               </div>

@@ -95,8 +95,8 @@ export function TrendDetail({ slug }: { slug: string }) {
       {trend.news_visual && <div className="mt-8"><SourcedNewsVisual visual={trend.news_visual} featured /></div>}
       <div className="mt-8 flex flex-wrap items-center gap-3">
         {firstEvidence && <a href={firstEvidence.source_url} target="_blank" rel="noreferrer" onClick={() => captureProductEvent("source_evidence_viewed", { trend_slug: slug, source_type: firstEvidence.provider })} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black hover:bg-[#E7E7E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{t("trend.openEvidence")} <ArrowUpRight size={16} /></a>}
-        <button type="button" onClick={() => { if (!isSaved) captureProductEvent("trend_saved", { trend_slug: slug, source: "detail" }); toggleSaved(slug); }} aria-pressed={isSaved} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-5 text-sm font-medium text-white hover:bg-white/[0.06]">{isSaved ? <Check size={16} /> : <Bookmark size={16} />} {isSaved ? t("trend.saved") : t("trend.save")}</button>
-        <button type="button" onClick={async () => { try { const result = await shareUrl(trend.title, window.location.href); if (result === "copied") { setShareNotice(true); window.setTimeout(() => setShareNotice(false), 1800); } } catch {} }} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-5 text-sm font-medium text-white hover:bg-white/[0.06]"><Share2 size={16} /> {shareNotice ? t("trend.copied") : t("trend.share")}</button>
+        <button type="button" onClick={() => { if (!isSaved) captureProductEvent("trend_saved", { trend_slug: slug, source: "detail" }); toggleSaved(slug); }} aria-pressed={isSaved} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-5 text-sm font-medium text-white hover:bg-white/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{isSaved ? <Check size={16} /> : <Bookmark size={16} />} {isSaved ? t("trend.saved") : t("trend.save")}</button>
+        <button type="button" onClick={async () => { try { const result = await shareUrl(trend.title, window.location.href); if (result === "copied") { setShareNotice(true); window.setTimeout(() => setShareNotice(false), 1800); } } catch {} }} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-5 text-sm font-medium text-white hover:bg-white/[0.06] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"><Share2 size={16} /> {shareNotice ? t("trend.copied") : t("trend.share")}</button>
       </div>
     </header>
 
@@ -126,7 +126,7 @@ export function TrendDetail({ slug }: { slug: string }) {
               </div>
             </section>)}
           </div>
-        </div> : <div className="rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 text-[#A8A8AF]">{t("trend.noArticle")}</div>}
+        </div> : <div className="editorial-card rounded-2xl border p-6 text-[#A8A8AF]">{t("trend.noArticle")}</div>}
 
         <section aria-labelledby="evidence-heading" className="mt-16 border-t border-white/[0.1] pt-12">
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">{t("trend.evidenceTrail")}</p>
@@ -154,12 +154,12 @@ export function TrendDetail({ slug }: { slug: string }) {
       </div>
 
       <aside className="space-y-5 lg:sticky lg:top-28">
-        <section className="rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6">
+        <section className="editorial-card rounded-2xl border p-6">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">{t("trend.trendScore")}</p>
           <p className="mt-3 text-6xl font-medium tracking-[-0.06em] text-white">{trend.score}</p>
           <div className="mt-7 space-y-5">{stats.map((stat) => <div key={stat.label}><div className="mb-2 flex justify-between text-xs"><span className="text-white/50">{stat.label}</span><span className="font-medium text-white">{stat.value}</span></div><div className="h-1 bg-white/10"><div className="h-full bg-white/70" style={{ width: `${stat.value}%` }} /></div></div>)}</div>
         </section>
-        <section className="rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6">
+        <section className="editorial-card rounded-2xl border p-6">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">{t("trend.evidenceStatus")}</p>
           <dl className="mt-5 space-y-4 text-sm"><div className="flex justify-between gap-3"><dt className="text-white/50">{t("trend.articleDepth")}</dt><dd className="text-right font-medium text-white">{article?.depth === "deep" ? t("trend.depthDeep") : t("trend.depthConcise")}</dd></div><div className="flex justify-between gap-3"><dt className="text-white/50">{t("trend.independentSitesLabel")}</dt><dd className="text-right font-medium text-white">{article?.independent_source_count || brief?.linked_site_count || evidence.length}</dd></div><div className="flex justify-between gap-3"><dt className="text-white/50">{t("trend.signalSystems")}</dt><dd className="text-right font-medium text-white">{brief?.evidence_source_count || trend.source_count}</dd></div><div className="flex justify-between gap-3"><dt className="text-white/50">{t("trend.lastUpdated")}</dt><dd className="text-right font-medium text-white">{dateLabel(article?.last_updated_at || brief?.freshest_observed_at || trend.last_seen_at, locale)}</dd></div><div className="flex justify-between gap-3"><dt className="text-white/50">{t("trend.firstDetected")}</dt><dd className="text-right font-medium text-white">{dateLabel(trend.first_seen_at, locale)}</dd></div></dl>
         </section>

@@ -59,7 +59,7 @@ export function NewsCard({
     } catch { /* A cancelled native share needs no error state. */ }
   }
 
-  return <article className={`group flex h-full flex-col rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 transition-colors hover:border-white/25 ${featured ? "sm:p-9" : "sm:p-7"}`}>
+  return <article className={`editorial-card editorial-card-interactive group flex h-full flex-col rounded-2xl border p-6 ${featured ? "sm:p-9" : "sm:p-7"}`}>
     <div className="flex items-start justify-between gap-5">
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.14em] text-white/45">
         <span className="tabular-nums text-white/25">{String(rank || trend.score).padStart(2, "0")}</span>

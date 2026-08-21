@@ -339,7 +339,7 @@ export function TrendChat({ trendId, slug, mode, trendTitle, evidence }: TrendCh
               disabled={sending}
               aria-describedby="discussion-note-help discussion-note-status"
               placeholder={l("Add a source, technical question, or useful interpretation…", "Bir kaynak, teknik soru veya yararlı yorum ekleyin…")}
-              className="w-full resize-none rounded-2xl border border-white/[0.12] bg-[#0B0B0D] px-4 py-3 text-sm leading-6 text-white placeholder:text-white/30 focus:border-white/35 focus:outline-none disabled:opacity-60"
+              className="editorial-card w-full resize-none rounded-2xl border px-4 py-3 text-sm leading-6 text-white placeholder:text-white/30 focus:border-white/35 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 disabled:opacity-60"
             />
             <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div id="discussion-note-help" className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.08em] text-white/50">
