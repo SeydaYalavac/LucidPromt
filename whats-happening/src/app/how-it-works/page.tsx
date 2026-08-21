@@ -302,6 +302,29 @@ export default function HowItWorksPage() {
           </div>
         </section>
 
+        <section className="border-t border-white/[0.08] bg-[#0B0B0D]">
+          <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-20 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24 lg:py-24">
+            <div>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Compare the method</p>
+              <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white">
+                Start with the research job.
+              </h2>
+            </div>
+            <div className="grid gap-px overflow-hidden rounded-[2rem] border border-white/[0.1] bg-white/[0.1] sm:grid-cols-2">
+              <Link href="/alternatives/google-trends" className="group bg-[#0B0B0D] p-7 transition-colors hover:bg-[#111114]">
+                <p className="text-sm font-medium text-white">Google Trends alternatives</p>
+                <p className="mt-3 text-sm leading-6 text-[#71717A]">Known search demand versus source-linked technology evidence.</p>
+                <ArrowRight size={15} className="mt-6 text-[#67E8F9] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </Link>
+              <Link href="/alternatives/exploding-topics" className="group bg-[#0B0B0D] p-7 transition-colors hover:bg-[#111114]">
+                <p className="text-sm font-medium text-white">Exploding Topics alternatives</p>
+                <p className="mt-3 text-sm leading-6 text-[#71717A]">Curated discovery versus an inspectable score and source trail.</p>
+                <ArrowRight size={15} className="mt-6 text-[#67E8F9] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
         <section className="border-t border-white/[0.08] bg-[#080809]">
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-6 py-20 sm:flex-row sm:items-end sm:justify-between lg:py-24">
             <div>
