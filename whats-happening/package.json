@@ -9,7 +9,9 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "ingest": "tsx workers/trend-ingest.ts"
+    "ingest": "tsx workers/trend-ingest.ts",
+    "research:refresh": "tsx scripts/refresh-security-research.ts",
+    "research:baseline": "tsx scripts/refresh-security-research.ts --baseline"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

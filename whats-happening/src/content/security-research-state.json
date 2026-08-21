@@ -1,0 +1,328 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-21",
+  "sources": {
+    "owasp-prompt": {
+      "fingerprint": "6906daaad19d01aa1d58c34bd7c7550ed80c09af92f67966ae8aaec3872a3470",
+      "lastModified": "Fri, 21 Aug 2026 14:56:59 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-disclosure": {
+      "fingerprint": "2a38cc28816b40cf9508839dcd86a97f3ffffd83ff6ffdddbbd78bc76a759e6a",
+      "lastModified": "Wed, 19 Aug 2026 14:37:53 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-supply": {
+      "fingerprint": "2f48f1f83d73b4eee78e48cda1f1a3b4cecb2e50f99647acd63a237d723f51f3",
+      "lastModified": "Thu, 20 Aug 2026 13:08:57 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-poison": {
+      "fingerprint": "dd6e47200d384ee74d8299ed7547dca9e5c7986d4775d54ee72f0854f49c8caa",
+      "lastModified": "Fri, 21 Aug 2026 19:30:34 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-output": {
+      "fingerprint": "7f57799a37ad7b65346a47d91bdc1f949fc3962079ac6dbb8fefef36cd9dd3d9",
+      "lastModified": "Tue, 18 Aug 2026 15:07:22 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-agency": {
+      "fingerprint": "e7d1aba82846ff177faaffe8f18edf9b2f14e00aec7eb75eb72d1aa2b8d86838",
+      "lastModified": "Thu, 20 Aug 2026 17:07:42 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-prompt-leak": {
+      "fingerprint": "d457123deae2fbac66a1e91448fe01bfffe4b4eb3cbc74da2687930e9409f8c6",
+      "lastModified": "Mon, 17 Aug 2026 07:22:09 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-vector": {
+      "fingerprint": "05941aa8c4b056be383d496d22e725ac641b87e0c02a0c2d96a0e9adaea23205",
+      "lastModified": "Mon, 10 Aug 2026 18:35:11 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-misinformation": {
+      "fingerprint": "09ffb1541c72629d2ae71c440467933c66d4f36e940b7e48864516fa0e81b50a",
+      "lastModified": "Thu, 20 Aug 2026 07:27:28 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "owasp-consumption": {
+      "fingerprint": "0bc3d5e17e4baf1fcf8e659b4be7ff5e309be58f711a61750552245ef2c9ad3b",
+      "lastModified": "Tue, 11 Aug 2026 19:25:55 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "nist-aml": {
+      "fingerprint": "c306a48f2c5f80e10cf5e7a828460eac5ce2cfa792ab603ad10fef2f793a6598",
+      "checkedAt": "2026-08-21"
+    },
+    "nist-genai": {
+      "fingerprint": "058d06f1582d1eb756a9547475771eb399a0b1c1b435a3be39490fd13642ab59",
+      "etag": "\"37d1e58af09cdb1:0\"",
+      "lastModified": "Mon, 24 Mar 2025 19:11:27 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "mitre-atlas": {
+      "fingerprint": "57ec49c58af58d23900603269a1f715e00c7769303e5adfe452b1fe3f6a9563d",
+      "etag": "W/\"6a7525ee-eba\"",
+      "lastModified": "Fri, 07 Aug 2026 00:25:18 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "cisa-deploy": {
+      "fingerprint": "a76973d5a0eb9aad1653f629250dd900c58303963e6a6ee8bbae4526effc9469",
+      "checkedAt": "2026-08-21"
+    },
+    "rag-paper": {
+      "fingerprint": "14106c7314b097f37de069cf32b0df52ed35214924a854a62cfb73d8bf683448",
+      "lastModified": "Tue, 11 Aug 2026 21:37:40 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "selfcheckgpt": {
+      "fingerprint": "dc6a8313bb05fec62b724fc05b4102944b4bf69a82929b214a6b49e46184d313",
+      "lastModified": "Tue, 11 Aug 2026 21:41:43 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "truthfulqa": {
+      "fingerprint": "d7ac5894cb60c109e48409e1e3ac85af2914accbe4ee76e66d76cea9444fd223",
+      "lastModified": "Tue, 11 Aug 2026 23:46:11 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "factscore": {
+      "fingerprint": "8a93586f6da604da90f7af5ece5349247d5d8967f14f6289e70b75c65e3a2e3e",
+      "lastModified": "Tue, 11 Aug 2026 21:34:34 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "semantic-entropy": {
+      "fingerprint": "b586ccc8b3040f752608f4953267a1941c35f14089b9ff817214800dd9098071",
+      "checkedAt": "2026-08-21"
+    },
+    "halueval": {
+      "fingerprint": "cdebe25979756842e06719fa4a3ac5f097cf89a93f5e192915f979f213268462",
+      "etag": "\"a3b3-659862a5f7b6a-gzip\"",
+      "lastModified": "Fri, 21 Aug 2026 03:23:51 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "model-stealing": {
+      "fingerprint": "a861800c5eb69f2af42d2a2a5db56af48f0ea2c1ac6cd753344bfbee8a38a122",
+      "lastModified": "Fri, 21 Aug 2026 21:44:16 GMT",
+      "checkedAt": "2026-08-21"
+    },
+    "membership-inference": {
+      "fingerprint": "4849c1f1a48cded947ad333b20c382f720b9f23b3bd41997419af69bcfe4fc72",
+      "lastModified": "Mon, 31 Jul 2017 13:29:58 GMT",
+      "checkedAt": "2026-08-21"
+    }
+  },
+  "dossiers": {
+    "prompt-injection": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "indirect-prompt-injection": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "sensitive-information-disclosure": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "model-supply-chain": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "training-data-poisoning": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "rag-vector-poisoning": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "improper-output-handling": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "excessive-agency": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "system-prompt-secrets": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "jailbreak-resilience": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "unbounded-consumption": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "model-extraction": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "membership-inference": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "adversarial-input-evasion": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "hallucination-risk-model": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "retrieval-grounding": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "atomic-claim-verification": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "nli-entailment-checking": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "self-consistency-uncertainty": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "hallucination-evaluation-sets": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    },
+    "human-review-calibrated-abstention": {
+      "version": 1,
+      "lastVerified": "2026-08-21",
+      "evidenceCheckedAt": "2026-08-21",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial defensive research review.",
+        "tr": "İlk savunma araştırması incelemesi."
+      }
+    }
+  }
+}

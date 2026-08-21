@@ -14,6 +14,7 @@ const tr = {
   "nav.explore": "Keşfet",
   "nav.map": "Harita",
   "nav.pricing": "Fiyatlandırma",
+  "nav.security": "AI güvenliği",
   "nav.how": "Nasıl çalışır",
   "nav.search": "Ara",
   "nav.openSearch": "Aramayı aç",
@@ -238,7 +239,7 @@ export function localeCategoryLabel(category: string, locale: Locale) {
 const english = Object.fromEntries(Object.keys(tr).map((key) => [key, key])) as Record<TranslationKey, string>;
 
 Object.assign(english, {
-  "nav.primary": "Primary navigation", "nav.mobile": "Mobile navigation", "nav.world": "World", "nav.trending": "Trending", "nav.explore": "Explore", "nav.map": "Map", "nav.pricing": "Pricing", "nav.how": "How it works", "nav.search": "Search", "nav.openSearch": "Open search", "nav.signIn": "Sign in", "nav.signUp": "Sign up", "nav.signOut": "Sign out", "nav.openAccount": "Open account menu", "nav.open": "Open navigation", "nav.close": "Close navigation",
+  "nav.primary": "Primary navigation", "nav.mobile": "Mobile navigation", "nav.world": "World", "nav.trending": "Trending", "nav.explore": "Explore", "nav.map": "Map", "nav.pricing": "Pricing", "nav.security": "AI security", "nav.how": "How it works", "nav.search": "Search", "nav.openSearch": "Open search", "nav.signIn": "Sign in", "nav.signUp": "Sign up", "nav.signOut": "Sign out", "nav.openAccount": "Open account menu", "nav.open": "Open navigation", "nav.close": "Close navigation",
   "locale.label": "Language", "locale.english": "English", "locale.turkish": "Türkçe",
   "search.dialog": "Search trends and pages", "search.close": "Close", "search.heading": "Search the source-linked signal map", "search.placeholder": "Search a trend, country, or category", "search.all": "Search all trends for “{query}”", "search.countryUnknown": "Country not attributed", "search.instructions": "Use ↑ ↓ to move, Enter to open, Esc to close.",
   "hero.title": "SOURCE-LINKED TREND\nINTELLIGENCE FOR\nFOUNDERS & ANALYSTS", "hero.description": "Source-linked AI trend intelligence for founders and analysts tracking emerging technology. Inspect the earliest available country-tagged evidence behind each signal.", "hero.search": "Search trends", "hero.placeholder1": "Search the source-linked signal queue", "hero.placeholder2": "Which technology topics score highest?", "hero.placeholder3": "Show country-tagged evidence from Japan", "hero.placeholder4": "Which signals have the fastest velocity?", "hero.placeholder5": "Find scored science signals", "hero.dataUnavailable": "Production data unavailable", "hero.dataConnected": "Connected source data", "hero.signalsLoaded": "{count} signal records loaded", "hero.signalCountUnavailable": "Signal count unavailable", "hero.trendsLoaded": "{count} trend records loaded", "hero.trendCountUnavailable": "Trend count unavailable", "hero.sourceLinked": "source-linked", "hero.explore": "Explore",

@@ -26,7 +26,7 @@ export function GlobalNavbar({ showPrimaryAuthAction = true }: GlobalNavbarProps
   const { t } = useLocale();
 
   const navigationLabels: Record<string, TranslationKey> = {
-    "/world": "nav.world", "/trending": "nav.trending", "/explore": "nav.explore", "/map": "nav.map", "/pricing": "nav.pricing",
+    "/world": "nav.world", "/trending": "nav.trending", "/explore": "nav.explore", "/map": "nav.map", "/security-research": "nav.security", "/pricing": "nav.pricing",
   };
 
   useMotionValueEvent(scrollY, "change", (latest) => setIsScrolled(latest > 32));
