@@ -26,6 +26,8 @@ describe("legal notices", () => {
     const terms = noticeText(termsNotice);
 
     expect(privacy).toContain("current product behavior");
+    expect(privacy).toContain("Privacy-masked session replay and rage-click detection are enabled");
+    expect(privacy).toContain("does not send form values");
     expect(privacy).toContain("There is no self-serve account deletion control");
     expect(privacy).toContain(supportAddress);
     expect(terms).toContain("describe the product as it works today");

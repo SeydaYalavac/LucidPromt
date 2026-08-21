@@ -17,7 +17,7 @@ export function WorldView() {
     <section className="pt-12" aria-label="World trends">
       {isLoading && <TrendLoading />}
       {error && <TrendUnavailable />}
-      {!!trends.length && <><NewsCard trend={trends[0]} featured rank={1} /><div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">{trends.slice(1, 5).map((trend, index) => <NewsCard key={trend.id} trend={trend} rank={index + 2} />)}</div>{data?.mode === "demo" && <p className="mt-5 font-mono text-xs uppercase tracking-widest text-amber-200">Demo data is explicitly enabled in this environment.</p>}</>}
+      {!!trends.length && <><NewsCard trend={trends[0]} featured rank={1} analyticsSource="world" /><div className="mt-5 grid gap-5 md:grid-cols-2 xl:grid-cols-4">{trends.slice(1, 5).map((trend, index) => <NewsCard key={trend.id} trend={trend} rank={index + 2} analyticsSource="world" />)}</div>{data?.mode === "demo" && <p className="mt-5 font-mono text-xs uppercase tracking-widest text-amber-200">Demo data is explicitly enabled in this environment.</p>}</>}
     </section>
   </div>;
 }

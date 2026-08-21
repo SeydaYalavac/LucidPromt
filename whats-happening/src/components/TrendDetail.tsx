@@ -6,6 +6,7 @@ import { useTrend } from "@/hooks/useTrendData";
 import { useSavedTrends } from "@/hooks/useSavedTrends";
 import { shareUrl } from "@/lib/share";
 import { useState } from "react";
+import { captureProductEvent } from "@/lib/analytics";
 
 export function TrendDetail({ slug }: { slug: string }) {
   const { saved, toggleSaved } = useSavedTrends();
@@ -37,7 +38,7 @@ export function TrendDetail({ slug }: { slug: string }) {
           </div>
         </div>
         <div className="flex gap-3">
-          <button type="button" onClick={() => toggleSaved(slug)} aria-pressed={saved.includes(slug)} className="flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 text-sm font-medium text-white"><BookmarkPlus size={16} /> {saved.includes(slug) ? "Saved" : "Save"}</button>
+          <button type="button" onClick={() => { if (!saved.includes(slug)) captureProductEvent("trend_saved", { trend_slug: slug, source: "detail" }); toggleSaved(slug); }} aria-pressed={saved.includes(slug)} className="flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 text-sm font-medium text-white"><BookmarkPlus size={16} /> {saved.includes(slug) ? "Saved" : "Save"}</button>
           <button type="button" onClick={async () => { try { const result = await shareUrl(trend.title, window.location.href); if (result === "copied") { setShareNotice(true); window.setTimeout(() => setShareNotice(false), 1800); } } catch {} }} className="flex min-h-11 items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 text-sm font-medium text-white"><Share size={16} /> {shareNotice ? "Link copied" : "Share"}</button>
         </div>
       </div>
@@ -64,7 +65,7 @@ export function TrendDetail({ slug }: { slug: string }) {
             <h2 className="mb-5 text-sm font-bold uppercase tracking-[0.2em] text-[#8B8B93]">Evidence trail</h2>
             <div className="space-y-3">
               {signals.map((signal) => (
-                <a key={signal.id} href={signal.source_url} target="_blank" rel="noreferrer" className="flex items-start justify-between gap-4 rounded-2xl border border-white/5 bg-[#111114] p-5 hover:border-white/15">
+                <a key={signal.id} href={signal.source_url} target="_blank" rel="noreferrer" onClick={() => captureProductEvent("source_evidence_viewed", { trend_slug: slug, source_type: signal.source })} className="flex items-start justify-between gap-4 rounded-2xl border border-white/5 bg-[#111114] p-5 hover:border-white/15">
                   <div><span className="font-mono text-[10px] uppercase tracking-wider text-[#06b6d4]">{signal.source.replace("_", " ")}</span><p className="mt-1 text-sm font-semibold text-white">{signal.title}</p></div>
                   <ExternalLink className="mt-1 shrink-0 text-[#8B8B93]" size={16} />
                 </a>

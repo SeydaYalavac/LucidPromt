@@ -2,13 +2,64 @@
 
 import useSWR from "swr";
 import type { ChatMessage, Signal, TrendDetailPayload, TrendListPayload } from "@/types/trends";
+import {
+  captureProductEventOnce,
+  stableRouteName,
+} from "@/lib/analytics";
+
+function stableApiEndpoint(url: string) {
+  const pathname = url.split(/[?#]/, 1)[0];
+  if (/^\/api\/trends\/[^/]+\/messages$/.test(pathname)) return "/api/trends/[slug]/messages";
+  if (/^\/api\/trends\/[^/]+$/.test(pathname)) return "/api/trends/[slug]";
+  return pathname;
+}
 
 async function fetcher<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  const payload = await response.json();
-  if (!response.ok) throw new Error(payload.error || "Live data request failed");
+  const endpoint = stableApiEndpoint(url);
+  let response: Response;
+  try {
+    response = await fetch(url);
+  } catch {
+    captureProductEventOnce(`api_error:network:${endpoint}`, "api_error", {
+      endpoint,
+      failure_type: "network",
+      status_code: 0,
+    });
+    throw new Error("Live data request failed");
+  }
+
+  let payload: { error?: string; code?: string };
+  try {
+    payload = await response.json();
+  } catch {
+    captureProductEventOnce(`api_error:invalid:${endpoint}`, "api_error", {
+      endpoint,
+      failure_type: "invalid_response",
+      status_code: response.status,
+    });
+    throw new Error("Live data returned an invalid response");
+  }
+
+  if (!response.ok) {
+    if (payload.code === "LIVE_DATA_UNAVAILABLE") {
+      captureProductEventOnce(`live_data_unavailable:${endpoint}`, "live_data_unavailable", {
+        endpoint,
+        route: stableRouteName(window.location.pathname),
+        status_code: response.status,
+      });
+    } else {
+      captureProductEventOnce(`api_error:http:${endpoint}:${response.status}`, "api_error", {
+        endpoint,
+        failure_type: "http",
+        status_code: response.status,
+      });
+    }
+    throw new Error(payload.error || "Live data request failed");
+  }
   return payload as T;
 }
+
+export { fetcher as productDataFetcher };
 
 export function useTrends(options: { globalPulse?: boolean; limit?: number } = {}) {
   const query = new URLSearchParams();

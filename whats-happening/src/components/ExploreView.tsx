@@ -21,7 +21,7 @@ export function ExploreView() {
       {isLoading && <div className="grid gap-5 md:grid-cols-2"><TrendLoading /><TrendLoading /></div>}
       {error && <TrendUnavailable />}
       {!error && !isLoading && !trends.length && <TrendEmpty message={`No ${category === "All" ? "" : category + " "}trends are available yet.`} />}
-      {!!trends.length && <div className="columns-1 gap-5 md:columns-2 xl:columns-3">{trends.map((trend, index) => <div key={trend.id} className="mb-5 break-inside-avoid"><NewsCard trend={trend} featured={index % 5 === 0} rank={index + 1} /></div>)}</div>}
+      {!!trends.length && <div className="columns-1 gap-5 md:columns-2 xl:columns-3">{trends.map((trend, index) => <div key={trend.id} className="mb-5 break-inside-avoid"><NewsCard trend={trend} featured={index % 5 === 0} rank={index + 1} analyticsSource="explore" /></div>)}</div>}
     </section>
   </div>;
 }
