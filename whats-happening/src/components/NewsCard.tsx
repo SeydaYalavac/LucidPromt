@@ -10,6 +10,7 @@ import { captureProductEvent } from "@/lib/analytics";
 import { sourceLabel } from "@/lib/trend-content";
 import { localeCategoryLabel, useLocale } from "@/i18n/locale";
 import { localizeTrendBrief } from "@/i18n/trend";
+import { SourcedNewsVisual } from "./SourcedNewsVisual";
 
 type CardSource = "category" | "country" | "explore" | "trending" | "world";
 
@@ -72,7 +73,9 @@ export function NewsCard({
       </div>
     </div>
 
-    <Link href={`/trend/${trend.slug}`} className="mt-9 flex flex-1 flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
+    {trend.news_visual && <div className="mt-5"><SourcedNewsVisual visual={trend.news_visual} featured={featured} /></div>}
+
+    <Link href={`/trend/${trend.slug}`} className={`${trend.news_visual ? "mt-6" : "mt-9"} flex flex-1 flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white`}>
       <h2 className={`text-balance font-medium leading-[1.05] tracking-[-0.04em] text-white ${featured ? "max-w-4xl text-[clamp(2.3rem,5vw,4.5rem)]" : "text-2xl sm:text-[1.7rem]"}`}>{trend.title}</h2>
       <p className={`mt-4 max-w-[68ch] text-pretty text-[#B3B3BA] ${featured ? "text-base leading-7" : "text-sm leading-6"}`}>{brief?.what_it_is || trend.summary || t("card.fallback")}</p>
       <div className="mt-auto pt-8">

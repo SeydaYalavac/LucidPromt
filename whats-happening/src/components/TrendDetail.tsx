@@ -11,6 +11,7 @@ import { sourceLabel } from "@/lib/trend-content";
 import type { TrendBriefEvidence } from "@/types/trends";
 import { localeCategoryLabel, useLocale } from "@/i18n/locale";
 import { localizeTrendBrief } from "@/i18n/trend";
+import { SourcedNewsVisual } from "./SourcedNewsVisual";
 
 function dateLabel(value: string, locale = "en") {
   if (!value) return locale === "tr" ? "Zaman bilgisi yok" : "Time unavailable";
@@ -91,6 +92,7 @@ export function TrendDetail({ slug }: { slug: string }) {
       <div className="mt-5 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.12em] text-white/40">
         <span>{evidenceStatus}</span><span aria-hidden="true">·</span><time dateTime={article?.last_updated_at || brief?.freshest_observed_at || trend.last_seen_at}>{t("trend.updated", { time: dateLabel(article?.last_updated_at || brief?.freshest_observed_at || trend.last_seen_at, locale) })}</time>
       </div>
+      {trend.news_visual && <div className="mt-8"><SourcedNewsVisual visual={trend.news_visual} featured /></div>}
       <div className="mt-8 flex flex-wrap items-center gap-3">
         {firstEvidence && <a href={firstEvidence.source_url} target="_blank" rel="noreferrer" onClick={() => captureProductEvent("source_evidence_viewed", { trend_slug: slug, source_type: firstEvidence.provider })} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black hover:bg-[#E7E7E9] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{t("trend.openEvidence")} <ArrowUpRight size={16} /></a>}
         <button type="button" onClick={() => { if (!isSaved) captureProductEvent("trend_saved", { trend_slug: slug, source: "detail" }); toggleSaved(slug); }} aria-pressed={isSaved} className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-5 text-sm font-medium text-white hover:bg-white/[0.06]">{isSaved ? <Check size={16} /> : <Bookmark size={16} />} {isSaved ? t("trend.saved") : t("trend.save")}</button>

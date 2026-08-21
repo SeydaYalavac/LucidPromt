@@ -122,6 +122,29 @@ describe("source-backed trend content", () => {
     });
   });
 
+  it("exposes only a rights-checked visual from eligible evidence", () => {
+    const newsVisual = {
+      image_url: "https://upload.wikimedia.org/ai-research.jpg",
+      title: "AI research lab",
+      alt_text: "An AI research lab.",
+      source_name: "Wikimedia Commons",
+      source_url: "https://commons.wikimedia.org/wiki/File:AI_research.jpg",
+      creator_name: "Example Photographer",
+      license_name: "CC BY 4.0",
+      license_url: "https://creativecommons.org/licenses/by/4.0/",
+      rights_basis: "open_license",
+    };
+
+    expect(resolveTrendContent(trend, [{
+      ...hackerNewsSignal,
+      metadata: { ...hackerNewsSignal.metadata, news_visual: newsVisual },
+    }]).news_visual).toEqual(newsVisual);
+    expect(resolveTrendContent(trend, [{
+      ...hackerNewsSignal,
+      metadata: { ...hackerNewsSignal.metadata, news_visual: { image_url: "https://publisher.example/og.jpg" } },
+    }]).news_visual).toBeNull();
+  });
+
   it("replaces stale fallback copy with the newest eligible source", () => {
     const resolved = resolveTrendContent(
       { ...trend, summary: "An older AI repository description." },
