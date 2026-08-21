@@ -1,4 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
+import { sanitizeExcerpt } from "../src/lib/trend-content";
 import type { SourceName, SourceSignal } from "../src/types/trends";
 
 export interface SourceAdapter {
@@ -92,7 +93,7 @@ export const googleTrends: SourceAdapter = {
       source: "google_trends" as const,
       externalId: `${geo}-${text(item.title, 160)}-${index}`,
       title: text(item.title, 220),
-      excerpt: text(item["ht:news_item"] && JSON.stringify(item["ht:news_item"]), 500),
+      excerpt: sanitizeExcerpt(item["ht:news_item"]) || undefined,
       sourceUrl: `https://trends.google.com/trending?geo=${encodeURIComponent(geo)}`,
       authorLabel: "Google Trends",
       engagementCount: Number(String(item["ht:approx_traffic"] || "0").replace(/\D/g, "")) || 0,
