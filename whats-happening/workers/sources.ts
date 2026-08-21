@@ -7,6 +7,11 @@ export interface SourceAdapter {
   fetchSignals(): Promise<SourceSignal[]>;
 }
 
+export const SOURCE_INTAKE_LIMITS = {
+  hackerNews: 200,
+  github: 100,
+} as const;
+
 const iso = (value: string | number | undefined) => {
   const parsed = value ? new Date(value) : new Date();
   return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
@@ -48,7 +53,7 @@ export const hackerNews: SourceAdapter = {
   async fetchSignals() {
     const ids = await json<number[]>("https://hacker-news.firebaseio.com/v0/newstories.json");
     const items = await Promise.all(
-      ids.slice(0, 80).map((id) =>
+      ids.slice(0, SOURCE_INTAKE_LIMITS.hackerNews).map((id) =>
         json<{ id: number; title?: string; text?: string; url?: string; by?: string; score?: number; descendants?: number; time?: number }>(
           `https://hacker-news.firebaseio.com/v0/item/${id}.json`,
         ),
@@ -88,7 +93,7 @@ export const github: SourceAdapter = {
         created_at: string;
         language: string | null;
       }>;
-    }>(`https://api.github.com/search/repositories?q=created:%3E${since}&sort=stars&order=desc&per_page=50`, { headers });
+    }>(`https://api.github.com/search/repositories?q=created:%3E${since}&sort=stars&order=desc&per_page=${SOURCE_INTAKE_LIMITS.github}`, { headers });
     return result.items.map((repo) => ({
       source: "github" as const,
       externalId: String(repo.id),

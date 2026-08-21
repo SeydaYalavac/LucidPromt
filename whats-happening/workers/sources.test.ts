@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { extractGoogleNewsItems } from "./sources";
+import { extractGoogleNewsItems, SOURCE_INTAKE_LIMITS } from "./sources";
+
+describe("official source intake", () => {
+  it("keeps enough first-party capacity for a 100-trend daily target", () => {
+    expect(SOURCE_INTAKE_LIMITS).toEqual({ hackerNews: 200, github: 100 });
+  });
+});
 
 describe("extractGoogleNewsItems", () => {
   it("keeps the publisher, article URL, title, and clean snippet from Google Trends RSS", () => {
