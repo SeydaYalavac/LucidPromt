@@ -5,6 +5,7 @@ import { Search, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSignals, useTrends } from "@/hooks/useTrendData";
+import { SITE_DESCRIPTION } from "@/lib/site";
 
 const placeholders = [
   "Search the source-linked signal queue",
@@ -43,7 +44,7 @@ export function HeroSection() {
           SOURCE-LINKED TREND<br />INTELLIGENCE FOR<br />FOUNDERS &amp; ANALYSTS
         </h1>
         <p className="mt-8 max-w-2xl text-pretty text-lg font-medium leading-relaxed text-[#A3A3AA] md:text-2xl">
-          Inspect scored technology signals, see why attention moved, and trace the earliest available country-tagged evidence.
+          {SITE_DESCRIPTION} Inspect the earliest available country-tagged evidence behind each signal.
         </p>
       </motion.div>
 

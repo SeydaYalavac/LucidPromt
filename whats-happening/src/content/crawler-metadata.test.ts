@@ -17,6 +17,7 @@ describe("crawler metadata", () => {
 
     expect(urls).toEqual([
       SITE_URL,
+      `${SITE_URL}/about`,
       `${SITE_URL}/how-it-works`,
       `${SITE_URL}/pricing`,
       `${SITE_URL}/compare/exploding-topics-vs-google-trends`,
