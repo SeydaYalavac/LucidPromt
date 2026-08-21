@@ -37,4 +37,25 @@ describe("prepareSourceSignals", () => {
 
     expect(prepared).toEqual([]);
   });
+
+  it("stores only rights-checked visual metadata", () => {
+    const validVisual = {
+      image_url: "https://upload.wikimedia.org/ai-research.jpg",
+      title: "AI research lab",
+      alt_text: "An AI research lab.",
+      source_name: "Wikimedia Commons",
+      source_url: "https://commons.wikimedia.org/wiki/File:AI_research.jpg",
+      creator_name: "Example Photographer",
+      license_name: "CC BY-SA 4.0",
+      license_url: "https://creativecommons.org/licenses/by-sa/4.0/",
+      rights_basis: "open_license",
+    };
+    const prepared = prepareSourceSignals([
+      signal({ externalId: "licensed", metadata: { news_visual: validVisual } }),
+      signal({ externalId: "unlicensed", metadata: { news_visual: { image_url: "https://publisher.example/og.jpg" } } }),
+    ]);
+
+    expect(prepared[0].metadata?.news_visual).toEqual(validVisual);
+    expect(prepared[1].metadata).not.toHaveProperty("news_visual");
+  });
 });

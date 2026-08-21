@@ -7,6 +7,7 @@ import type {
   TrendBriefEvidence,
   TrendSummarySource,
 } from "@/types/trends";
+import { sanitizeNewsVisual } from "./news-visual";
 
 const MAX_EXCERPT_LENGTH = 500;
 const MAX_CARD_SUMMARY_LENGTH = 180;
@@ -668,7 +669,7 @@ export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: 
     .filter(isEligibleEvidenceSignal)
     .sort((a, b) => signalTimestamp(b) - signalTimestamp(a));
   const newest = eligibleSignals[0];
-  if (!newest) return { ...trend, summary: null, summary_source: null, brief: null };
+  if (!newest) return { ...trend, summary: null, summary_source: null, brief: null, news_visual: null };
 
   const storedSummary = sanitizeExcerpt(trend.summary);
   const newestSummary = summarizeEvidenceSignal(newest);
@@ -687,6 +688,7 @@ export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: 
     summary: summary ? boundedSummary(summary) : null,
     summary_source: summary ? summarySource(selectedSignal) : null,
     brief: buildTrendBrief(trend, eligibleSignals),
+    news_visual: eligibleSignals.map((signal) => sanitizeNewsVisual(signal.metadata?.news_visual)).find(Boolean) || null,
   };
 }
 
@@ -705,8 +707,14 @@ export function isAiTrend(trend: { title?: unknown; summary?: unknown }) {
   return hasAiRelevance(trend.title, trend.summary);
 }
 
-export function sanitizeSignal<T extends { excerpt?: string | null }>(signal: T): T {
-  return { ...signal, excerpt: sanitizeExcerpt(signal.excerpt) };
+export function sanitizeSignal<T extends { excerpt?: string | null; metadata?: Record<string, unknown> | null }>(signal: T): T {
+  const metadata = signal.metadata ? { ...signal.metadata } : signal.metadata;
+  if (metadata) {
+    const newsVisual = sanitizeNewsVisual(metadata.news_visual);
+    if (newsVisual) metadata.news_visual = newsVisual;
+    else delete metadata.news_visual;
+  }
+  return { ...signal, excerpt: sanitizeExcerpt(signal.excerpt), metadata };
 }
 
 export function sanitizeTrend<T extends { summary?: string | null }>(trend: T): T {

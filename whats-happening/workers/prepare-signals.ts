@@ -1,4 +1,5 @@
 import { isAiSignal, sanitizeExcerpt } from "../src/lib/trend-content";
+import { sanitizeNewsVisual } from "../src/lib/news-visual";
 import type { SourceSignal } from "../src/types/trends";
 
 function cleanText(value: string, maximum: number) {
@@ -34,7 +35,13 @@ export function prepareSourceSignals(signals: SourceSignal[]) {
       engagementCount: Math.max(0, Math.round(Number(signal.engagementCount) || 0)),
       audienceCount: signal.audienceCount == null ? undefined : Math.max(0, Math.round(Number(signal.audienceCount) || 0)),
       publishedAt: publishedAt.toISOString(),
+      metadata: signal.metadata ? { ...signal.metadata } : undefined,
     };
+    const newsVisual = sanitizeNewsVisual(signal.metadata?.news_visual);
+    if (normalized.metadata) {
+      if (newsVisual) normalized.metadata.news_visual = newsVisual;
+      else delete normalized.metadata.news_visual;
+    }
     if (!isAiSignal(normalized)) continue;
 
     const key = `${normalized.source}:${normalized.externalId}`;

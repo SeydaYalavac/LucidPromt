@@ -42,6 +42,22 @@ export interface Trend {
   summary_source?: TrendSummarySource | null;
   brief?: TrendBrief | null;
   evidence_status?: "single_source" | "multi_source";
+  news_visual?: NewsVisual | null;
+}
+
+export interface NewsVisual {
+  image_url: string;
+  title: string;
+  alt_text: string;
+  source_name: string;
+  source_url: string;
+  creator_name: string;
+  license_name: string;
+  license_url: string;
+  rights_basis: "open_license" | "permissioned";
+  usage_notes?: string;
+  width?: number;
+  height?: number;
 }
 
 export interface TrendSummarySource {
