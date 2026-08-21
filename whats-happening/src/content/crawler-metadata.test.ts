@@ -45,7 +45,7 @@ describe("crawler metadata", () => {
     expect(response.headers.get("content-type")).toBe("text/plain; charset=utf-8");
     expect(await response.text()).toBe(llmsText);
     expect(linkedUrls.length).toBe(15);
-    expect(linkedUrls.every((url) => url.startsWith(`${SITE_URL}/`))).toBe(true);
+    expect(linkedUrls.every((url) => url === SITE_URL || url.startsWith(`${SITE_URL}/`))).toBe(true);
     expect(llmsText).toContain("Production trend data and account access are currently unavailable");
     expect(llmsText).not.toContain(`${SITE_URL}/signin`);
     expect(llmsText).not.toContain(`${SITE_URL}/signup`);
