@@ -14,18 +14,23 @@ const structuredTextKeys = [
   "title",
 ] as const;
 
-const technologyPatterns = [
-  /\b(?:ai|artificial intelligence|machine learning|deep learning|neural network|large language model|language model|llm|generative ai|agentic|computer vision|natural language processing|inference)\b/i,
-  /\b(?:openai|anthropic|deepmind|chatgpt|claude|gemini|copilot|gpt(?:-?\d+)?|mistral|hugging face)\b/i,
-  /\b(?:software|developer|programming|codebase|coding|open source|api|sdk|framework|library|database|cloud computing|serverless|devops|kubernetes|docker|linux|kernel|browser|webassembly)\b/i,
-  /\b(?:javascript|typescript|python|rust|golang|java|swift|react|next\.js|node\.js|postgres|supabase)\b/i,
-  /\b(?:cybersecurity|cyber security|ransomware|malware|data breach|encryption|privacy tech|zero-day|vulnerability|hacker)\b/i,
-  /\b(?:chip|semiconductor|gpu|processor|quantum computing|robotics|robot|autonomous|self-driving|electric vehicle|ev battery)\b/i,
-  /\b(?:nvidia|amd|intel|microsoft|github|gitlab|android|iphone|ios|macos|windows|tesla|spacex)\b/i,
-  /\b(?:blockchain|cryptocurrency|crypto|bitcoin|ethereum|web3|smart contract)\b/i,
-  /\b(?:biotech|biotechnology|medtech|mrna|genomics|gene editing|clinical trial|cancer vaccine)\b/i,
-  /\b(?:spaceflight|space tech|satellite|rocket|nasa|esa|fusion energy|renewable energy|energy storage|carbon capture|climate tech)\b/i,
+// Public records must carry affirmative AI evidence. Broad technology terms are
+// intentionally absent: a repository, chip, model, agent, or company name alone
+// is not enough to prove that the underlying topic is about AI.
+const explicitAiPatterns = [
+  /\bAI\b/,
+  /\b(?:artificial intelligence|artificial general intelligence|machine learning|deep learning|reinforcement learning|generative ai|agentic ai|ai (?:(?:autonomous|coding|research|sales|software|support) )?agents?|ai models?|ai systems?|ai assistants?|ai coding|ai safety|ai policy|ai regulation|ai governance|ai infrastructure|ai accelerators?|ai chips?|ai inference|ai training|ai search|ai (?:image|video|voice|data)|ai[- ](?:assisted|based|designed|driven|enabled|generated|powered))\b/i,
+  /\bai[-_ ]+(?:agent|assistant|bot|chip|coding|data|image|inference|model|platform|repo|research|safety|search|system|tool|training|video|voice)s?\b/i,
+  /\b(?:large language models?|language models?|foundation models?|frontier models?|vision[- ]language models?|multimodal models?|diffusion models?|neural networks?|computer vision|natural language processing)\b/i,
+  /\b(?:LLMs?|NLP|RAG)\b/,
+  /\b(?:retrieval[- ]augmented generation|fine[- ]tuning|prompt engineering|model alignment|model safety|model evaluations?|mechanistic interpretability|inference (?:accelerator|chip|engine|runtime|server)|text[- ]to[- ](?:image|video)|image[- ]to[- ]video)\b/i,
+  /\b(?:openai|anthropic|chatgpt|deepmind|hugging face|mistral ai|perplexity ai|stability ai|midjourney|dall[- ]?e|deepseek(?:-[\w.-]+)?|qwen(?:[0-9][\w.-]*)?)\b/i,
+  /\b(?:vllm|ollama|langchain|langgraph|llamaindex|pytorch|tensorflow|tensorrt[- ]llm|llama\.cpp|comfyui)\b/i,
+  /\bgpt(?:-?[0-9][\w.-]*|[_-][a-z][\w.-]*)\b/i,
 ];
+
+const ambiguousAiEntityPattern = /\b(?:claude|gemini|llama|grok|sora|copilot|codex|cursor|windsurf)\b/i;
+const aiEntityContextPattern = /\b(?:ai|anthropic|google|meta|openai|microsoft|github|model|llm|assistant|chatbot|agent|inference|training|weights|tokens?|api|coding|code|editor|prompt|benchmark|reasoning|multimodal|vision|subscription)\b/i;
 
 function decodeEntities(value: string) {
   const named: Record<string, string> = {
@@ -112,18 +117,23 @@ export function sanitizeExcerpt(value: unknown) {
   return extractStructuredText(value);
 }
 
-export function hasTechnologyRelevance(...values: unknown[]) {
+export function hasAiRelevance(...values: unknown[]) {
   const text = values.map((value) => sanitizeExcerpt(value) || "").join(" ");
-  return technologyPatterns.some((pattern) => pattern.test(text));
+  if (!text) return false;
+  if (explicitAiPatterns.some((pattern) => pattern.test(text))) return true;
+  return ambiguousAiEntityPattern.test(text) && aiEntityContextPattern.test(text);
 }
 
-export function isDiscoverableSignal(signal: { source?: SourceName | string | null; title?: unknown; excerpt?: unknown }) {
-  if (signal.source === "github") return true;
-  if (signal.source === "hacker_news" && /^show hn\s*:/i.test(String(signal.title || ""))) return true;
-  return hasTechnologyRelevance(signal.title, signal.excerpt);
+export function isAiSignal(signal: { title?: unknown; excerpt?: unknown }) {
+  if (hasAiRelevance(signal.title)) return true;
+  const excerpt = sanitizeExcerpt(signal.excerpt) || "";
+  if (!excerpt) return false;
+  if (explicitAiPatterns.slice(1).some((pattern) => pattern.test(excerpt))) return true;
+  return ambiguousAiEntityPattern.test(excerpt) && aiEntityContextPattern.test(excerpt);
 }
 
 type EvidenceSignal = {
+  trend_id?: string | null;
   source?: SourceName | string | null;
   external_id?: string | null;
   title?: unknown;
@@ -233,7 +243,7 @@ export function sourceLabel(source: SourceName | string | null | undefined) {
 }
 
 export function isEligibleEvidenceSignal(signal: EvidenceSignal) {
-  if (!isDiscoverableSignal(signal)) return false;
+  if (!isAiSignal(signal)) return false;
   if (String(signal.external_id || "").toLowerCase().startsWith("demo")) return false;
   return Boolean(cleanSourceUrl(signal.source_url));
 }
@@ -522,8 +532,19 @@ export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: 
   };
 }
 
-export function isDiscoverableTrend(trend: { title?: unknown; summary?: unknown; category?: unknown }) {
-  return hasTechnologyRelevance(trend.title, trend.summary);
+export function selectAiScopedTrends<T extends EvidenceTrend & { id: string }>(trends: T[], signals: EvidenceSignal[]) {
+  const signalsByTrend = new Map<string, EvidenceSignal[]>();
+  for (const signal of signals.filter(isEligibleEvidenceSignal)) {
+    if (!signal.trend_id) continue;
+    signalsByTrend.set(signal.trend_id, [...(signalsByTrend.get(signal.trend_id) || []), signal]);
+  }
+  return trends
+    .map((trend) => resolveTrendContent(trend, signalsByTrend.get(trend.id) || []))
+    .filter((trend) => trend.summary && trend.summary_source);
+}
+
+export function isAiTrend(trend: { title?: unknown; summary?: unknown }) {
+  return hasAiRelevance(trend.title, trend.summary);
 }
 
 export function sanitizeSignal<T extends { excerpt?: string | null }>(signal: T): T {
