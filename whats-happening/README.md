@@ -1,4 +1,8 @@
-# What's Happening: canlı trend backend'i
+# What's Happening: AI Trend Intelligence for Founders & Analysts
+
+Source-linked AI trend intelligence for founders and analysts, scoring GitHub, Hacker News, and Google Trends signals with source trails and country context.
+
+## Canlı trend backend'i
 
 Bu uygulama statik trend kartları yerine resmi/veri-lisanslı API'lerden sinyal toplar, trend skorlar, Supabase üzerinden hızlı okur, yeni trend için bir defa AI açıklaması üretir ve trend başına canlı geliştirici sohbeti sunar.
 

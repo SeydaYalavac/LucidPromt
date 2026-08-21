@@ -1,4 +1,4 @@
-import { SITE_URL } from "../lib/site";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "../lib/site";
 
 export type AlternativeSlug =
   | "google-trends"
@@ -472,18 +472,17 @@ export function buildAlternativeJsonLd(data: AlternativePageData) {
       {
         "@type": "Organization",
         "@id": `${SITE_URL}/#organization`,
-        name: "What's Happening",
+        name: SITE_NAME,
         url: SITE_URL,
       },
       {
         "@type": "SoftwareApplication",
         "@id": `${SITE_URL}/#software`,
-        name: "What's Happening",
+        name: SITE_NAME,
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         url: SITE_URL,
-        description:
-          "Source-linked trend intelligence for inspecting scored technology signals, country-attributed evidence, and source trails.",
+        description: SITE_DESCRIPTION,
         offers: {
           "@type": "Offer",
           price: "0",
