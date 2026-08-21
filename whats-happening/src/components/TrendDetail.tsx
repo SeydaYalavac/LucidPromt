@@ -70,8 +70,8 @@ export function TrendDetail({ slug }: { slug: string }) {
     { label: "Novelty", value: trend.novelty_score },
   ];
   const isSaved = saved.includes(slug);
-  const evidenceStatus = brief?.corroboration === "multi_source"
-    ? `${brief.evidence_source_count} independent source systems`
+  const evidenceStatus = article && article.independent_source_count >= 2
+    ? `${article.independent_source_count} independent evidence sites`
     : "Single-source evidence";
 
   return <main className="mx-auto max-w-6xl px-6 pb-24 pt-32 sm:pt-40">

@@ -554,7 +554,7 @@ function buildTrendArticle(
   const sourceNames = representativeSignals.map((signal) => sourceLabel(signal.source));
   const impactContext = sourceNames.length > 1
     ? `Attention is crossing ${sourceNames.join(" and ")}. That makes the topic more useful as a research lead than a single-platform spike, while still falling short of proof that adoption will continue.`
-    : usefulFor;
+    : `The evidence spans ${independentSourceCount} independently hosted sites: ${evidence.map((item) => item.label).join(" and ")}. That supports a closer review of the topic and its reception, but not a claim about sustained adoption.`;
 
   return {
     depth: "deep",
