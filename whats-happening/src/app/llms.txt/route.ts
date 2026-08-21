@@ -10,7 +10,7 @@ What's Happening is a public web product for founders and analysts tracking emer
 
 ## Product
 
-- [Home](${SITE_URL}/): Product overview and current public access.
+- [Home](${SITE_URL}): Product overview and current public access.
 - [How it works](${SITE_URL}/how-it-works): Source coverage, score weights, country attribution, and current data availability.
 - [Pricing](${SITE_URL}/pricing): Current $0 public access and unavailable account and Teams features.
 - [World](${SITE_URL}/world): Country-context interface, with an explicit unavailable state when no production records can load.
