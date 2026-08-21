@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { GET as getLlmsText, llmsText } from "../app/llms.txt/route";
 import robots from "../app/robots";
 import sitemap from "../app/sitemap";
 import { SITE_URL } from "../lib/site";
@@ -34,5 +35,20 @@ describe("crawler metadata", () => {
     expect(urls.every((url) => url.startsWith(SITE_URL))).toBe(true);
     expect(urls).not.toContain(`${SITE_URL}/signin`);
     expect(urls).not.toContain(`${SITE_URL}/signup`);
+  });
+
+  it("publishes factual llms.txt guidance with canonical public links only", async () => {
+    const response = getLlmsText();
+    const linkedUrls = Array.from(llmsText.matchAll(/\]\((https:\/\/[^)]+)\)/g), (match) => match[1]);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("content-type")).toBe("text/plain; charset=utf-8");
+    expect(await response.text()).toBe(llmsText);
+    expect(linkedUrls.length).toBe(15);
+    expect(linkedUrls.every((url) => url.startsWith(`${SITE_URL}/`))).toBe(true);
+    expect(llmsText).toContain("Production trend data and account access are currently unavailable");
+    expect(llmsText).not.toContain(`${SITE_URL}/signin`);
+    expect(llmsText).not.toContain(`${SITE_URL}/signup`);
+    expect(llmsText).not.toContain(`${SITE_URL}/api/`);
   });
 });
