@@ -17,7 +17,11 @@ import {
 } from "lucide-react";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { emailSchema, passwordSchema, signinSchema, signupSchema } from "@/lib/auth-validation";
-import { captureProductEvent, captureProductEventOnce } from "@/lib/analytics";
+import { captureProductEvent, captureProductEventOnce, captureSignupSource } from "@/lib/analytics";
+import {
+  SIGNUP_SOURCE_OPTIONS,
+  type SignupSource,
+} from "@/lib/signup-attribution";
 
 export type AuthMode = "signin" | "signup" | "forgot" | "update";
 type SocialProvider = Extract<Provider, "google" | "github" | "apple">;
@@ -110,10 +114,12 @@ export function AuthPanel({
   mode,
   next,
   initialError,
+  signupSourceOptions = [...SIGNUP_SOURCE_OPTIONS],
 }: {
   mode: AuthMode;
   next: string;
   initialError?: string;
+  signupSourceOptions?: Array<(typeof SIGNUP_SOURCE_OPTIONS)[number]>;
 }) {
   const router = useRouter();
   const { supabase, session, isLoading: sessionLoading, isConfigured } = useAuthSession();
@@ -121,6 +127,8 @@ export function AuthPanel({
   const [displayName, setDisplayName] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [signupSource, setSignupSource] = useState<SignupSource | null>(null);
+  const [aiPromptText, setAiPromptText] = useState("");
   const [busy, setBusy] = useState(false);
   const [activeProvider, setActiveProvider] = useState<SocialProvider | null>(null);
   const [error, setError] = useState<string | null>(initialError || null);
@@ -135,6 +143,11 @@ export function AuthPanel({
     setActiveProvider(null);
     setError(null);
     setNotice(null);
+
+    if (mode === "signup" && !signupSource) {
+      setError("Choose where you found us before creating your account.");
+      return;
+    }
     captureProductEvent("auth_attempted", { mode, provider: "email" });
 
     if (!supabase) {
@@ -171,6 +184,7 @@ export function AuthPanel({
       }
 
       if (mode === "signup") {
+        captureSignupSource(signupSource as SignupSource, aiPromptText);
         const emailRedirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
         const { data, error: authError } = await supabase.auth.signUp({
           email,
@@ -219,6 +233,10 @@ export function AuthPanel({
   async function signInWithProvider(provider: SocialProvider) {
     setError(null);
     setNotice(null);
+    if (mode === "signup" && !signupSource) {
+      setError("Choose where you found us before continuing.");
+      return;
+    }
     captureProductEvent("auth_attempted", { mode, provider });
     if (!supabase) {
       setError("Authentication isn’t available until Supabase is connected.");
@@ -227,6 +245,7 @@ export function AuthPanel({
     }
     setBusy(true);
     setActiveProvider(provider);
+    if (mode === "signup") captureSignupSource(signupSource as SignupSource, aiPromptText);
     const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
     const { error: authError } = await supabase.auth.signInWithOAuth({
       provider,
@@ -310,6 +329,53 @@ export function AuthPanel({
         <div className="mb-6 rounded-xl border border-amber-300/20 bg-amber-300/[0.06] px-4 py-3 text-sm leading-6 text-amber-100/85">
           This recovery link is missing or expired. Request a new link before choosing a password.
         </div>
+      )}
+
+      {mode === "signup" && (
+        <fieldset className="mb-6 ph-no-capture">
+          <legend className="text-sm font-medium text-white/85">Where did you find us?</legend>
+          <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {signupSourceOptions.map((option) => (
+              <label
+                key={option.value}
+                className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-3.5 text-sm text-white/70 transition-colors has-[:checked]:border-[#06b6d4]/60 has-[:checked]:bg-[#06b6d4]/10 has-[:checked]:text-white hover:border-white/20 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#22d3ee]"
+              >
+                <input
+                  type="radio"
+                  name="signupSource"
+                  value={option.value}
+                  checked={signupSource === option.value}
+                  onChange={() => {
+                    setSignupSource(option.value);
+                    if (option.value !== "ai_assistant") setAiPromptText("");
+                    setError(null);
+                  }}
+                  disabled={busy}
+                  className="h-4 w-4 accent-[#06b6d4]"
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+          {signupSource === "ai_assistant" && (
+            <label className="mt-4 block text-sm font-medium text-white/85">
+              What did you ask it?
+              <textarea
+                name="aiPromptText"
+                value={aiPromptText}
+                onChange={(event) => setAiPromptText(event.target.value)}
+                maxLength={200}
+                rows={3}
+                disabled={busy}
+                placeholder="Optional, up to 200 characters"
+                className="mt-2 w-full resize-none rounded-xl border border-white/10 bg-white/[0.045] px-4 py-3 text-[15px] leading-6 text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#06b6d4]/70 focus:bg-white/[0.065] disabled:cursor-not-allowed disabled:opacity-45"
+              />
+              <span className="mt-1.5 block text-right font-mono text-[11px] tabular-nums text-white/35">
+                {aiPromptText.length}/200
+              </span>
+            </label>
+          )}
+        </fieldset>
       )}
 
       {mode !== "forgot" && mode !== "update" && (

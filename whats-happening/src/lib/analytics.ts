@@ -1,4 +1,11 @@
 import posthog from "posthog-js";
+import {
+  buildSignupSourceEventProperties,
+  deriveAiReferrerChannel,
+  type ReferrerChannel,
+  type SignupSource,
+  type SignupSourceEventProperties,
+} from "@/lib/signup-attribution";
 
 const MANAGED_POSTHOG_KEY =
   process.env.NEXT_PUBLIC_POSTHOG_KEY ||
@@ -19,6 +26,7 @@ type ProductEventProperties = {
     status_code: number;
   };
   feedback_submitted: { category: string };
+  signup_source: SignupSourceEventProperties;
   auth_attempted: { mode: string; provider: string };
   auth_completed: {
     mode: string;
@@ -34,6 +42,7 @@ type ProductEventProperties = {
 
 let initialized = false;
 const capturedOnce = new Set<string>();
+const FIRST_REFERRER_CHANNEL_PROPERTY = "first_referrer_channel";
 
 function withoutQueryOrHash(value: unknown) {
   if (typeof value !== "string") return value;
@@ -119,6 +128,10 @@ export function initProductAnalytics() {
       return event;
     },
   });
+  const referrerChannel = deriveAiReferrerChannel(document.referrer, window.location.href);
+  if (referrerChannel) {
+    posthog.register_once({ [FIRST_REFERRER_CHANNEL_PROPERTY]: referrerChannel });
+  }
   posthog.startSessionRecording(true);
   initialized = true;
 }
@@ -146,6 +159,20 @@ export function captureProductEventOnce<
 export function identifyProductUser(userId: string) {
   initProductAnalytics();
   posthog.identify(userId);
+}
+
+export function captureSignupSource(
+  source: SignupSource,
+  aiPromptText: string,
+) {
+  initProductAnalytics();
+  const storedReferrerChannel = posthog.get_property(FIRST_REFERRER_CHANNEL_PROPERTY);
+  const referrerChannel: ReferrerChannel | undefined =
+    storedReferrerChannel === "ai_assistant" ? storedReferrerChannel : undefined;
+  posthog.capture(
+    "signup_source",
+    buildSignupSourceEventProperties(source, aiPromptText, referrerChannel),
+  );
 }
 
 export function resetProductUser() {
