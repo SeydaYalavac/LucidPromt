@@ -13,7 +13,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const { data } = useTrends({ limit: 50 });
+  const { data } = useTrends({ limit: 200 });
   const { t } = useLocale();
   const navigationLabels: Record<string, TranslationKey> = {
     "/world": "nav.world", "/trending": "nav.trending", "/explore": "nav.explore", "/map": "nav.map", "/pricing": "nav.pricing",

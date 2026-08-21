@@ -106,4 +106,41 @@ describe("daily trend feed", () => {
     expect(payload.trends).toHaveLength(2);
     expect(payload.coverage).toMatchObject({ qualified_today: 2, active_qualified: 2, status: "under_supply" });
   });
+
+  it("publishes current AI sports evidence with its source URL and published time", () => {
+    const sportsTrend = trend(1, { category: "Sports", title: "AI improves football injury prevention" });
+    const sportsSignal = signal(1, {
+      title: "AI improves football injury prevention",
+      excerpt: "Machine learning analyzes athlete workloads for sports science teams.",
+      source_url: "https://news.ycombinator.com/item?id=10001",
+      published_at: "2026-08-21T16:00:00.000Z",
+      observed_at: "2026-08-21T17:00:00.000Z",
+    });
+    const payload = buildTrendListPayload([sportsTrend], [sportsSignal], { limit: 100, offset: 0, mode: "live", now });
+
+    expect(payload.trends).toHaveLength(1);
+    expect(payload.trends[0]).toMatchObject({ category: "Sports" });
+    expect(payload.trends[0].summary_source).toMatchObject({
+      source_url: "https://news.ycombinator.com/item?id=10001",
+      published_at: "2026-08-21T16:00:00.000Z",
+    });
+  });
+
+  it("fails closed for non-AI, non-sports, stale, or timestamp-less Sports evidence", () => {
+    const sportsTrends = [
+      trend(1, { category: "Sports", title: "Football transfer update" }),
+      trend(2, { category: "Sports", title: "AI software benchmark" }),
+      trend(3, { category: "Sports", title: "AI football officiating" }),
+      trend(4, { category: "Sports", title: "AI sports broadcasting" }),
+    ];
+    const signals = [
+      signal(1, { title: "Football transfer update", excerpt: "League fixtures" }),
+      signal(2, { title: "AI software benchmark", excerpt: "A coding model evaluation" }),
+      signal(3, { title: "AI football officiating", observed_at: "2026-08-18T17:00:00.000Z" }),
+      signal(4, { title: "AI sports broadcasting", published_at: "" }),
+    ];
+    const payload = buildTrendListPayload(sportsTrends, signals, { limit: 100, offset: 0, mode: "live", now });
+
+    expect(payload.trends).toEqual([]);
+  });
 });

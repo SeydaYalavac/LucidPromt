@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getNextVisibleCount, isRouteActive, matchesTrend } from "./discovery";
+import { getNextVisibleCount, isRouteActive, matchesTrend, visibleDiscoveryCategories } from "./discovery";
 import type { Trend } from "@/types/trends";
 
 const trend = {
@@ -24,5 +24,10 @@ describe("discovery navigation", () => {
   it("caps infinite reveal at the available result count", () => {
     expect(getNextVisibleCount(8, 22)).toBe(16);
     expect(getNextVisibleCount(16, 22)).toBe(22);
+  });
+
+  it("shows Sports only while a current qualified Sports record is present", () => {
+    expect(visibleDiscoveryCategories([trend])).not.toContain("Sports");
+    expect(visibleDiscoveryCategories([{ ...trend, category: "Sports" }])).toContain("Sports");
   });
 });

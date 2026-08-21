@@ -1,7 +1,6 @@
 import { GlobalNavbar } from "@/components/GlobalNavbar";
 import { Footer } from "@/components/Footer";
-import { TrendCollection } from "@/components/TrendCollection";
-import { CollectionHeader } from "@/components/CollectionHeader";
+import { CategoryView } from "@/components/CategoryView";
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -11,9 +10,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       <GlobalNavbar />
       
       <main className="mx-auto max-w-4xl px-6 pt-32 pb-24">
-        <CollectionHeader kind="category" value={slug} />
-        
-        <TrendCollection filter="category" value={slug} />
+        <CategoryView slug={slug} />
       </main>
 
       <Footer />

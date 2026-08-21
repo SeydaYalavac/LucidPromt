@@ -12,6 +12,14 @@ export const SOURCE_INTAKE_LIMITS = {
   github: 100,
 } as const;
 
+export const GITHUB_SEARCH_SLICES = [
+  { query: "created:>{since}", limit: 70 },
+  { query: "AI sports created:>{since}", limit: 15 },
+  { query: "machine-learning athlete created:>{since}", limit: 15 },
+] as const;
+
+export const DEFAULT_DISCOVERY_QUERY = "latest artificial intelligence developments including sports performance analytics injury prevention officiating broadcasting accessibility and sports science";
+
 export const DEFAULT_GOOGLE_TRENDS_MARKETS = [
   "US", "GB", "CA", "AU", "IN", "SG", "JP", "KR", "DE", "FR", "TR", "BR",
   "MX", "AR", "ZA", "NG", "AE", "SA", "ID", "PH", "TH", "VN", "NZ", "IT",
@@ -87,7 +95,7 @@ export const github: SourceAdapter = {
     const since = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
     const headers: HeadersInit = { Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" };
     if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
-    const result = await json<{
+    type GitHubSearchResult = {
       items: Array<{
         id: number;
         full_name: string;
@@ -99,8 +107,14 @@ export const github: SourceAdapter = {
         created_at: string;
         language: string | null;
       }>;
-    }>(`https://api.github.com/search/repositories?q=created:%3E${since}&sort=stars&order=desc&per_page=${SOURCE_INTAKE_LIMITS.github}`, { headers });
-    return result.items.map((repo) => ({
+    };
+    const results = await Promise.all(GITHUB_SEARCH_SLICES.map(({ query, limit }) =>
+      json<GitHubSearchResult>(
+        `https://api.github.com/search/repositories?q=${encodeURIComponent(query.replace("{since}", since))}&sort=stars&order=desc&per_page=${limit}`,
+        { headers },
+      ),
+    ));
+    return results.flatMap((result) => result.items).map((repo) => ({
       source: "github" as const,
       externalId: String(repo.id),
       title: text(repo.full_name, 220),
@@ -244,7 +258,7 @@ function searchProvider(name: "tavily" | "exa"): SourceAdapter {
   return {
     name,
     async fetchSignals() {
-      const query = process.env.DISCOVERY_QUERY || "breaking technology science culture trends today";
+      const query = process.env.DISCOVERY_QUERY || DEFAULT_DISCOVERY_QUERY;
       if (name === "tavily") {
         if (!process.env.TAVILY_API_KEY) throw new Error("Tavily API key is not configured");
         const result = await json<{ results: Array<{ url: string; title: string; content?: string; score?: number; published_date?: string }> }>(

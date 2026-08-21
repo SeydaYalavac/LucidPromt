@@ -21,6 +21,11 @@ export const discoveryCategories: DiscoveryCategory[] = [
   "Entertainment",
 ];
 
+export function visibleDiscoveryCategories(trends: Array<Pick<Trend, "category">>) {
+  const hasSports = trends.some((trend) => trend.category.trim().toLocaleLowerCase() === "sports");
+  return hasSports ? discoveryCategories : discoveryCategories.filter((category) => category !== "Sports");
+}
+
 export function isRouteActive(pathname: string, href: string) {
   return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 }
