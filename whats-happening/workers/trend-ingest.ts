@@ -1,5 +1,6 @@
 import { adapters } from "./sources";
 import { clusterSignals, earliestAttributedSignal, scoreSignals, slugifyTitle } from "../src/lib/scoring";
+import { isDiscoverableSignal, sanitizeExcerpt } from "../src/lib/trend-content";
 import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
 import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
@@ -39,7 +40,11 @@ async function run() {
   results.forEach((result, index) => {
     const name = sourceNames[index];
     if (result.status === "fulfilled") {
-      signals = signals.concat(result.value);
+      signals = signals.concat(
+        result.value
+          .map((signal) => ({ ...signal, excerpt: sanitizeExcerpt(signal.excerpt) || undefined }))
+          .filter(isDiscoverableSignal),
+      );
       succeeded.push(name);
     } else {
       errors.push({ source: name, message: result.reason instanceof Error ? result.reason.message : String(result.reason) });
@@ -63,7 +68,7 @@ async function run() {
           slug,
           title: lead.title,
           category: categoryFor(lead),
-          summary: lead.excerpt?.slice(0, 500) || null,
+          summary: sanitizeExcerpt(lead.excerpt),
           country_id: originSignal?.countryCode ? countryIds.get(originSignal.countryCode) || null : null,
           velocity_score: score.velocity,
           reach_score: score.reach,
@@ -90,7 +95,7 @@ async function run() {
       source: item.source,
       external_id: item.externalId,
       title: item.title,
-      excerpt: item.excerpt?.slice(0, 500) || null,
+      excerpt: sanitizeExcerpt(item.excerpt),
       source_url: item.sourceUrl,
       author_label: item.authorLabel?.slice(0, 60) || null,
       engagement_count: item.engagementCount,
