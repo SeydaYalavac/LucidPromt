@@ -53,6 +53,7 @@ export interface TrendSummarySource {
 }
 
 export interface TrendBriefEvidence {
+  reference_id: string;
   provider: SourceName;
   kind: "signal" | "linked_report";
   label: string;
@@ -61,6 +62,26 @@ export interface TrendBriefEvidence {
   published_at: string;
   observed_at: string;
   signal_summary: string;
+}
+
+export interface TrendArticleClaim {
+  text: string;
+  evidence_reference_ids: string[];
+  kind: "reported" | "measured" | "analysis" | "limitation";
+}
+
+export interface TrendArticleSection {
+  id: "background" | "why_now" | "timeline" | "impact" | "practical_implications" | "counterpoints";
+  label: string;
+  heading: string;
+  claims: TrendArticleClaim[];
+}
+
+export interface TrendArticle {
+  depth: "deep" | "concise";
+  independent_source_count: number;
+  last_updated_at: string;
+  sections: TrendArticleSection[];
 }
 
 export interface TrendBrief {
@@ -74,6 +95,7 @@ export interface TrendBrief {
   linked_site_count: number;
   corroboration: "multi_source" | "single_source";
   caution: string;
+  article: TrendArticle;
 }
 
 export interface Signal {

@@ -186,7 +186,7 @@ describe("source-backed trend content", () => {
     expect(resolved.brief).toBeNull();
   });
 
-  it("builds a four-part brief and discloses single-source uncertainty", () => {
+  it("keeps weak evidence concise and discloses single-source uncertainty", () => {
     const brief = buildTrendBrief(trend, [hackerNewsSignal]);
 
     expect(brief).toMatchObject({
@@ -200,6 +200,9 @@ describe("source-backed trend content", () => {
     expect(brief?.useful_for).toContain("questions, objections, and use cases");
     expect(brief?.next_step).toContain("original submission");
     expect(brief?.evidence[0].source_url).toBe("https://news.ycombinator.com/item?id=123");
+    expect(brief?.article.depth).toBe("concise");
+    expect(brief?.article.sections.map(({ id }) => id)).toEqual(["background", "why_now", "counterpoints"]);
+    expect(brief?.article.sections.flatMap(({ claims }) => claims).every(({ evidence_reference_ids }) => evidence_reference_ids.length > 0)).toBe(true);
   });
 
   it("marks independent providers as corroborated without claiming causation", () => {
@@ -227,6 +230,20 @@ describe("source-backed trend content", () => {
     expect(brief?.why_trending).toContain("GitHub");
     expect(brief?.why_trending).toContain("100 stars");
     expect(brief?.caution).toContain("does not prove cause");
+    expect(brief?.article.depth).toBe("deep");
+    expect(brief?.article.independent_source_count).toBe(2);
+    expect(brief?.article.sections.map(({ id }) => id)).toEqual([
+      "background",
+      "why_now",
+      "timeline",
+      "impact",
+      "practical_implications",
+      "counterpoints",
+    ]);
+    const referenceIds = new Set(brief?.evidence.map(({ reference_id }) => reference_id));
+    expect(brief?.article.sections.flatMap(({ claims }) => claims).every(({ evidence_reference_ids }) => (
+      evidence_reference_ids.length > 0 && evidence_reference_ids.every((id) => referenceIds.has(id))
+    ))).toBe(true);
   });
 
   it("adds publisher links carried by Google Trends without counting them as independent signal systems", () => {
@@ -253,5 +270,32 @@ describe("source-backed trend content", () => {
     expect(brief).toMatchObject({ evidence_source_count: 1, linked_site_count: 2, corroboration: "single_source" });
     expect(brief?.evidence[1]).toMatchObject({ kind: "linked_report", label: "Example AI" });
     expect(brief?.why_trending).toContain("roughly 2000+ searches");
+    expect(brief?.article).toMatchObject({ depth: "deep", independent_source_count: 2 });
+  });
+
+  it("refreshes article depth, support, and update time when new independent evidence arrives", () => {
+    const initial = buildTrendBrief(trend, [hackerNewsSignal]);
+    const refreshed = buildTrendBrief(trend, [
+      hackerNewsSignal,
+      {
+        source: "github",
+        external_id: "repo-refresh",
+        title: "org/ai-model-reasoning-benchmark",
+        excerpt: "A reproducible benchmark for AI reasoning systems.",
+        source_url: "https://github.com/org/ai-model-reasoning-benchmark",
+        engagement_count: 42,
+        published_at: "2026-08-21T15:00:00.000Z",
+        observed_at: "2026-08-21T15:05:00.000Z",
+        metadata: { stars: 40, forks: 2 },
+      },
+    ]);
+
+    expect(initial?.article.depth).toBe("concise");
+    expect(refreshed?.article).toMatchObject({
+      depth: "deep",
+      independent_source_count: 2,
+      last_updated_at: "2026-08-21T15:05:00.000Z",
+    });
+    expect(refreshed?.article.sections.find(({ id }) => id === "timeline")?.claims).toHaveLength(2);
   });
 });
