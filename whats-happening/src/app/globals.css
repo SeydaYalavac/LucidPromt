@@ -20,6 +20,11 @@
 }
 
 body {
+  --card-border: rgba(226, 222, 213, 0.18);
+  --card-border-hover: rgba(241, 238, 230, 0.32);
+  --card-border-selected: rgba(248, 246, 240, 0.56);
+  --card-surface: #0b0b0d;
+  --card-surface-hover: #101012;
   background-color: var(--color-background);
   color: var(--color-primary-text);
   font-family: var(--font-sans);
@@ -35,4 +40,37 @@ body {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-color) transparent;
+}
+
+@layer components {
+  .editorial-card {
+    border-color: var(--card-border);
+    background-color: var(--card-surface);
+  }
+
+  .editorial-card-interactive {
+    transition-duration: 160ms;
+    transition-property: background-color, border-color;
+    transition-timing-function: ease-out;
+  }
+
+  .editorial-card-interactive:hover,
+  .editorial-card-interactive:focus-within {
+    border-color: var(--card-border-hover);
+    background-color: var(--card-surface-hover);
+  }
+
+  .editorial-card-selected {
+    border-color: var(--card-border-selected);
+    background-color: rgba(248, 246, 240, 0.08);
+  }
+
+  @media (forced-colors: active) {
+    .editorial-card,
+    .editorial-card-interactive:hover,
+    .editorial-card-interactive:focus-within,
+    .editorial-card-selected {
+      border-color: CanvasText;
+    }
+  }
 }

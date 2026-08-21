@@ -9,7 +9,7 @@ export function SourcedNewsVisual({ visual, featured = false }: { visual?: NewsV
 
   if (!visual || failedUrl === visual.image_url) return null;
 
-  return <figure className="overflow-hidden rounded-xl border border-white/[0.1] bg-[#111114]">
+  return <figure className="editorial-card overflow-hidden rounded-xl border">
     <div className={`overflow-hidden bg-[#111114] ${featured ? "aspect-[16/7]" : "aspect-[16/9]"}`}>
       {/* The rights-checked adapter can return multiple media hosts, so this intentionally avoids a static Next.js host allowlist. */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
