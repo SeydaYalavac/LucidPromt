@@ -1,5 +1,6 @@
 import { isAiSignal, sanitizeExcerpt } from "../src/lib/trend-content";
 import { sanitizeNewsVisual } from "../src/lib/news-visual";
+import { curatedNewsVisualForSourceSignal } from "../src/lib/curated-news-visuals";
 import type { SourceSignal } from "../src/types/trends";
 
 function cleanText(value: string, maximum: number) {
@@ -16,7 +17,7 @@ function cleanUrl(value: string) {
   }
 }
 
-export function prepareSourceSignals(signals: SourceSignal[]) {
+export function prepareSourceSignals(signals: SourceSignal[], now = new Date()) {
   const prepared = new Map<string, SourceSignal>();
 
   for (const signal of signals) {
@@ -37,10 +38,12 @@ export function prepareSourceSignals(signals: SourceSignal[]) {
       publishedAt: publishedAt.toISOString(),
       metadata: signal.metadata ? { ...signal.metadata } : undefined,
     };
-    const newsVisual = sanitizeNewsVisual(signal.metadata?.news_visual);
+    const newsVisual = sanitizeNewsVisual(signal.metadata?.news_visual) || curatedNewsVisualForSourceSignal(normalized, now);
     if (normalized.metadata) {
       if (newsVisual) normalized.metadata.news_visual = newsVisual;
       else delete normalized.metadata.news_visual;
+    } else if (newsVisual) {
+      normalized.metadata = { news_visual: newsVisual };
     }
     if (!isAiSignal(normalized)) continue;
 

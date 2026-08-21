@@ -65,7 +65,7 @@ export function buildTrendListPayload(
   const currentSportsTrendIds = new Set(
     signals.filter((signal) => isCurrentAiSportsEvidence(signal, cutoff)).map((signal) => signal.trend_id),
   );
-  const qualified = selectAiScopedTrends([...deduped.values()], signals)
+  const qualified = selectAiScopedTrends([...deduped.values()], signals, now)
     .filter((trend) => !isSportsCategory(trend.category) || currentSportsTrendIds.has(trend.id))
     .map((trend) => ({
       ...trend,
