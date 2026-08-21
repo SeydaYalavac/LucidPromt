@@ -103,7 +103,13 @@ export function TrendDetail({ slug }: { slug: string }) {
         </section>
 
         <div className="mt-16 border-t border-white/[0.1] pt-12">
-        <TrendChat trendId={trend.id} slug={slug} mode={mode} />
+        <TrendChat
+          trendId={trend.id}
+          slug={slug}
+          mode={mode}
+          trendTitle={trend.title}
+          evidence={evidence.map((item) => ({ label: item.label, title: item.source_title, url: item.source_url }))}
+        />
         </div>
       </div>
 

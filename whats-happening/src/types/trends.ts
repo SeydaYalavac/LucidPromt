@@ -97,6 +97,7 @@ export interface ChatMessage {
   author_id: string;
   author_display_name: string;
   body: string;
+  reply_to_id: string | null;
   moderation_provider: "openai" | "local";
   moderation_labels: string[];
   status: "visible" | "removed";
