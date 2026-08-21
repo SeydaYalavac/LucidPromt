@@ -7,6 +7,7 @@ import type {
   TrendBriefEvidence,
   TrendSummarySource,
 } from "@/types/trends";
+import { curatedNewsVisualForStoredSignal } from "./curated-news-visuals";
 import { sanitizeNewsVisual } from "./news-visual";
 
 const MAX_EXCERPT_LENGTH = 500;
@@ -664,7 +665,7 @@ function summarySource(signal: EvidenceSignal): TrendSummarySource | null {
   };
 }
 
-export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: EvidenceSignal[]) {
+export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: EvidenceSignal[], now = new Date()) {
   const eligibleSignals = signals
     .filter(isEligibleEvidenceSignal)
     .sort((a, b) => signalTimestamp(b) - signalTimestamp(a));
@@ -688,18 +689,20 @@ export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: 
     summary: summary ? boundedSummary(summary) : null,
     summary_source: summary ? summarySource(selectedSignal) : null,
     brief: buildTrendBrief(trend, eligibleSignals),
-    news_visual: eligibleSignals.map((signal) => sanitizeNewsVisual(signal.metadata?.news_visual)).find(Boolean) || null,
+    news_visual: eligibleSignals
+      .map((signal) => sanitizeNewsVisual(signal.metadata?.news_visual) || curatedNewsVisualForStoredSignal(signal, now))
+      .find(Boolean) || null,
   };
 }
 
-export function selectAiScopedTrends<T extends EvidenceTrend & { id: string }>(trends: T[], signals: EvidenceSignal[]) {
+export function selectAiScopedTrends<T extends EvidenceTrend & { id: string }>(trends: T[], signals: EvidenceSignal[], now = new Date()) {
   const signalsByTrend = new Map<string, EvidenceSignal[]>();
   for (const signal of signals.filter(isEligibleEvidenceSignal)) {
     if (!signal.trend_id) continue;
     signalsByTrend.set(signal.trend_id, [...(signalsByTrend.get(signal.trend_id) || []), signal]);
   }
   return trends
-    .map((trend) => resolveTrendContent(trend, signalsByTrend.get(trend.id) || []))
+    .map((trend) => resolveTrendContent(trend, signalsByTrend.get(trend.id) || [], now))
     .filter((trend) => trend.summary && trend.summary_source);
 }
 

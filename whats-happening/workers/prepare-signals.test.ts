@@ -58,4 +58,20 @@ describe("prepareSourceSignals", () => {
     expect(prepared[0].metadata?.news_visual).toEqual(validVisual);
     expect(prepared[1].metadata).not.toHaveProperty("news_visual");
   });
+
+  it("attaches the exact current curated visual and expires it", () => {
+    const exact = signal({
+      externalId: "49390035",
+      title: "Linus Torvalds uses AI to debug an Intel GPU driver bug",
+      sourceUrl: "https://news.ycombinator.com/item?id=49390035",
+      publishedAt: "2026-08-21T16:00:00.000Z",
+      metadata: { points: 20, comments: 4 },
+    });
+
+    expect(prepareSourceSignals([exact], new Date("2026-08-21T22:00:00.000Z"))[0].metadata?.news_visual).toMatchObject({
+      creator_name: "World Economic Forum",
+      license_name: "CC BY-SA 2.0",
+    });
+    expect(prepareSourceSignals([exact], new Date("2026-08-24T00:00:00.000Z"))[0].metadata).not.toHaveProperty("news_visual");
+  });
 });
