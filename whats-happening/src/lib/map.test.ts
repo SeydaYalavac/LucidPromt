@@ -86,6 +86,13 @@ describe("map activity aggregation", () => {
     expect(payload.activities.map((activity) => activity.country.code)).toEqual(["GB", "US"]);
     expect(payload.activities.find((activity) => activity.country.code === "US")?.evidence_count).toBe(1);
     expect(payload.activities.every((activity) => activity.rising_topics[0].evidence[0].source_url.startsWith("https://trends.google.com/"))).toBe(true);
+    expect(payload.countries.map((country) => country.code)).toEqual(["GB", "US"]);
+    expect(payload.activities[0].developments[0]).toEqual(expect.objectContaining({
+      geographic_precision: "country",
+      trend_slug: trend.slug,
+      source_title: trend.title,
+    }));
+    expect(payload.activities[0].developments[0].geographic_evidence).toContain("country-level context");
   });
 
   it("returns an honest empty state when no country-attributed evidence exists", () => {
@@ -95,6 +102,7 @@ describe("map activity aggregation", () => {
     });
 
     expect(payload.activities).toEqual([]);
+    expect(payload.countries).toHaveLength(2);
     expect(payload.coverage.countries_with_evidence).toBe(0);
     expect(payload.coverage.attributed_evidence_count).toBe(0);
   });

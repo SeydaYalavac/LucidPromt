@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { edgeReadHeaders, unavailable } from "@/lib/api";
 import { isDemoMode } from "@/lib/env";
-import { demoTrends } from "@/lib/demo-data";
+import { demoMapCountries, demoMapSignals, demoTrends } from "@/lib/demo-data";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { sanitizeSignal, sanitizeTrend } from "@/lib/trend-content";
 import { activeTrendCutoff } from "@/lib/trend-feed";
@@ -17,7 +17,7 @@ function batches<T>(items: T[], size: number) {
 export async function GET() {
   const now = new Date();
   if (isDemoMode()) {
-    return NextResponse.json(buildMapActivityPayload([], demoTrends, [], { mode: "demo", now }), { headers: edgeReadHeaders });
+    return NextResponse.json(buildMapActivityPayload(demoMapCountries, demoTrends, demoMapSignals, { mode: "demo", now }), { headers: edgeReadHeaders });
   }
   try {
     const supabase = getSupabaseAdmin();

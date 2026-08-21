@@ -1,4 +1,4 @@
-import type { ChatMessage, Signal, Trend } from "@/types/trends";
+import type { ChatMessage, Country, Signal, Trend } from "@/types/trends";
 
 const now = new Date();
 const minutesAgo = (minutes: number) => new Date(now.getTime() - minutes * 60_000).toISOString();
@@ -103,6 +103,32 @@ export const demoSignals: Signal[] = [
     audience_count: null,
     published_at: minutesAgo(28),
     observed_at: minutesAgo(2),
+  },
+];
+
+export const demoMapCountries: Country[] = [
+  { id: "demo-country-us", code: "US", slug: "united-states", name: "United States", latitude: 37.09, longitude: -95.71 },
+  { id: "demo-country-gb", code: "GB", slug: "united-kingdom", name: "United Kingdom", latitude: 55.37, longitude: -3.43 },
+];
+
+const attributedDemoMapSignals: Signal[] = demoSignals.map((signal, index) => ({
+  ...signal,
+  id: `${signal.id}-map`,
+  external_id: `interaction-preview-${index + 1}`,
+  title: index === 0 ? "Local-first AI agent runtime reaches a contributor milestone" : "Developers debate auditable AI agents",
+  country_id: demoMapCountries[index].id,
+  country: demoMapCountries[index],
+}));
+
+export const demoMapSignals: Signal[] = [
+  ...attributedDemoMapSignals,
+  {
+    ...demoSignals[1],
+    id: "demo-signal-3-map",
+    external_id: "interaction-preview-3",
+    title: "AI agent auditability discussion gains a second market signal",
+    country_id: demoMapCountries[0].id,
+    country: demoMapCountries[0],
   },
 ];
 
