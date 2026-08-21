@@ -17,6 +17,7 @@ What's Happening is a public web product for founders and analysts tracking emer
 - [Trending](${SITE_URL}/trending): Ranked trend interface, with an explicit unavailable state when no production records can load.
 - [Explore](${SITE_URL}/explore): Category interface, with an explicit unavailable state when no production records can load.
 - [Map](${SITE_URL}/map): Country-attributed map interface, with an explicit unavailable state when no production records can load.
+- [Defensive AI security research](${SITE_URL}/security-research): Searchable English and Turkish dossiers covering AI risk models, controls, validation, limitations, and authoritative evidence.
 
 ## Comparison guides
 

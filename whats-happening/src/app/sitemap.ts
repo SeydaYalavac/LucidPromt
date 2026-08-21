@@ -23,6 +23,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${SITE_URL}/security-research`,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
     ...[
       "compare/exploding-topics-vs-google-trends",
       "compare/exploding-topics-vs-glimpse",

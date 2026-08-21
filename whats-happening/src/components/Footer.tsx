@@ -8,6 +8,7 @@ export function Footer() {
   const links: { label: TranslationKey; href: string }[] = [
     { label: "nav.explore", href: "/explore" }, { label: "nav.trending", href: "/trending" },
     { label: "footer.countries", href: "/world" }, { label: "nav.map", href: "/map" },
+    { label: "nav.security", href: "/security-research" },
     { label: "footer.about", href: "/about" }, { label: "nav.how", href: "/how-it-works" },
     { label: "nav.pricing", href: "/pricing" }, { label: "footer.privacy", href: "/privacy" },
     { label: "footer.terms", href: "/terms" }, { label: "footer.support", href: "mailto:whatshappeninginai@mail.tin.computer" },

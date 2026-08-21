@@ -20,6 +20,7 @@ describe("crawler metadata", () => {
       `${SITE_URL}/about`,
       `${SITE_URL}/how-it-works`,
       `${SITE_URL}/pricing`,
+      `${SITE_URL}/security-research`,
       `${SITE_URL}/compare/exploding-topics-vs-google-trends`,
       `${SITE_URL}/compare/exploding-topics-vs-glimpse`,
       `${SITE_URL}/alternatives/google-trends`,
@@ -45,7 +46,7 @@ describe("crawler metadata", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("text/plain; charset=utf-8");
     expect(await response.text()).toBe(llmsText);
-    expect(linkedUrls.length).toBe(15);
+    expect(linkedUrls.length).toBe(16);
     expect(linkedUrls.every((url) => url === SITE_URL || url.startsWith(`${SITE_URL}/`))).toBe(true);
     expect(llmsText).toContain("Production trend data and account access are currently unavailable");
     expect(llmsText).not.toContain(`${SITE_URL}/signin`);
