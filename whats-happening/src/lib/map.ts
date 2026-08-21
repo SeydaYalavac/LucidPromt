@@ -8,6 +8,7 @@ import { ACTIVE_TREND_WINDOW_HOURS, activeTrendCutoff } from "./trend-feed";
 import type {
   Country,
   CountryActivity,
+  MapDevelopmentPoint,
   MapActivityPayload,
   MapEvidenceLink,
   MapTrendActivity,
@@ -44,6 +45,20 @@ function evidenceLink(signal: Signal): MapEvidenceLink {
     published_at: signal.published_at,
     observed_at: signal.observed_at,
     signal_summary: summarizeEvidenceSignal(signal) || `${sourceLabel(signal.source)} recorded this topic.`,
+  };
+}
+
+function developmentPoint(country: Country, trend: Trend, signal: Signal): MapDevelopmentPoint {
+  return {
+    ...evidenceLink(signal),
+    trend_id: trend.id,
+    trend_slug: trend.slug,
+    trend_title: trend.title,
+    trend_summary: trend.summary,
+    category: trend.category,
+    country,
+    geographic_precision: "country",
+    geographic_evidence: `${country.name} market evidence from ${sourceLabel(signal.source)}. The source provides country-level context, not an exact event location.`,
   };
 }
 
@@ -90,7 +105,6 @@ export function buildMapActivityPayload(
       if (!matches.length) return [];
       const evidence = matches
         .filter((signal, index, items) => items.findIndex((item) => item.source_url === signal.source_url) === index)
-        .slice(0, 3)
         .map(evidenceLink);
       return [{
         id: trend.id,
@@ -112,6 +126,15 @@ export function buildMapActivityPayload(
     const countrySignals = [...signalsByCountryAndTrend.entries()]
       .filter(([key]) => key.startsWith(`${country.id}:`))
       .flatMap(([, items]) => items);
+    const developments = trendActivities
+      .flatMap((topic) => {
+        const trend = trendsById.get(topic.id);
+        if (!trend) return [];
+        return (signalsByCountryAndTrend.get(`${country.id}:${topic.id}`) || [])
+          .filter((signal, index, items) => items.findIndex((item) => item.source_url === signal.source_url) === index)
+          .map((signal) => developmentPoint(country, trend, signal));
+      })
+      .sort((a, b) => Math.max(timestamp(b.observed_at), timestamp(b.published_at)) - Math.max(timestamp(a.observed_at), timestamp(a.published_at)));
     return [{
       country,
       trend_count: trendActivities.length,
@@ -119,10 +142,12 @@ export function buildMapActivityPayload(
       source_count: new Set(countrySignals.map((signal) => signal.source)).size,
       latest_observed_at: new Date(Math.max(...countrySignals.map(evidenceTimestamp))).toISOString(),
       rising_topics: trendActivities,
+      developments,
     }];
   }).sort((a, b) => b.evidence_count - a.evidence_count || b.trend_count - a.trend_count || a.country.name.localeCompare(b.country.name));
 
   return {
+    countries: [...countries].sort((a, b) => a.name.localeCompare(b.name)),
     activities,
     mode: options.mode,
     coverage: {

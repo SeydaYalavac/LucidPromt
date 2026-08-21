@@ -167,6 +167,17 @@ export interface MapEvidenceLink {
   signal_summary: string;
 }
 
+export interface MapDevelopmentPoint extends MapEvidenceLink {
+  trend_id: string;
+  trend_slug: string;
+  trend_title: string;
+  trend_summary: string | null;
+  category: string;
+  country: Country;
+  geographic_precision: "country";
+  geographic_evidence: string;
+}
+
 export interface MapTrendActivity {
   id: string;
   slug: string;
@@ -189,9 +200,11 @@ export interface CountryActivity {
   source_count: number;
   latest_observed_at: string;
   rising_topics: MapTrendActivity[];
+  developments: MapDevelopmentPoint[];
 }
 
 export interface MapActivityPayload {
+  countries: Country[];
   activities: CountryActivity[];
   mode: "live" | "demo";
   coverage: {
