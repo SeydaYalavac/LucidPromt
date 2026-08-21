@@ -21,6 +21,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...[
       "compare/exploding-topics-vs-google-trends",
       "compare/exploding-topics-vs-glimpse",
+      "alternatives/google-trends",
+      "alternatives/exploding-topics",
+      "alternatives/glimpse",
+      "alternatives/trends-co",
     ].map((path) => ({
       url: `${SITE_URL}/${path}`,
       changeFrequency: "monthly" as const,
