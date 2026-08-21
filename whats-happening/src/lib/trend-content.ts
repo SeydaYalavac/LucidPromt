@@ -1,6 +1,8 @@
-import type { SourceName } from "@/types/trends";
+import type { SourceName, TrendSummarySource } from "@/types/trends";
 
 const MAX_EXCERPT_LENGTH = 500;
+const MAX_CARD_SUMMARY_LENGTH = 280;
+const SUMMARY_WRITE_TOLERANCE_MS = 5_000;
 
 const structuredTextKeys = [
   "ht:news_item_snippet",
@@ -119,6 +121,188 @@ export function isDiscoverableSignal(signal: { source?: SourceName | string | nu
   if (signal.source === "github") return true;
   if (signal.source === "hacker_news" && /^show hn\s*:/i.test(String(signal.title || ""))) return true;
   return hasTechnologyRelevance(signal.title, signal.excerpt);
+}
+
+type EvidenceSignal = {
+  source?: SourceName | string | null;
+  external_id?: string | null;
+  title?: unknown;
+  excerpt?: unknown;
+  source_url?: string | null;
+  engagement_count?: number | null;
+  audience_count?: number | null;
+  published_at?: string | null;
+  observed_at?: string | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+type EvidenceTrend = {
+  title?: unknown;
+  summary?: string | null;
+  updated_at?: string | null;
+  last_seen_at?: string | null;
+};
+
+const sourceLabels: Record<SourceName, string> = {
+  hacker_news: "Hacker News",
+  github: "GitHub",
+  google_trends: "Google Trends",
+  reddit: "Reddit",
+  x: "X",
+  tavily: "Tavily",
+  exa: "Exa",
+};
+
+function boundedSummary(value: string) {
+  if (value.length <= MAX_CARD_SUMMARY_LENGTH) return value;
+  const clipped = value.slice(0, MAX_CARD_SUMMARY_LENGTH + 1);
+  const boundary = clipped.lastIndexOf(" ");
+  return `${clipped.slice(0, boundary > 180 ? boundary : MAX_CARD_SUMMARY_LENGTH).trimEnd()}…`;
+}
+
+function count(value: unknown) {
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed) : 0;
+}
+
+function plural(value: number, singular: string) {
+  return `${value.toLocaleString("en-US")} ${singular}${value === 1 ? "" : "s"}`;
+}
+
+function observedLabel(signal: EvidenceSignal) {
+  const raw = signal.observed_at || signal.published_at;
+  if (!raw) return null;
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "UTC",
+    timeZoneName: "short",
+  }).format(date);
+}
+
+function cleanSourceUrl(value: unknown) {
+  if (typeof value !== "string") return null;
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    const isPlaceholder = host === "localhost"
+      || host === "127.0.0.1"
+      || host === "example.com"
+      || host === "example.org"
+      || host === "example.net"
+      || host.endsWith(".test")
+      || host.endsWith(".invalid");
+    if (!/^https?:$/.test(url.protocol) || url.username || url.password || isPlaceholder) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function signalTimestamp(signal: EvidenceSignal) {
+  for (const value of [signal.observed_at, signal.published_at]) {
+    const timestamp = value ? new Date(value).getTime() : Number.NaN;
+    if (Number.isFinite(timestamp)) return timestamp;
+  }
+  return 0;
+}
+
+function trendSummaryTimestamp(trend: EvidenceTrend) {
+  for (const value of [trend.updated_at, trend.last_seen_at]) {
+    const timestamp = value ? new Date(value).getTime() : Number.NaN;
+    if (Number.isFinite(timestamp)) return timestamp;
+  }
+  return 0;
+}
+
+export function sourceLabel(source: SourceName | string | null | undefined) {
+  return source && source in sourceLabels ? sourceLabels[source as SourceName] : "Source";
+}
+
+export function isEligibleEvidenceSignal(signal: EvidenceSignal) {
+  if (!isDiscoverableSignal(signal)) return false;
+  if (String(signal.external_id || "").toLowerCase().startsWith("demo")) return false;
+  return Boolean(cleanSourceUrl(signal.source_url));
+}
+
+export function summarizeEvidenceSignal(signal: EvidenceSignal) {
+  if (!isEligibleEvidenceSignal(signal)) return null;
+  const excerpt = sanitizeExcerpt(signal.excerpt);
+  const title = sanitizeExcerpt(signal.title);
+  if (excerpt && excerpt.toLocaleLowerCase() !== title?.toLocaleLowerCase()) return boundedSummary(excerpt);
+
+  const metadata = signal.metadata || {};
+  const observed = observedLabel(signal);
+  const timing = observed ? ` · observed ${observed}` : "";
+
+  if (signal.source === "hacker_news") {
+    const comments = count(metadata.comments);
+    const points = count(metadata.points ?? Math.max(0, count(signal.engagement_count) - comments));
+    return `Hacker News activity: ${plural(points, "point")} · ${plural(comments, "comment")}${timing}`;
+  }
+  if (signal.source === "github") {
+    const forks = count(metadata.forks);
+    const stars = count(metadata.stars ?? Math.max(0, count(signal.engagement_count) - forks));
+    return `GitHub activity: ${plural(stars, "star")} · ${plural(forks, "fork")}${timing}`;
+  }
+  if (signal.source === "google_trends") {
+    const traffic = sanitizeExcerpt(metadata.approximate_traffic);
+    return traffic
+      ? `Google Trends activity: ${traffic} searches${timing}`
+      : `Observed in Google Trends${observed ? ` on ${observed}` : ""}`;
+  }
+  if (signal.source === "reddit") {
+    const comments = count(metadata.comments);
+    const score = Math.max(0, count(signal.engagement_count) - comments);
+    return `Reddit activity: ${plural(score, "point")} · ${plural(comments, "comment")}${timing}`;
+  }
+
+  const interactions = count(signal.engagement_count);
+  return `${sourceLabel(signal.source)} activity: ${plural(interactions, "public interaction")}${timing}`;
+}
+
+function summarySource(signal: EvidenceSignal): TrendSummarySource | null {
+  const sourceUrl = cleanSourceUrl(signal.source_url);
+  const sourceTitle = sanitizeExcerpt(signal.title);
+  if (!sourceUrl || !sourceTitle || !signal.source || !(signal.source in sourceLabels)) return null;
+  return {
+    source: signal.source as SourceName,
+    source_url: sourceUrl,
+    source_title: sourceTitle,
+    published_at: signal.published_at || signal.observed_at || "",
+    observed_at: signal.observed_at || signal.published_at || "",
+  };
+}
+
+export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: EvidenceSignal[]) {
+  const eligibleSignals = signals
+    .filter(isEligibleEvidenceSignal)
+    .sort((a, b) => signalTimestamp(b) - signalTimestamp(a));
+  const newest = eligibleSignals[0];
+  if (!newest) return { ...trend, summary: null, summary_source: null };
+
+  const storedSummary = sanitizeExcerpt(trend.summary);
+  const newestSummary = summarizeEvidenceSignal(newest);
+  const matchingSignal = storedSummary
+    ? eligibleSignals.find((signal) => sanitizeExcerpt(signal.excerpt) === storedSummary)
+    : undefined;
+  const summaryIsCurrent = storedSummary
+    && trendSummaryTimestamp(trend) + SUMMARY_WRITE_TOLERANCE_MS >= signalTimestamp(newest);
+  const matchingSignalIsNewest = matchingSignal
+    && signalTimestamp(matchingSignal) + SUMMARY_WRITE_TOLERANCE_MS >= signalTimestamp(newest);
+  const selectedSignal = matchingSignalIsNewest ? matchingSignal : newest;
+  const summary = (summaryIsCurrent || matchingSignalIsNewest) ? storedSummary : newestSummary;
+
+  return {
+    ...trend,
+    summary: summary ? boundedSummary(summary) : null,
+    summary_source: summary ? summarySource(selectedSignal) : null,
+  };
 }
 
 export function isDiscoverableTrend(trend: { title?: unknown; summary?: unknown; category?: unknown }) {
