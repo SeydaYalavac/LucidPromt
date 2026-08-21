@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   hasTechnologyRelevance,
+  buildTrendBrief,
   isDiscoverableSignal,
   isDiscoverableTrend,
   resolveTrendContent,
@@ -134,5 +135,75 @@ describe("source-backed trend content", () => {
 
     expect(resolved.summary).toBeNull();
     expect(resolved.summary_source).toBeNull();
+    expect(resolved.brief).toBeNull();
+  });
+
+  it("builds a four-part brief and discloses single-source uncertainty", () => {
+    const brief = buildTrendBrief(trend, [hackerNewsSignal]);
+
+    expect(brief).toMatchObject({
+      evidence_source_count: 1,
+      linked_site_count: 1,
+      corroboration: "single_source",
+    });
+    expect(brief?.what_it_is).toContain("discussion on Hacker News");
+    expect(brief?.why_trending).toContain("22 points");
+    expect(brief?.why_trending).toContain("one source only");
+    expect(brief?.useful_for).toContain("questions, objections, and use cases");
+    expect(brief?.next_step).toContain("original submission");
+    expect(brief?.evidence[0].source_url).toBe("https://news.ycombinator.com/item?id=123");
+  });
+
+  it("marks independent providers as corroborated without claiming causation", () => {
+    const brief = buildTrendBrief(trend, [
+      hackerNewsSignal,
+      {
+        source: "github",
+        external_id: "repo-1",
+        title: "org/reasoning-benchmark",
+        excerpt: "An open benchmark for reasoning models.",
+        source_url: "https://github.com/org/reasoning-benchmark",
+        engagement_count: 120,
+        published_at: "2026-08-21T14:02:00.000Z",
+        observed_at: "2026-08-21T14:05:00.000Z",
+        metadata: { language: "Python", stars: 100, forks: 20 },
+      },
+    ]);
+
+    expect(brief).toMatchObject({
+      evidence_source_count: 2,
+      linked_site_count: 2,
+      corroboration: "multi_source",
+    });
+    expect(brief?.why_trending).toContain("Hacker News");
+    expect(brief?.why_trending).toContain("GitHub");
+    expect(brief?.why_trending).toContain("100 stars");
+    expect(brief?.caution).toContain("does not prove cause");
+  });
+
+  it("adds publisher links carried by Google Trends without counting them as independent signal systems", () => {
+    const brief = buildTrendBrief(trend, [{
+      source: "google_trends",
+      external_id: "US-ai-chip-1",
+      title: "ai chip",
+      excerpt: "A new AI chip benchmark is published",
+      source_url: "https://trends.google.com/trending?geo=US",
+      engagement_count: 2000,
+      published_at: "2026-08-21T14:00:00.000Z",
+      observed_at: "2026-08-21T14:05:00.000Z",
+      metadata: {
+        approximate_traffic: "2000+",
+        news_items: [{
+          title: "A new AI chip benchmark is published",
+          snippet: "The benchmark compares current inference hardware.",
+          url: "https://publisher.example.ai/benchmark",
+          source: "Example AI",
+        }],
+      },
+    }]);
+
+    expect(brief).toMatchObject({ evidence_source_count: 1, linked_site_count: 2, corroboration: "single_source" });
+    expect(brief?.evidence[1]).toMatchObject({ kind: "linked_report", label: "Example AI" });
+    expect(brief?.why_trending).toContain("roughly 2000+ searches");
   });
 });

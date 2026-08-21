@@ -1,4 +1,4 @@
-import type { SourceName, TrendSummarySource } from "@/types/trends";
+import type { SourceName, TrendBrief, TrendBriefEvidence, TrendSummarySource } from "@/types/trends";
 
 const MAX_EXCERPT_LENGTH = 500;
 const MAX_CARD_SUMMARY_LENGTH = 280;
@@ -204,6 +204,14 @@ function cleanSourceUrl(value: unknown) {
   }
 }
 
+function sourceHost(value: string) {
+  try {
+    return new URL(value).hostname.replace(/^www\./, "").toLowerCase();
+  } catch {
+    return value;
+  }
+}
+
 function signalTimestamp(signal: EvidenceSignal) {
   for (const value of [signal.observed_at, signal.published_at]) {
     const timestamp = value ? new Date(value).getTime() : Number.NaN;
@@ -266,6 +274,214 @@ export function summarizeEvidenceSignal(signal: EvidenceSignal) {
   return `${sourceLabel(signal.source)} activity: ${plural(interactions, "public interaction")}${timing}`;
 }
 
+function compactSentence(value: string, max = 220) {
+  const clean = sanitizeExcerpt(value) || "";
+  if (clean.length <= max) return clean;
+  const clipped = clean.slice(0, max + 1);
+  const boundary = clipped.lastIndexOf(" ");
+  return `${clipped.slice(0, boundary > max * 0.65 ? boundary : max).trimEnd()}…`;
+}
+
+function sourceActivity(signal: EvidenceSignal) {
+  const metadata = signal.metadata || {};
+  if (signal.source === "hacker_news") {
+    const comments = count(metadata.comments);
+    const points = count(metadata.points ?? Math.max(0, count(signal.engagement_count) - comments));
+    return `Hacker News recorded ${plural(points, "point")} and ${plural(comments, "comment")}.`;
+  }
+  if (signal.source === "github") {
+    const forks = count(metadata.forks);
+    const stars = count(metadata.stars ?? Math.max(0, count(signal.engagement_count) - forks));
+    return `GitHub recorded ${plural(stars, "star")} and ${plural(forks, "fork")}.`;
+  }
+  if (signal.source === "google_trends") {
+    const traffic = sanitizeExcerpt(metadata.approximate_traffic);
+    return traffic
+      ? `Google Trends listed roughly ${traffic.replace(/\s*searches?$/i, "")} searches.`
+      : "Google Trends listed the topic in its current trending searches.";
+  }
+  if (signal.source === "reddit") {
+    const comments = count(metadata.comments);
+    const score = Math.max(0, count(signal.engagement_count) - comments);
+    return `Reddit recorded ${plural(score, "point")} and ${plural(comments, "comment")}.`;
+  }
+  if (signal.source === "x") {
+    return `X recorded ${plural(count(signal.engagement_count), "public interaction")}.`;
+  }
+  return `${sourceLabel(signal.source)} surfaced a current matching report.`;
+}
+
+function describeTrend(trend: EvidenceTrend, signal: EvidenceSignal) {
+  const title = sanitizeExcerpt(signal.title) || sanitizeExcerpt(trend.title) || "this topic";
+  const excerpt = sanitizeExcerpt(signal.excerpt);
+  const metadata = signal.metadata || {};
+
+  if (signal.source === "github") {
+    const language = sanitizeExcerpt(metadata.language);
+    const context = language ? ` written primarily in ${language}` : "";
+    return excerpt
+      ? `${title} is a GitHub project${context}. Its repository describes it as: ${compactSentence(excerpt, 180)}`
+      : `${title} is a GitHub project${context} attracting recent repository activity.`;
+  }
+  if (signal.source === "google_trends") {
+    return excerpt
+      ? `A Google Trends search topic linked to the report “${compactSentence(excerpt, 180)}”.`
+      : `${title} is a search topic currently listed by Google Trends.`;
+  }
+  if (signal.source === "hacker_news") {
+    return excerpt
+      ? `A Hacker News discussion about ${title}. The submitted context says: ${compactSentence(excerpt, 180)}`
+      : `${title} is a technology topic drawing discussion on Hacker News.`;
+  }
+  if (signal.source === "reddit") {
+    return excerpt
+      ? `A Reddit discussion about ${title}. The post says: ${compactSentence(excerpt, 180)}`
+      : `${title} is a topic drawing discussion on Reddit.`;
+  }
+  return excerpt
+    ? `${compactSentence(excerpt, 220)}`
+    : `${title} is a topic appearing in current ${sourceLabel(signal.source)} evidence.`;
+}
+
+function usefulnessFor(signals: EvidenceSignal[]) {
+  const sources = new Set(signals.map((signal) => signal.source));
+  if (sources.size > 1) {
+    return "Useful for checking whether attention is crossing independent communities before committing deeper research time.";
+  }
+  if (sources.has("github")) {
+    return "Useful for developers evaluating whether a new open-source project deserves a technical review or trial.";
+  }
+  if (sources.has("hacker_news") || sources.has("reddit")) {
+    return "Useful for seeing the questions, objections, and use cases a technical community is discussing right now.";
+  }
+  if (sources.has("google_trends")) {
+    return "Useful for gauging current search attention and finding the reporting attached to that query.";
+  }
+  return "Useful as an early research lead that can be checked against the linked report before making a decision.";
+}
+
+function nextStepFor(signals: EvidenceSignal[]) {
+  const sources = new Set(signals.map((signal) => signal.source));
+  if (sources.size > 1) {
+    return "Compare the newest claim across the independent sources below, then follow the primary evidence they cite.";
+  }
+  if (sources.has("github")) {
+    return "Open the repository and check its README, license, release history, and open issues before trying it.";
+  }
+  if (sources.has("hacker_news") || sources.has("reddit")) {
+    return "Read the linked discussion and its original submission, separating author claims from community reaction.";
+  }
+  if (sources.has("google_trends")) {
+    return "Open Google Trends and the linked reporting. Search volume shows attention, not the cause behind it.";
+  }
+  return "Open the source and verify its central claim before using this trend in a product or research decision.";
+}
+
+type LinkedReport = {
+  title?: unknown;
+  snippet?: unknown;
+  url?: unknown;
+  source?: unknown;
+};
+
+function linkedReports(signal: EvidenceSignal): TrendBriefEvidence[] {
+  if (signal.source === "hacker_news") {
+    const url = cleanSourceUrl(signal.metadata?.article_url);
+    const title = sanitizeExcerpt(signal.title);
+    if (!url || !title) return [];
+    return [{
+      provider: "hacker_news",
+      kind: "linked_report",
+      label: sourceHost(url),
+      source_url: url,
+      source_title: title,
+      published_at: signal.published_at || "",
+      observed_at: signal.observed_at || signal.published_at || "",
+      signal_summary: "Original submission linked from the Hacker News discussion.",
+    }];
+  }
+  if (signal.source !== "google_trends" || !Array.isArray(signal.metadata?.news_items)) return [];
+  return (signal.metadata.news_items as LinkedReport[]).flatMap((item) => {
+    const url = cleanSourceUrl(item.url);
+    const title = sanitizeExcerpt(item.title);
+    if (!url || !title) return [];
+    const label = sanitizeExcerpt(item.source) || sourceHost(url);
+    const snippet = sanitizeExcerpt(item.snippet);
+    return [{
+      provider: "google_trends" as const,
+      kind: "linked_report" as const,
+      label,
+      source_url: url,
+      source_title: title,
+      published_at: signal.published_at || "",
+      observed_at: signal.observed_at || signal.published_at || "",
+      signal_summary: snippet ? compactSentence(snippet, 180) : title,
+    }];
+  }).slice(0, 2);
+}
+
+function evidenceReference(signal: EvidenceSignal): TrendBriefEvidence | null {
+  let sourceUrl = cleanSourceUrl(signal.source_url);
+  if (signal.source === "hacker_news" && /^\d+$/.test(String(signal.external_id || ""))) {
+    sourceUrl = `https://news.ycombinator.com/item?id=${signal.external_id}`;
+  }
+  const title = sanitizeExcerpt(signal.title);
+  if (!sourceUrl || !title || !signal.source || !(signal.source in sourceLabels)) return null;
+  return {
+    provider: signal.source as SourceName,
+    kind: "signal",
+    label: sourceLabel(signal.source),
+    source_url: sourceUrl,
+    source_title: title,
+    published_at: signal.published_at || "",
+    observed_at: signal.observed_at || signal.published_at || "",
+    signal_summary: sourceActivity(signal),
+  };
+}
+
+export function buildTrendBrief(trend: EvidenceTrend, signals: EvidenceSignal[]): TrendBrief | null {
+  const eligible = signals
+    .filter(isEligibleEvidenceSignal)
+    .sort((a, b) => signalTimestamp(b) - signalTimestamp(a));
+  if (!eligible.length) return null;
+
+  const strongestByProvider = new Map<string, EvidenceSignal>();
+  for (const signal of eligible) {
+    if (!signal.source || strongestByProvider.has(signal.source)) continue;
+    strongestByProvider.set(signal.source, signal);
+  }
+  const representativeSignals = [...strongestByProvider.values()];
+  const activity = representativeSignals.map(sourceActivity);
+  const evidence = representativeSignals
+    .flatMap((signal) => [evidenceReference(signal), ...linkedReports(signal)])
+    .filter((item): item is TrendBriefEvidence => Boolean(item))
+    .filter((item, index, items) => items.findIndex((candidate) => candidate.source_url === item.source_url) === index)
+    .slice(0, 5);
+  if (!evidence.length) return null;
+
+  const evidenceSourceCount = representativeSignals.length;
+  const multiSource = evidenceSourceCount > 1;
+  const freshest = eligible[0].observed_at || eligible[0].published_at || "";
+  const whyTrending = multiSource
+    ? `The topic appears across ${representativeSignals.map((signal) => sourceLabel(signal.source)).join(" and ")}. ${activity.join(" ")}`
+    : `The current rank is supported by one source only. ${activity[0]} Treat it as an early signal, not corroborated momentum.`;
+
+  return {
+    what_it_is: describeTrend(trend, eligible[0]),
+    why_trending: compactSentence(whyTrending, 360),
+    useful_for: usefulnessFor(representativeSignals),
+    next_step: nextStepFor(representativeSignals),
+    evidence,
+    freshest_observed_at: freshest,
+    evidence_source_count: evidenceSourceCount,
+    linked_site_count: new Set(evidence.map((item) => sourceHost(item.source_url))).size,
+    corroboration: multiSource ? "multi_source" : "single_source",
+    caution: multiSource
+      ? "Multiple source systems show attention, but the evidence does not prove cause or predict future growth."
+      : "One source system is available, so the cause and durability of this attention remain unconfirmed.",
+  };
+}
+
 function summarySource(signal: EvidenceSignal): TrendSummarySource | null {
   const sourceUrl = cleanSourceUrl(signal.source_url);
   const sourceTitle = sanitizeExcerpt(signal.title);
@@ -284,7 +500,7 @@ export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: 
     .filter(isEligibleEvidenceSignal)
     .sort((a, b) => signalTimestamp(b) - signalTimestamp(a));
   const newest = eligibleSignals[0];
-  if (!newest) return { ...trend, summary: null, summary_source: null };
+  if (!newest) return { ...trend, summary: null, summary_source: null, brief: null };
 
   const storedSummary = sanitizeExcerpt(trend.summary);
   const newestSummary = summarizeEvidenceSignal(newest);
@@ -302,6 +518,7 @@ export function resolveTrendContent<T extends EvidenceTrend>(trend: T, signals: 
     ...trend,
     summary: summary ? boundedSummary(summary) : null,
     summary_source: summary ? summarySource(selectedSignal) : null,
+    brief: buildTrendBrief(trend, eligibleSignals),
   };
 }
 

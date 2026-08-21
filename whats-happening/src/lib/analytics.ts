@@ -17,7 +17,7 @@ type ProductEventProperties = {
   "$pageview": { route: string; $current_url: string };
   signup_cta_clicked: { source: "auth_panel" | "global_nav" | "mobile_nav" };
   source_evidence_viewed: { trend_slug: string; source_type: string };
-  trend_saved: { trend_slug: string; source: "detail" | "explore" | "trending" | "world" };
+  trend_saved: { trend_slug: string; source: "category" | "country" | "detail" | "explore" | "trending" | "world" };
   live_data_unavailable: { endpoint: string; route: string; status_code: number };
   authentication_unavailable: { mode: string };
   api_error: {

@@ -13,6 +13,30 @@ const iso = (value: string | number | undefined) => {
 };
 const text = (value: unknown, max = 500) => String(value || "").replace(/\s+/g, " ").trim().slice(0, max);
 
+type GoogleNewsItem = {
+  title: string;
+  snippet: string | null;
+  url: string;
+  source: string | null;
+};
+
+export function extractGoogleNewsItems(value: unknown): GoogleNewsItem[] {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return values.flatMap((candidate) => {
+    if (!candidate || typeof candidate !== "object") return [];
+    const item = candidate as Record<string, unknown>;
+    const title = text(item["ht:news_item_title"] || item.title, 240);
+    const url = text(item["ht:news_item_url"] || item.url, 500);
+    if (!title || !/^https?:\/\//i.test(url)) return [];
+    return [{
+      title,
+      snippet: sanitizeExcerpt(item["ht:news_item_snippet"] || item.snippet),
+      url,
+      source: text(item["ht:news_item_source"] || item.source, 120) || null,
+    }];
+  }).slice(0, 3);
+}
+
 async function json<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, init);
   if (!response.ok) throw new Error(`${url} returned ${response.status}`);
@@ -37,11 +61,11 @@ export const hackerNews: SourceAdapter = {
         externalId: String(item.id),
         title: text(item.title, 220),
         excerpt: sanitizeExcerpt(item.text) || undefined,
-        sourceUrl: item.url || `https://news.ycombinator.com/item?id=${item.id}`,
+        sourceUrl: `https://news.ycombinator.com/item?id=${item.id}`,
         authorLabel: text(item.by, 60),
         engagementCount: (item.score || 0) + (item.descendants || 0),
         publishedAt: new Date((item.time || Date.now() / 1000) * 1000).toISOString(),
-        metadata: { points: item.score || 0, comments: item.descendants || 0 },
+        metadata: { points: item.score || 0, comments: item.descendants || 0, article_url: item.url || null },
       }));
   },
 };
@@ -90,18 +114,21 @@ export const googleTrends: SourceAdapter = {
     };
     const raw = parsed.rss?.channel?.item;
     const items = Array.isArray(raw) ? raw : raw ? [raw] : [];
-    return items.map((item, index) => ({
-      source: "google_trends" as const,
-      externalId: `${geo}-${text(item.title, 160)}-${index}`,
-      title: text(item.title, 220),
-      excerpt: sanitizeExcerpt(item["ht:news_item"]) || undefined,
-      sourceUrl: `https://trends.google.com/trending?geo=${encodeURIComponent(geo)}`,
-      authorLabel: "Google Trends",
-      engagementCount: Number(String(item["ht:approx_traffic"] || "0").replace(/\D/g, "")) || 0,
-      publishedAt: iso(item.pubDate as string),
-      countryCode: geo,
-      metadata: { approximate_traffic: item["ht:approx_traffic"] || null },
-    }));
+    return items.map((item, index) => {
+      const newsItems = extractGoogleNewsItems(item["ht:news_item"]);
+      return {
+        source: "google_trends" as const,
+        externalId: `${geo}-${text(item.title, 160)}-${index}`,
+        title: text(item.title, 220),
+        excerpt: newsItems[0]?.snippet || newsItems[0]?.title || undefined,
+        sourceUrl: `https://trends.google.com/trending?geo=${encodeURIComponent(geo)}`,
+        authorLabel: "Google Trends",
+        engagementCount: Number(String(item["ht:approx_traffic"] || "0").replace(/\D/g, "")) || 0,
+        publishedAt: iso(item.pubDate as string),
+        countryCode: geo,
+        metadata: { approximate_traffic: item["ht:approx_traffic"] || null, news_items: newsItems },
+      };
+    });
   },
 };
 
