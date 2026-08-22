@@ -21,7 +21,6 @@ export type ReferrerChannel = "ai_assistant";
 
 export type SignupSourceEventProperties = {
   source: SignupSource;
-  ai_prompt_text?: string;
   referrer_channel?: ReferrerChannel;
   $set_once: {
     acquisition_source: SignupSource;
@@ -71,18 +70,12 @@ export function deriveAiReferrerChannel(
 
 export function buildSignupSourceEventProperties(
   source: SignupSource,
-  aiPromptText: string,
   referrerChannel?: ReferrerChannel,
 ): SignupSourceEventProperties {
   const properties: SignupSourceEventProperties = {
     source,
     $set_once: { acquisition_source: source },
   };
-
-  if (source === "ai_assistant") {
-    const prompt = aiPromptText.trim().slice(0, 200);
-    if (prompt) properties.ai_prompt_text = prompt;
-  }
 
   if (referrerChannel) {
     properties.referrer_channel = referrerChannel;

@@ -43,24 +43,26 @@ describe("signup attribution", () => {
     );
   });
 
-  it("keeps prompt text on the signup event and out of person properties", () => {
+  it("keeps AI attribution bounded to source and first-touch classification", () => {
     const properties = buildSignupSourceEventProperties(
       "ai_assistant",
-      `  ${"x".repeat(220)}  `,
       "ai_assistant",
     );
 
-    expect(properties.ai_prompt_text).toHaveLength(200);
-    expect(properties.$set_once).toEqual({
-      acquisition_source: "ai_assistant",
-      first_referrer_channel: "ai_assistant",
+    expect(properties).toEqual({
+      source: "ai_assistant",
+      referrer_channel: "ai_assistant",
+      $set_once: {
+        acquisition_source: "ai_assistant",
+        first_referrer_channel: "ai_assistant",
+      },
     });
-    expect(properties.$set_once).not.toHaveProperty("ai_prompt_text");
   });
 
-  it("drops prompt text for non-AI answers", () => {
-    expect(
-      buildSignupSourceEventProperties("search_engine", "private arbitrary form value"),
-    ).not.toHaveProperty("ai_prompt_text");
+  it("keeps non-AI attribution bounded to the selected source", () => {
+    expect(buildSignupSourceEventProperties("search_engine")).toEqual({
+      source: "search_engine",
+      $set_once: { acquisition_source: "search_engine" },
+    });
   });
 });
