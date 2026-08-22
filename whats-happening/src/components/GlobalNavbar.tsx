@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, LogOut, Menu, Search, User, X } from "lucide-react";
@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { isRouteActive, primaryNavigation } from "@/lib/discovery";
 import { useAuthSession } from "@/hooks/useAuthSession";
 import { captureProductEvent } from "@/lib/analytics";
+import { shouldOpenCommandSearch } from "@/lib/command-search-shortcut";
 import { SearchOverlay } from "./SearchOverlay";
 import { LocaleSelector } from "./LocaleSelector";
 import { useLocale, type TranslationKey } from "@/i18n/locale";
@@ -22,6 +23,8 @@ export function GlobalNavbar({ showPrimaryAuthAction = true }: GlobalNavbarProps
   const [mobileOpen, setMobileOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const searchTriggerRef = useRef<HTMLButtonElement>(null);
+  const searchReturnFocusRef = useRef<HTMLElement | null>(null);
   const { supabase, session, isLoading } = useAuthSession();
   const { t } = useLocale();
 
@@ -34,6 +37,32 @@ export function GlobalNavbar({ showPrimaryAuthAction = true }: GlobalNavbarProps
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [mobileOpen]);
+
+  const openSearch = useCallback(() => {
+    const activeElement = document.activeElement;
+    searchReturnFocusRef.current = activeElement instanceof HTMLElement && activeElement !== document.body
+      ? activeElement
+      : searchTriggerRef.current;
+    setSearchOpen(true);
+  }, []);
+
+  const closeSearch = useCallback(() => {
+    setSearchOpen(false);
+    requestAnimationFrame(() => searchReturnFocusRef.current?.focus());
+  }, []);
+
+  useEffect(() => {
+    if (searchOpen) return;
+
+    const openSearchFromKeyboard = (event: KeyboardEvent) => {
+      if (!shouldOpenCommandSearch(event)) return;
+      event.preventDefault();
+      openSearch();
+    };
+
+    window.addEventListener("keydown", openSearchFromKeyboard);
+    return () => window.removeEventListener("keydown", openSearchFromKeyboard);
+  }, [openSearch, searchOpen]);
 
   async function signOut() {
     if (!supabase) return;
@@ -59,7 +88,7 @@ export function GlobalNavbar({ showPrimaryAuthAction = true }: GlobalNavbarProps
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4">
-            <button type="button" onClick={() => setSearchOpen(true)} className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg text-[#A1A1AA] hover:bg-white/[0.05] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" aria-label={t("nav.openSearch")}><Search size={17} /><span className="hidden text-[11px] uppercase tracking-widest xl:inline">{t("nav.search")}</span></button>
+            <button ref={searchTriggerRef} type="button" onClick={openSearch} className="flex min-h-11 min-w-11 items-center justify-center gap-2 rounded-lg text-[#A1A1AA] hover:bg-white/[0.05] hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white" aria-label={t("nav.openSearch")}><Search size={17} /><span className="hidden text-[11px] uppercase tracking-widest xl:inline">{t("nav.search")}</span></button>
             <LocaleSelector compact />
             {!isLoading && !session && <>
               <Link href="/signin" className="hidden text-[11px] uppercase tracking-widest text-[#A1A1AA] hover:text-white sm:block">{t("nav.signIn")}</Link>
@@ -72,7 +101,7 @@ export function GlobalNavbar({ showPrimaryAuthAction = true }: GlobalNavbarProps
       </motion.header>
 
       {mobileOpen && <div className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-[#070706] px-5 pb-8 pt-24 lg:hidden" role="dialog" aria-modal="true" aria-label={t("nav.mobile")}><nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain" aria-label={t("nav.mobile")}><div className="flex min-h-full flex-col justify-center">{[...primaryNavigation, { label: "How it works", href: "/how-it-works" }].map((item) => <Link key={item.href} href={item.href} className="group border-b border-white/[0.09] py-5 text-4xl font-medium tracking-[-0.04em] text-white"><span>{item.href === "/how-it-works" ? t("nav.how") : t(navigationLabels[item.href])}</span></Link>)}</div></nav><div className="grid shrink-0 grid-cols-2 gap-3 pt-8"><Link href="/signin" className="secondary-action">{t("nav.signIn")}</Link><Link href="/signup" onClick={() => captureProductEvent("signup_cta_clicked", { source: "mobile_nav" })} className="primary-action">{t("nav.signUp")}</Link></div></div>}
-      <SearchOverlay open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <SearchOverlay open={searchOpen} onClose={closeSearch} />
     </>
   );
 }
