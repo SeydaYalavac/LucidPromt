@@ -234,11 +234,13 @@ export function useLocale() {
   return context;
 }
 
-export function localeCategoryLabel(category: string, locale: Locale) {
-  if (locale === "en") return category;
-  const normalizedCategory = category.trim().replace(/\s+/g, " ").toLocaleLowerCase();
+export function localeCategoryLabel(category: string | null | undefined, locale: Locale) {
+  const displayCategory = category?.trim().replace(/\s+/g, " ");
+  if (!displayCategory) return locale === "tr" ? "Kategorisiz" : "Uncategorized";
+  if (locale === "en") return displayCategory;
+  const normalizedCategory = displayCategory.toLocaleLowerCase();
   const key = `category.${normalizedCategory}` as TranslationKey;
-  return key in tr ? tr[key] : category;
+  return key in tr ? tr[key] : displayCategory;
 }
 
 const english = Object.fromEntries(Object.keys(tr).map((key) => [key, key])) as Record<TranslationKey, string>;

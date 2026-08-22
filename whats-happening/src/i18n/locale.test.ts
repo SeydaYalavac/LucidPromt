@@ -20,5 +20,7 @@ describe("locale helpers", () => {
     expect(localeCategoryLabel("Space", "tr")).toBe("Uzay");
     expect(localeCategoryLabel("Robotics", "tr")).toBe("Robotics");
     expect(localeCategoryLabel("Technology", "en")).toBe("Technology");
+    expect(localeCategoryLabel(undefined, "en")).toBe("Uncategorized");
+    expect(localeCategoryLabel(null, "tr")).toBe("Kategorisiz");
   });
 });
