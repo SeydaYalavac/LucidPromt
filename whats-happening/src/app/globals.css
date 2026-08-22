@@ -13,8 +13,8 @@
   --color-accent-orange: #f97316;
   --color-accent-red: #ef4444;
 
-  --font-sans: var(--font-manrope), Arial, sans-serif;
-  --font-display: var(--font-newsreader), Georgia, serif;
+  --font-sans: var(--font-geist-sans), Arial, sans-serif;
+  --font-display: var(--font-geist-sans), Arial, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
 
@@ -35,7 +35,6 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-variation-settings: "opsz" 64;
 }
 
 a,

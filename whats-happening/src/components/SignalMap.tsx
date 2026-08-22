@@ -7,7 +7,7 @@ import { feature } from "topojson-client";
 import worldAtlas from "world-atlas/countries-110m.json";
 import type { Feature, FeatureCollection, Geometry, GeoJsonProperties } from "geojson";
 import type { GeometryCollection, Topology } from "topojson-specification";
-import { ArrowRight, ExternalLink, LocateFixed, Minus, Plus, X } from "lucide-react";
+import { ArrowRight, ExternalLink, LocateFixed, Maximize2, Minimize2, Minus, Plus, X } from "lucide-react";
 import { useMapActivity } from "@/hooks/useTrendData";
 import { clampMapScale, mapMarkerRadius } from "@/lib/map";
 import type { Country, CountryActivity, MapDevelopmentPoint } from "@/types/trends";
@@ -58,17 +58,19 @@ function DevelopmentDetail({
   onSelect,
   onClose,
   panelRef,
+  expanded,
 }: {
   activity: CountryActivity;
   point: MapDevelopmentPoint;
   onSelect: (id: string) => void;
   onClose: () => void;
   panelRef: React.RefObject<HTMLElement | null>;
+  expanded: boolean;
 }) {
   const { locale } = useLocale();
   const l = (en: string, tr: string) => locale === "tr" ? tr : en;
 
-  return <aside ref={panelRef} tabIndex={-1} className="relative z-30 max-h-[720px] overflow-y-auto border-t border-white/[0.12] bg-[#0B0B0D] p-5 focus:outline-none sm:p-7 xl:max-h-none xl:min-h-[700px] xl:border-l xl:border-t-0" aria-live="polite" aria-label={l(`${activity.country.name} news desk`, `${activity.country.name} haber masası`)}>
+  return <aside ref={panelRef} tabIndex={-1} className={`relative z-30 overflow-y-auto border-t border-white/[0.12] bg-[#0B0B0D] p-5 focus:outline-none sm:p-7 xl:border-l xl:border-t-0 ${expanded ? "max-h-[52dvh] xl:h-dvh xl:max-h-dvh xl:min-h-0" : "max-h-[720px] xl:max-h-none xl:min-h-[700px]"}`} aria-live="polite" aria-label={l(`${activity.country.name} news desk`, `${activity.country.name} haber masası`)}>
     <div className="flex items-start justify-between gap-5 border-b border-white/[0.1] pb-6">
       <div>
         <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/45">{l("Mapped news desk", "Haritalı haber masası")}</p>
@@ -108,6 +110,7 @@ export function SignalMap() {
   const [transform, setTransform] = useState<Transform>(INITIAL_TRANSFORM);
   const [selectedCountryName, setSelectedCountryName] = useState<string | null>(null);
   const [selectedPointId, setSelectedPointId] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
   const dragStart = useRef<{ x: number; y: number; originX: number; originY: number } | null>(null);
   const panelRef = useRef<HTMLElement>(null);
   const lastMapTrigger = useRef<SVGElement | null>(null);
@@ -123,6 +126,20 @@ export function SignalMap() {
     const desktop = window.matchMedia("(min-width: 1280px)").matches;
     window.requestAnimationFrame(() => panel.focus({ preventScroll: desktop }));
   }, [selectedPoint]);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function closeExpandedMap(event: KeyboardEvent) {
+      if (event.key === "Escape") setExpanded(false);
+    }
+    window.addEventListener("keydown", closeExpandedMap);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", closeExpandedMap);
+    };
+  }, [expanded]);
 
   useEffect(() => {
     if (!selectedPoint) return;
@@ -142,6 +159,13 @@ export function SignalMap() {
 
   function reset() {
     setTransform(INITIAL_TRANSFORM);
+  }
+
+  function toggleExpandedMap() {
+    if (!expanded) {
+      setTransform((current) => ({ ...current, scale: Math.max(current.scale, 1.5) }));
+    }
+    setExpanded((value) => !value);
   }
 
   function closeNewsDesk() {
@@ -168,8 +192,8 @@ export function SignalMap() {
       <p className="max-w-[58ch] text-pretty text-base leading-7 text-[#A8A8AF] lg:pb-1">{l("Only places supported by current country-attributed evidence light up. Choose one lit place to open the news behind it.", "Yalnızca güncel, ülkeye atfedilmiş kanıtla desteklenen yerler yanar. Arkasındaki haberi açmak için ışıklı bir yer seçin.")}</p>
     </header>
 
-    <section className={`relative mt-2 overflow-hidden rounded-[1.5rem] border border-[rgba(226,222,213,0.2)] bg-[#070809] ${selectedActivity && selectedPoint ? "xl:grid xl:grid-cols-[minmax(0,1fr)_410px]" : ""}`} aria-label={l("Interactive world AI activity map", "Etkileşimli dünya yapay zeka etkinlik haritası")} aria-describedby="map-evidence-limit">
-      <div className="relative h-[58svh] min-h-[410px] max-h-[700px] overflow-hidden bg-[#0A0A09] xl:h-[700px]">
+    <section className={`${expanded ? "fixed inset-0 z-[70] m-0 h-dvh overflow-y-auto rounded-none border-0" : "relative mt-2 overflow-hidden rounded-[1.5rem] border border-[rgba(226,222,213,0.2)]"} bg-[#070809] ${selectedActivity && selectedPoint ? "xl:grid xl:grid-cols-[minmax(0,1fr)_410px]" : ""}`} aria-label={l("Interactive world AI activity map", "Etkileşimli dünya yapay zeka etkinlik haritası")} aria-describedby="map-evidence-limit">
+      <div className={`relative overflow-hidden bg-[#0A0A09] ${expanded ? "h-dvh min-h-0 max-h-none" : "h-[64svh] min-h-[430px] max-h-[780px] xl:h-[min(78svh,780px)]"}`}>
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-4 p-4 sm:p-6">
           <div className="border-l border-white/35 pl-3">
             <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/38">{data?.mode === "demo" ? l("Demo interaction preview", "Demo etkileşim önizlemesi") : l("Live evidence window", "Canlı kanıt aralığı")}</p>
@@ -179,13 +203,14 @@ export function SignalMap() {
         </div>
 
         <div className="absolute right-4 top-20 z-20 flex flex-col gap-2 sm:right-6">
+          <button type="button" onClick={toggleExpandedMap} aria-pressed={expanded} className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/15 bg-[#0B0B0D]/95 text-white/75 transition-colors duration-150 hover:border-white/30 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white" aria-label={expanded ? l("Exit full-screen map", "Tam ekran haritadan çık") : l("Expand map to full screen", "Haritayı tam ekrana büyüt")}>{expanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button>
           <button type="button" onClick={() => zoom(0.5)} className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/15 bg-[#0B0B0D]/95 text-white/75 transition-colors duration-150 hover:border-white/30 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white" aria-label={l("Zoom map in", "Haritayı yakınlaştır")}><Plus size={16} /></button>
           <button type="button" onClick={() => zoom(-0.5)} className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/15 bg-[#0B0B0D]/95 text-white/75 transition-colors duration-150 hover:border-white/30 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white" aria-label={l("Zoom map out", "Haritayı uzaklaştır")}><Minus size={16} /></button>
           <button type="button" onClick={reset} className="flex min-h-11 min-w-11 items-center justify-center rounded-full border border-white/15 bg-[#0B0B0D]/95 text-white/75 transition-colors duration-150 hover:border-white/30 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-white" aria-label={l("Reset map position", "Harita konumunu sıfırla")}><LocateFixed size={16} /></button>
         </div>
 
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} role="group" aria-label={l(`World map with ${activities.length} places showing verified AI developments`, `${activities.length} yerde doğrulanmış yapay zeka gelişmelerini gösteren dünya haritası`)} tabIndex={0} onKeyDown={(event) => { if (event.key === "+" || event.key === "=") zoom(0.5); if (event.key === "-") zoom(-0.5); if (event.key === "0") reset(); if (event.key === "ArrowLeft") setTransform((value) => ({ ...value, x: value.x + 24 })); if (event.key === "ArrowRight") setTransform((value) => ({ ...value, x: value.x - 24 })); if (event.key === "ArrowUp") setTransform((value) => ({ ...value, y: value.y + 24 })); if (event.key === "ArrowDown") setTransform((value) => ({ ...value, y: value.y - 24 })); }} onWheel={(event) => { event.preventDefault(); zoom(event.deltaY > 0 ? -0.2 : 0.2); }} onPointerDown={(event) => { if ((event.target as Element).closest('[role="button"]')) return; event.currentTarget.setPointerCapture(event.pointerId); dragStart.current = { x: event.clientX, y: event.clientY, originX: transform.x, originY: transform.y }; }} onPointerMove={(event) => { if (!dragStart.current) return; const ratio = WIDTH / event.currentTarget.getBoundingClientRect().width; setTransform((value) => ({ ...value, x: dragStart.current!.originX + (event.clientX - dragStart.current!.x) * ratio, y: dragStart.current!.originY + (event.clientY - dragStart.current!.y) * ratio })); }} onPointerUp={() => { dragStart.current = null; }} onPointerCancel={() => { dragStart.current = null; }} className="absolute inset-0 h-full w-full touch-none cursor-grab focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/70">
-          <g transform={`translate(${transform.x} ${transform.y}) scale(${transform.scale})`}>
+          <g transform={`translate(${WIDTH / 2 + transform.x} ${HEIGHT / 2 + transform.y}) scale(${transform.scale}) translate(${-WIDTH / 2} ${-HEIGHT / 2})`}>
             <path d={path({ type: "Sphere" }) || undefined} fill="#070809" stroke="rgba(241,238,230,.18)" strokeWidth={0.8 / transform.scale} />
             <path d={path(graticule) || undefined} fill="none" stroke="rgba(241,238,230,.055)" strokeWidth={0.45 / transform.scale} />
             {atlasCountries.features.map((atlasCountry, index) => {
@@ -224,7 +249,7 @@ export function SignalMap() {
         {hasActivity && <div className="pointer-events-none absolute bottom-4 left-4 z-10 max-w-[calc(100%-5rem)] border-l border-white/30 pl-3 sm:bottom-6 sm:left-6"><p className="font-mono text-[9px] uppercase tracking-[0.14em] text-white/48">{l("Lit place = sourced news · number = grouped developments", "Işıklı yer = kaynaklı haber · sayı = gruplanmış gelişmeler")}</p></div>}
       </div>
 
-      {selectedActivity && selectedPoint && <DevelopmentDetail activity={selectedActivity} point={selectedPoint} onSelect={setSelectedPointId} onClose={closeNewsDesk} panelRef={panelRef} />}
+      {selectedActivity && selectedPoint && <DevelopmentDetail activity={selectedActivity} point={selectedPoint} onSelect={setSelectedPointId} onClose={closeNewsDesk} panelRef={panelRef} expanded={expanded} />}
     </section>
 
     {hasActivity ? <section className="mt-14 border-t border-white/[0.09] pt-9" aria-labelledby="activity-list-heading">
