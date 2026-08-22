@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_GOOGLE_TRENDS_MARKETS,
   DEFAULT_DISCOVERY_QUERY,
@@ -7,8 +7,13 @@ import {
   googleTrendMarkets,
   parseGoogleTrendsRss,
   SOURCE_INTAKE_LIMITS,
+  xRecent,
 } from "./sources";
 import { MAP_COUNTRIES } from "./map-countries";
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("official source intake", () => {
   it("keeps enough first-party capacity for a 100-trend daily target", () => {
@@ -61,7 +66,53 @@ describe("Google Trends market intake", () => {
       countryCode: "TR",
       sourceUrl: "https://trends.google.com/trending?geo=TR",
       engagementCount: 20000,
+      countryAttribution: expect.objectContaining({
+        country_code: "TR",
+        source_type: "google_trends",
+        attribution_type: "observed_market",
+      }),
     })]);
+    expect(first[0].metadata?.country_attribution).toEqual(first[0].countryAttribution);
     expect(first[0].externalId).toContain("TR-");
+  });
+});
+
+describe("permissioned explicit location intake", () => {
+  it("preserves an X place country only when the official response attaches it to the post", async () => {
+    const previousToken = process.env.X_BEARER_TOKEN;
+    const previousQueries = process.env.X_WATCH_QUERIES;
+    process.env.X_BEARER_TOKEN = "test-token";
+    process.env.X_WATCH_QUERIES = "AI model";
+    vi.stubGlobal("fetch", vi.fn(async () => ({
+      ok: true,
+      json: async () => ({
+        data: [{
+          id: "123",
+          text: "New AI model benchmark",
+          created_at: "2026-08-22T06:00:00.000Z",
+          public_metrics: { like_count: 5 },
+          geo: { place_id: "place-1" },
+        }],
+        includes: { places: [{ id: "place-1", country_code: "DE", full_name: "Berlin, Germany", place_type: "city" }] },
+      }),
+    })));
+
+    try {
+      const [result] = await xRecent.fetchSignals();
+      expect(result).toEqual(expect.objectContaining({
+        countryCode: "DE",
+        countryAttribution: expect.objectContaining({
+          source_type: "x",
+          attribution_type: "explicit_source_location",
+          source_url: "https://x.com/i/web/status/123",
+        }),
+      }));
+      expect(result.metadata?.country_attribution).toEqual(result.countryAttribution);
+    } finally {
+      if (previousToken == null) delete process.env.X_BEARER_TOKEN;
+      else process.env.X_BEARER_TOKEN = previousToken;
+      if (previousQueries == null) delete process.env.X_WATCH_QUERIES;
+      else process.env.X_WATCH_QUERIES = previousQueries;
+    }
   });
 });

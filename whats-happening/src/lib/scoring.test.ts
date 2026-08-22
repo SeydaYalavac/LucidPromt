@@ -13,6 +13,24 @@ const signal = (overrides: Partial<SourceSignal> = {}): SourceSignal => ({
   ...overrides,
 });
 
+const attributedSignal = (countryCode: string, publishedAt: string, externalId: string): SourceSignal => {
+  const sourceUrl = `https://trends.google.com/trending?geo=${countryCode}`;
+  return signal({
+    source: "google_trends",
+    externalId,
+    sourceUrl,
+    countryCode,
+    publishedAt,
+    countryAttribution: {
+      country_code: countryCode,
+      source_type: "google_trends",
+      source_url: sourceUrl,
+      attribution_type: "observed_market",
+      reason: `Observed in the ${countryCode} market.`,
+    },
+  });
+};
+
 describe("scoreSignals", () => {
   it("keeps each metric in the database range", () => {
     const score = scoreSignals([signal({ engagementCount: 1_000_000, audienceCount: 2_000_000 })], now);
@@ -44,11 +62,11 @@ describe("clustering helpers", () => {
     expect(clusters).toHaveLength(1);
   });
 
-  it("uses the earliest signal with country metadata for origin context", () => {
+  it("uses the earliest signal with source-backed country evidence for context", () => {
     const origin = earliestAttributedSignal([
-      signal({ externalId: "1", countryCode: "US", publishedAt: "2026-08-20T11:00:00Z" }),
+      attributedSignal("US", "2026-08-20T11:00:00Z", "1"),
       signal({ externalId: "2", publishedAt: "2026-08-20T08:00:00Z" }),
-      signal({ externalId: "3", countryCode: "TR", publishedAt: "2026-08-20T09:00:00Z" }),
+      attributedSignal("TR", "2026-08-20T09:00:00Z", "3"),
     ]);
 
     expect(origin?.countryCode).toBe("TR");
@@ -56,10 +74,16 @@ describe("clustering helpers", () => {
 
   it("does not choose an earliest geography when market observations are tied", () => {
     const origin = earliestAttributedSignal([
-      signal({ externalId: "us", countryCode: "US", publishedAt: "2026-08-20T09:00:00Z" }),
-      signal({ externalId: "gb", countryCode: "GB", publishedAt: "2026-08-20T09:00:00Z" }),
+      attributedSignal("US", "2026-08-20T09:00:00Z", "us"),
+      attributedSignal("GB", "2026-08-20T09:00:00Z", "gb"),
     ]);
 
     expect(origin).toBeUndefined();
+  });
+
+  it("ignores a country code without attribution evidence", () => {
+    expect(earliestAttributedSignal([
+      signal({ countryCode: "US" }),
+    ])).toBeUndefined();
   });
 });

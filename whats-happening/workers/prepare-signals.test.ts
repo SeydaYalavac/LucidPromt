@@ -59,6 +59,40 @@ describe("prepareSourceSignals", () => {
     expect(prepared[1].metadata).not.toHaveProperty("news_visual");
   });
 
+  it("keeps only country fields backed by matching typed source evidence", () => {
+    const sourceUrl = "https://trends.google.com/trending?geo=TR";
+    const valid = signal({
+      source: "google_trends",
+      sourceUrl,
+      countryCode: "TR",
+      countryAttribution: {
+        country_code: "TR",
+        source_type: "google_trends",
+        source_url: sourceUrl,
+        attribution_type: "observed_market",
+        reason: "Untrusted adapter copy is replaced by the canonical observed-market explanation.",
+      },
+    });
+    const unsupported = signal({ countryCode: "US" });
+    const mismatched = signal({
+      source: "google_trends",
+      externalId: "mismatch",
+      sourceUrl,
+      countryCode: "US",
+      metadata: { country_attribution: valid.countryAttribution },
+    });
+
+    const prepared = prepareSourceSignals([valid, unsupported, mismatched]);
+
+    expect(prepared[0]).toEqual(expect.objectContaining({
+      countryCode: "TR",
+      countryAttribution: expect.objectContaining({ attribution_type: "observed_market" }),
+    }));
+    expect(prepared[0].metadata?.country_attribution).toEqual(prepared[0].countryAttribution);
+    expect(prepared[1]).not.toHaveProperty("countryCode");
+    expect(prepared[2]).not.toHaveProperty("countryCode");
+  });
+
   it("attaches the exact current curated visual and expires it", () => {
     const exact = signal({
       externalId: "49390035",

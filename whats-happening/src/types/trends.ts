@@ -16,6 +16,16 @@ export interface Country {
   longitude: number | null;
 }
 
+export type CountryAttributionType = "observed_market" | "explicit_source_location";
+
+export interface CountryAttributionEvidence {
+  country_code: string;
+  source_type: SourceName;
+  source_url: string;
+  attribution_type: CountryAttributionType;
+  reason: string;
+}
+
 export interface Trend {
   id: string;
   slug: string;
@@ -192,6 +202,7 @@ export interface MapDevelopmentPoint extends MapEvidenceLink {
   country: Country;
   geographic_precision: "country";
   geographic_evidence: string;
+  geographic_attribution: CountryAttributionEvidence;
 }
 
 export interface MapTrendActivity {
@@ -243,5 +254,6 @@ export interface SourceSignal {
   audienceCount?: number;
   publishedAt: string;
   countryCode?: string;
+  countryAttribution?: CountryAttributionEvidence;
   metadata?: Record<string, unknown>;
 }

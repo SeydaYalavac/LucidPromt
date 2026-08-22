@@ -7,12 +7,65 @@ import { DAILY_TREND_TARGET } from "../src/lib/trend-feed";
 import { categoryForSignals } from "../src/lib/trend-category";
 import { prepareSourceSignals } from "./prepare-signals";
 import { MAP_COUNTRIES } from "./map-countries";
+import { backfillableCountryAttribution, evidenceCountryRows } from "./country-attribution";
+import { countryAttributionFromMetadata } from "../src/lib/country-attribution";
 import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
 
 const sourceNames = (process.env.INGEST_SOURCES || "hacker_news,github,google_trends")
   .split(",")
   .map((source) => source.trim())
   .filter((source): source is SourceName => source in adapters);
+
+type StoredSignal = {
+  id: string;
+  country_id: string | null;
+  source: SourceName;
+  source_url: string;
+  metadata: Record<string, unknown> | null;
+};
+
+async function backfillCountryAttributions(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  countryIds: Map<string, string>,
+) {
+  const { data, error } = await supabase
+    .from("signals")
+    .select("id,country_id,source,source_url,metadata")
+    .limit(10_000);
+  if (error) throw error;
+  const rows = (data || []) as StoredSignal[];
+  const countryCodesById = new Map([...countryIds].map(([code, id]) => [id, code]));
+  let before = 0;
+  let backfilled = 0;
+
+  for (const row of rows) {
+    const storedCountryCode = row.country_id ? countryCodesById.get(row.country_id) : null;
+    const storedAttribution = countryAttributionFromMetadata(row.metadata, {
+      source: row.source,
+      sourceUrl: row.source_url,
+      countryCode: storedCountryCode,
+    });
+    if (storedAttribution && storedCountryCode === storedAttribution.country_code) {
+      before += 1;
+      continue;
+    }
+
+    const attribution = backfillableCountryAttribution(row);
+    const countryId = attribution ? countryIds.get(attribution.country_code) : null;
+    if (!attribution || !countryId) continue;
+    const { error: updateError } = await supabase
+      .from("signals")
+      .update({
+        country_id: countryId,
+        metadata: { ...(row.metadata || {}), country_attribution: attribution },
+      })
+      .eq("id", row.id);
+    if (updateError) throw updateError;
+    backfilled += 1;
+  }
+
+  return { before, after: before + backfilled, backfilled };
+}
 
 async function run() {
   if (!sourceNames.length) throw new Error("INGEST_SOURCES contains no supported source names");
@@ -45,9 +98,18 @@ async function run() {
     }
   });
 
+  const discoveredCountries = evidenceCountryRows(signals);
+  if (discoveredCountries.length) {
+    const { error: discoveredCountryError } = await supabase
+      .from("countries")
+      .upsert(discoveredCountries, { onConflict: "code", ignoreDuplicates: true });
+    if (discoveredCountryError) throw discoveredCountryError;
+  }
+
   const { data: countries, error: countriesError } = await supabase.from("countries").select("id,code");
   if (countriesError) throw countriesError;
   const countryIds = new Map((countries || []).map((country) => [country.code, country.id]));
+  const countryAttributions = await backfillCountryAttributions(supabase, countryIds);
 
   for (const cluster of clusterSignals(signals)) {
     const lead = [...cluster].sort((a, b) => b.engagementCount - a.engagementCount)[0];
@@ -78,7 +140,7 @@ async function run() {
           title: lead.title,
           category: categoryForSignals(cluster),
           summary,
-          country_id: originSignal?.countryCode ? countryIds.get(originSignal.countryCode) || null : null,
+          country_id: originSignal?.countryAttribution ? countryIds.get(originSignal.countryAttribution.country_code) || null : null,
           velocity_score: score.velocity,
           reach_score: score.reach,
           novelty_score: score.novelty,
@@ -100,7 +162,7 @@ async function run() {
 
     const signalRows = cluster.map((item) => ({
       trend_id: trend.id,
-      country_id: item.countryCode ? countryIds.get(item.countryCode) || null : null,
+      country_id: item.countryAttribution ? countryIds.get(item.countryAttribution.country_code) || null : null,
       source: item.source,
       external_id: item.externalId,
       title: item.title,
@@ -152,6 +214,8 @@ async function run() {
     runSupplyStatus: qualifiedClustersSeen >= DAILY_TREND_TARGET ? "target_met" : "under_supply",
     upsertedSignals: insertedSignals,
     createdTrends,
+    countryAttributions,
+    countriesDiscoveredFromEvidence: discoveredCountries.length,
     errors,
   }));
   if (succeeded.length === 0) process.exitCode = 1;

@@ -1,5 +1,6 @@
 import { XMLParser } from "fast-xml-parser";
 import { sanitizeExcerpt } from "../src/lib/trend-content";
+import { explicitSourceLocationAttribution, googleTrendsMarketAttribution } from "../src/lib/country-attribution";
 import type { SourceName, SourceSignal } from "../src/types/trends";
 
 export interface SourceAdapter {
@@ -151,17 +152,21 @@ export function parseGoogleTrendsRss(xml: string, geo: string): SourceSignal[] {
     const title = text(item.title, 220);
     if (!title) return [];
     const newsItems = extractGoogleNewsItems(item["ht:news_item"]);
+    const sourceUrl = `https://trends.google.com/trending?geo=${encodeURIComponent(geo)}`;
+    const countryAttribution = googleTrendsMarketAttribution(geo, sourceUrl);
+    if (!countryAttribution) return [];
     return [{
       source: "google_trends" as const,
       externalId: stableGoogleTrendId(geo, title),
       title,
       excerpt: newsItems[0]?.snippet || newsItems[0]?.title || undefined,
-      sourceUrl: `https://trends.google.com/trending?geo=${encodeURIComponent(geo)}`,
+      sourceUrl,
       authorLabel: "Google Trends",
       engagementCount: Number(String(item["ht:approx_traffic"] || "0").replace(/\D/g, "")) || 0,
       publishedAt: iso(item.pubDate as string),
       countryCode: geo,
-      metadata: { approximate_traffic: item["ht:approx_traffic"] || null, news_items: newsItems, market: geo },
+      countryAttribution,
+      metadata: { approximate_traffic: item["ht:approx_traffic"] || null, news_items: newsItems, market: geo, country_attribution: countryAttribution },
     }];
   });
 }
@@ -231,25 +236,40 @@ export const xRecent: SourceAdapter = {
     const batches = await Promise.all(
       queries.slice(0, 10).map((query) =>
         json<{
-          data?: Array<{ id: string; text: string; author_id?: string; created_at?: string; public_metrics?: Record<string, number> }>;
+          data?: Array<{ id: string; text: string; author_id?: string; created_at?: string; public_metrics?: Record<string, number>; geo?: { place_id?: string } }>;
+          includes?: { places?: Array<{ id: string; country_code?: string; full_name?: string; place_type?: string }> };
         }>(
-          `https://api.x.com/2/tweets/search/recent?query=${encodeURIComponent(`${query} -is:retweet`)}&max_results=100&tweet.fields=created_at,public_metrics`,
+          `https://api.x.com/2/tweets/search/recent?query=${encodeURIComponent(`${query} -is:retweet`)}&max_results=100&tweet.fields=created_at,public_metrics,geo&expansions=geo.place_id&place.fields=country_code,full_name,place_type`,
           { headers: { Authorization: `Bearer ${token}` } },
         ),
       ),
     );
     return batches.flatMap((batch) =>
-      (batch.data || []).map((tweet) => ({
-        source: "x" as const,
-        externalId: tweet.id,
-        title: text(tweet.text, 220),
-        excerpt: text(tweet.text, 280),
-        sourceUrl: `https://x.com/i/web/status/${tweet.id}`,
-        authorLabel: tweet.author_id,
-        engagementCount: Object.values(tweet.public_metrics || {}).reduce((sum, value) => sum + value, 0),
-        publishedAt: iso(tweet.created_at),
-        metadata: tweet.public_metrics || {},
-      })),
+      (batch.data || []).map((tweet) => {
+        const sourceUrl = `https://x.com/i/web/status/${tweet.id}`;
+        const place = batch.includes?.places?.find((candidate) => candidate.id === tweet.geo?.place_id);
+        const countryAttribution = place?.country_code && place.full_name
+          ? explicitSourceLocationAttribution({
+            countryCode: place.country_code,
+            source: "x",
+            sourceUrl,
+            locationLabel: place.full_name,
+          })
+          : null;
+        return {
+          source: "x" as const,
+          externalId: tweet.id,
+          title: text(tweet.text, 220),
+          excerpt: text(tweet.text, 280),
+          sourceUrl,
+          authorLabel: tweet.author_id,
+          engagementCount: Object.values(tweet.public_metrics || {}).reduce((sum, value) => sum + value, 0),
+          publishedAt: iso(tweet.created_at),
+          countryCode: countryAttribution?.country_code,
+          countryAttribution: countryAttribution || undefined,
+          metadata: { ...(tweet.public_metrics || {}), ...(place ? { source_place: place } : {}), ...(countryAttribution ? { country_attribution: countryAttribution } : {}) },
+        };
+      }),
     );
   },
 };

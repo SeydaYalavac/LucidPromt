@@ -4,6 +4,7 @@ import {
   sourceLabel,
   summarizeEvidenceSignal,
 } from "./trend-content";
+import { countryAttributionFromMetadata } from "./country-attribution";
 import { ACTIVE_TREND_WINDOW_HOURS, activeTrendCutoff } from "./trend-feed";
 import type {
   Country,
@@ -49,6 +50,12 @@ function evidenceLink(signal: Signal): MapEvidenceLink {
 }
 
 function developmentPoint(country: Country, trend: Trend, signal: Signal): MapDevelopmentPoint {
+  const geographicAttribution = countryAttributionFromMetadata(signal.metadata, {
+    source: signal.source,
+    sourceUrl: signal.source_url,
+    countryCode: country.code,
+  });
+  if (!geographicAttribution) throw new Error("Map development requires qualifying country attribution");
   return {
     ...evidenceLink(signal),
     trend_id: trend.id,
@@ -58,7 +65,8 @@ function developmentPoint(country: Country, trend: Trend, signal: Signal): MapDe
     category: trend.category,
     country,
     geographic_precision: "country",
-    geographic_evidence: `${country.name} market evidence from ${sourceLabel(signal.source)}. The source provides country-level context, not an exact event location.`,
+    geographic_evidence: geographicAttribution.reason,
+    geographic_attribution: geographicAttribution,
   };
 }
 
@@ -80,6 +88,12 @@ export function buildMapActivityPayload(
   for (const signal of signals) {
     if (!signal.country_id || !countryById.has(signal.country_id)) continue;
     if (!trendsById.has(signal.trend_id) || !isEligibleEvidenceSignal(signal)) continue;
+    const country = countryById.get(signal.country_id);
+    if (!country || !countryAttributionFromMetadata(signal.metadata, {
+      source: signal.source,
+      sourceUrl: signal.source_url,
+      countryCode: country.code,
+    })) continue;
     if (evidenceTimestamp(signal) < cutoff) continue;
     const evidenceKey = [
       signal.country_id,

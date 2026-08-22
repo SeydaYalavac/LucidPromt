@@ -61,7 +61,17 @@ function signal(country: Country, observedAt: string): Signal {
     audience_count: null,
     published_at: "2026-08-21T18:00:00Z",
     observed_at: observedAt,
-    metadata: { approximate_traffic: "20,000+", market: country.code },
+    metadata: {
+      approximate_traffic: "20,000+",
+      market: country.code,
+      country_attribution: {
+        country_code: country.code,
+        source_type: "google_trends",
+        source_url: `https://trends.google.com/trending?geo=${country.code}`,
+        attribution_type: "observed_market",
+        reason: `Google Trends recorded this topic in the ${country.code} market. This is observed-market evidence, not event origin.`,
+      },
+    },
   };
 }
 
@@ -92,7 +102,36 @@ describe("map activity aggregation", () => {
       trend_slug: trend.slug,
       source_title: trend.title,
     }));
-    expect(payload.activities[0].developments[0].geographic_evidence).toContain("country-level context");
+    expect(payload.activities[0].developments[0].geographic_evidence).toContain("observed-market evidence, not event origin");
+    expect(payload.activities[0].developments[0].geographic_attribution).toEqual(expect.objectContaining({
+      source_type: "google_trends",
+      attribution_type: "observed_market",
+    }));
+  });
+
+  it("keeps a country dark when country_id has no matching attribution evidence", () => {
+    const unsupported = {
+      ...signal(countries[0], "2026-08-21T19:00:00Z"),
+      metadata: { market: "US" },
+    };
+    const mismatched = {
+      ...signal(countries[1], "2026-08-21T19:10:00Z"),
+      metadata: {
+        ...signal(countries[1], "2026-08-21T19:10:00Z").metadata,
+        country_attribution: {
+          ...(signal(countries[1], "2026-08-21T19:10:00Z").metadata?.country_attribution as Record<string, unknown>),
+          country_code: "US",
+        },
+      },
+    };
+
+    const payload = buildMapActivityPayload(countries, [trend], [unsupported, mismatched], {
+      mode: "live",
+      now: new Date("2026-08-21T20:00:00Z"),
+    });
+
+    expect(payload.activities).toEqual([]);
+    expect(payload.coverage.attributed_evidence_count).toBe(0);
   });
 
   it("returns an honest empty state when no country-attributed evidence exists", () => {
