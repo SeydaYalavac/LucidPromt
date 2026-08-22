@@ -9,33 +9,77 @@ export const primaryNavigation = [
   { label: "Pricing", href: "/pricing" },
 ] as const;
 
-export type DiscoveryCategory = "All" | "AI" | "Science" | "Technology" | "Business" | "Sports" | "Entertainment";
-
-export const discoveryCategories: DiscoveryCategory[] = [
-  "All",
-  "AI",
-  "Science",
+const preferredCategoryOrder = [
+  "Artificial Intelligence",
+  "Developer Tools",
   "Technology",
+  "Science",
   "Business",
   "Sports",
   "Entertainment",
-];
+  "World",
+  "Space",
+] as const;
+
+function normalizeCategory(value: string) {
+  return value.trim().replace(/\s+/g, " ").toLowerCase();
+}
+
+const categoryAliases = new Map([
+  ["ai", "Artificial Intelligence"],
+  ["artificial intelligence", "Artificial Intelligence"],
+  ["yapay zeka", "Artificial Intelligence"],
+  ["developer tools", "Developer Tools"],
+  ["geliştirici araçları", "Developer Tools"],
+  ["sports", "Sports"],
+  ["spor", "Sports"],
+  ["world", "World"],
+  ["dünya", "World"],
+  ["space", "Space"],
+  ["uzay", "Space"],
+]);
+
+export function canonicalCategoryQuery(value: string) {
+  let decoded = value;
+  try {
+    decoded = decodeURIComponent(value);
+  } catch {
+    // URLSearchParams normally decodes this before it reaches us. Keep a malformed
+    // direct value harmless instead of turning a filter request into a server error.
+  }
+  const normalized = normalizeCategory(decoded.replace(/-/g, " "));
+  return categoryAliases.get(normalized) || normalized;
+}
 
 export function visibleDiscoveryCategories(trends: Array<Pick<Trend, "category">>) {
-  const hasSports = trends.some((trend) => trend.category.trim().toLocaleLowerCase() === "sports");
-  return hasSports ? discoveryCategories : discoveryCategories.filter((category) => category !== "Sports");
+  const currentCategories = new Map<string, string>();
+  for (const trend of trends) {
+    const displayCategory = trend.category.trim().replace(/\s+/g, " ");
+    if (!displayCategory) continue;
+    const normalized = normalizeCategory(displayCategory);
+    if (!currentCategories.has(normalized)) currentCategories.set(normalized, displayCategory);
+  }
+
+  const preferredOrder = new Map(preferredCategoryOrder.map((category, index) => [normalizeCategory(category), index]));
+  const categories = [...currentCategories.entries()].sort(([leftKey, leftLabel], [rightKey, rightLabel]) => {
+    const leftIndex = preferredOrder.get(leftKey) ?? Number.MAX_SAFE_INTEGER;
+    const rightIndex = preferredOrder.get(rightKey) ?? Number.MAX_SAFE_INTEGER;
+    return leftIndex - rightIndex || leftLabel.localeCompare(rightLabel, "en");
+  });
+
+  return ["All", ...categories.map(([, label]) => label)];
 }
 
 export function isRouteActive(pathname: string, href: string) {
   return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 }
 
-export function matchesTrend(trend: Trend, query: string, category: string = "All") {
+export function matchesTrend(trend: Trend, query: string, category: string = "All", localizedCategory = trend.category) {
   const normalizedQuery = query.trim().toLocaleLowerCase();
-  const categoryMatches = category === "All" || trend.category.toLocaleLowerCase() === category.toLocaleLowerCase();
+  const categoryMatches = category === "All" || normalizeCategory(trend.category) === normalizeCategory(canonicalCategoryQuery(category));
   if (!categoryMatches) return false;
   if (!normalizedQuery) return true;
-  return [trend.title, trend.summary, trend.category, trend.country?.name]
+  return [trend.title, trend.summary, trend.category, localizedCategory, trend.country?.name]
     .filter(Boolean)
     .some((value) => value!.toLocaleLowerCase().includes(normalizedQuery));
 }

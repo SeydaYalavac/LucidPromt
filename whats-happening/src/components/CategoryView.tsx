@@ -12,7 +12,6 @@ import { NewsCard } from "./NewsCard";
 export function CategoryView({ slug }: { slug: string }) {
   const router = useRouter();
   const { locale } = useLocale();
-  const isSports = slug.trim().toLocaleLowerCase() === "sports";
   const { data, error, isLoading } = useSWR<TrendListPayload>(
     `/api/trends?category=${encodeURIComponent(slug)}&limit=200`,
     productDataFetcher,
@@ -20,10 +19,10 @@ export function CategoryView({ slug }: { slug: string }) {
   const trends = data?.trends || [];
 
   useEffect(() => {
-    if (isSports && !isLoading && (error || !trends.length)) router.replace("/explore");
-  }, [error, isLoading, isSports, router, trends.length]);
+    if (!isLoading && !error && !trends.length) router.replace("/explore");
+  }, [error, isLoading, router, trends.length]);
 
-  if (isSports && (isLoading || error || !trends.length)) {
+  if (!isLoading && !error && !trends.length) {
     return <div className="h-56 animate-pulse rounded-3xl bg-[#111114]" aria-hidden="true" />;
   }
 

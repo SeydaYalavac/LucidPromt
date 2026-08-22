@@ -14,6 +14,10 @@ describe("locale helpers", () => {
 
   it("translates known categories and preserves unknown category names", () => {
     expect(localeCategoryLabel("Technology", "tr")).toBe("Teknoloji");
+    expect(localeCategoryLabel("Artificial Intelligence", "tr")).toBe("Yapay zeka");
+    expect(localeCategoryLabel(" Developer   Tools ", "tr")).toBe("Geliştirici araçları");
+    expect(localeCategoryLabel("World", "tr")).toBe("Dünya");
+    expect(localeCategoryLabel("Space", "tr")).toBe("Uzay");
     expect(localeCategoryLabel("Robotics", "tr")).toBe("Robotics");
     expect(localeCategoryLabel("Technology", "en")).toBe("Technology");
   });
