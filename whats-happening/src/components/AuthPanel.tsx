@@ -215,7 +215,7 @@ export function AuthPanel({
       }
 
       if (mode === "signup") {
-        captureSignupSource(signupSource as SignupSource, aiPromptText);
+        captureSignupSource(signupSource as SignupSource);
         const emailRedirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
         const { data, error: authError } = await supabase.auth.signUp({
           email,
@@ -276,7 +276,7 @@ export function AuthPanel({
     }
     setBusy(true);
     setActiveProvider(provider);
-    if (mode === "signup") captureSignupSource(signupSource as SignupSource, aiPromptText);
+    if (mode === "signup") captureSignupSource(signupSource as SignupSource);
     const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`;
     const { error: authError } = await supabase.auth.signInWithOAuth({
       provider,

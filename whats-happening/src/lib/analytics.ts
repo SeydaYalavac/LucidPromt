@@ -161,17 +161,14 @@ export function identifyProductUser(userId: string) {
   posthog.identify(userId);
 }
 
-export function captureSignupSource(
-  source: SignupSource,
-  aiPromptText: string,
-) {
+export function captureSignupSource(source: SignupSource) {
   initProductAnalytics();
   const storedReferrerChannel = posthog.get_property(FIRST_REFERRER_CHANNEL_PROPERTY);
   const referrerChannel: ReferrerChannel | undefined =
     storedReferrerChannel === "ai_assistant" ? storedReferrerChannel : undefined;
   posthog.capture(
     "signup_source",
-    buildSignupSourceEventProperties(source, aiPromptText, referrerChannel),
+    buildSignupSourceEventProperties(source, referrerChannel),
   );
 }
 
