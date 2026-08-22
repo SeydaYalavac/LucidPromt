@@ -15,8 +15,8 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   const [activeIndex, setActiveIndex] = useState(0);
   const { data } = useTrends({ limit: 200 });
   const { locale, t } = useLocale();
-  const navigationLabels: Record<string, TranslationKey> = {
-    "/world": "nav.world", "/trending": "nav.trending", "/explore": "nav.explore", "/map": "nav.map", "/pricing": "nav.pricing",
+  const navigationLabels: Record<(typeof primaryNavigation)[number]["href"], TranslationKey> = {
+    "/world": "nav.world", "/trending": "nav.trending", "/explore": "nav.explore", "/map": "nav.map", "/security-research": "nav.security", "/pricing": "nav.pricing",
   };
 
   const results = useMemo(() => {
