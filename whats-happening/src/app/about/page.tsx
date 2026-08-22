@@ -60,7 +60,7 @@ export default function AboutPage() {
       <main>
         <section className="mx-auto grid w-full max-w-7xl gap-14 px-6 pb-24 pt-36 sm:pt-44 lg:grid-cols-[1.05fr_0.95fr] lg:items-end lg:gap-20 lg:pb-32">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#67E8F9]">
+            <p className="font-mono text-xs uppercase tracking-[0.22em] text-[#D8D4CA]">
               AI trend intelligence / source-linked
             </p>
             <h1 className="mt-7 max-w-4xl text-balance text-[clamp(3.2rem,7vw,6.8rem)] font-semibold leading-[0.9] tracking-[-0.07em] text-white">
@@ -78,26 +78,25 @@ export default function AboutPage() {
             </Link>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-7 sm:p-9">
-            <div className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-cyan-300/[0.07] blur-3xl" />
+          <div className="relative overflow-hidden rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-7 sm:p-9">
             <div className="relative flex items-center justify-between border-b border-white/[0.08] pb-6">
               <div>
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#67E8F9]">Evidence path</p>
+                <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#D8D4CA]">Evidence path</p>
                 <p className="mt-2 text-sm text-[#A1A1AA]">Three inputs, one inspectable trail</p>
               </div>
-              <Radar size={22} className="text-[#67E8F9]" aria-hidden="true" />
+              <Radar size={22} className="text-[#D8D4CA]" aria-hidden="true" />
             </div>
             <div className="relative mt-2 divide-y divide-white/[0.08]">
               {sources.map(({ name, label, icon: Icon }) => (
                 <div key={name} className="grid grid-cols-[2rem_1fr_auto] items-center gap-4 py-5">
-                  <Icon size={17} className="text-[#67E8F9]" aria-hidden="true" />
+                  <Icon size={17} className="text-[#D8D4CA]" aria-hidden="true" />
                   <p className="text-sm font-medium text-white">{name}</p>
                   <p className="font-mono text-[0.62rem] uppercase tracking-[0.14em] text-[#71717A]">{label}</p>
                 </div>
               ))}
             </div>
             <p className="relative flex items-start gap-3 border-t border-white/[0.08] pt-6 text-sm leading-6 text-[#71717A]">
-              <Link2 size={16} className="mt-1 shrink-0 text-[#67E8F9]" aria-hidden="true" />
+              <Link2 size={16} className="mt-1 shrink-0 text-[#D8D4CA]" aria-hidden="true" />
               Each signal keeps a route back to the public source record that informed it.
             </p>
           </div>
@@ -130,7 +129,7 @@ export default function AboutPage() {
             <div className="grid gap-4 sm:grid-cols-3">
               {sources.map(({ name, copy, icon: Icon }) => (
                 <article key={name} className="rounded-[1.75rem] border border-white/[0.1] bg-[#0B0B0D] p-6">
-                  <Icon size={19} className="text-[#67E8F9]" aria-hidden="true" />
+                  <Icon size={19} className="text-[#D8D4CA]" aria-hidden="true" />
                   <h3 className="mt-8 text-lg font-medium text-white">{name}</h3>
                   <p className="mt-3 text-sm leading-6 text-[#8B8B93]">{copy}</p>
                 </article>

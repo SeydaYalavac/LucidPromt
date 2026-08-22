@@ -38,7 +38,7 @@ export function DemandSurvey() {
   if (justAnswered) {
     return (
       <p className="mt-7 flex min-h-11 items-center gap-2 border-t border-white/[0.08] pt-6 text-sm text-[#C9C9CF]" role="status">
-        <Check size={16} className="text-[#67E8F9]" aria-hidden="true" />
+        <Check size={16} className="text-[#D8D4CA]" aria-hidden="true" />
         {locale === "tr" ? "Teşekkürler. Kategorin kaydedildi." : "Thanks. Your category was recorded."}
       </p>
     );
@@ -58,7 +58,7 @@ export function DemandSurvey() {
             key={category.id}
             type="button"
             onClick={() => submit(category.id)}
-            className="min-h-11 rounded-full border border-white/10 bg-white/[0.035] px-4 text-sm font-medium text-[#D0D0D5] transition-colors hover:border-[#67E8F9]/45 hover:bg-[#67E8F9]/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#67E8F9]"
+            className="min-h-11 rounded-full border border-white/10 bg-white/[0.035] px-4 text-sm font-medium text-[#D0D0D5] transition-colors hover:border-[#D8D4CA]/45 hover:bg-[#D8D4CA]/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D8D4CA]"
           >
             {localeCategoryLabel(category.label, locale)}
           </button>

@@ -146,11 +146,10 @@ export default function HowItWorksPage() {
             </Link>
           </div>
 
-          <div className="relative overflow-hidden rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8">
-            <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-cyan-300/[0.06] blur-3xl" />
+          <div className="relative overflow-hidden rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8">
             <div className="relative flex items-center justify-between border-b border-white/[0.08] pb-5">
               <div>
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#67E8F9]">Signal path</p>
+                <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#D8D4CA]">Signal path</p>
                 <p className="mt-2 text-sm text-[#A1A1AA]">Designed for a 10-minute ingestion cycle</p>
               </div>
               <span className="flex items-center gap-2 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-[#71717A]">
@@ -165,7 +164,7 @@ export default function HowItWorksPage() {
                 { icon: Globe2, label: "Google Trends" },
               ].map(({ icon: Icon, label }) => (
                 <div key={label} className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
-                  <Icon size={17} className="text-[#67E8F9]" aria-hidden="true" />
+                  <Icon size={17} className="text-[#D8D4CA]" aria-hidden="true" />
                   <p className="mt-4 text-sm font-medium text-white">{label}</p>
                   <p className="mt-1 font-mono text-[0.65rem] uppercase tracking-[0.14em] text-[#52525B]">official feed</p>
                 </div>
@@ -173,7 +172,7 @@ export default function HowItWorksPage() {
             </div>
 
             <div className="relative my-3 flex justify-center">
-              <span className="h-8 w-px bg-gradient-to-b from-white/20 to-cyan-300/30" />
+              <span className="h-8 w-px bg-white/20" />
             </div>
 
             <div className="relative grid gap-3 sm:grid-cols-3">
@@ -183,7 +182,7 @@ export default function HowItWorksPage() {
                 ["03", "Score", "0–100"],
               ].map(([number, label, copy]) => (
                 <div key={number} className="flex items-center gap-3 rounded-2xl border border-white/[0.08] bg-[#111114] p-4">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-300/[0.06] font-mono text-[0.65rem] text-[#67E8F9]">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-stone-300/20 bg-stone-300/[0.06] font-mono text-[0.65rem] text-[#D8D4CA]">
                     {number}
                   </span>
                   <div>
@@ -210,8 +209,8 @@ export default function HowItWorksPage() {
               </p>
             </div>
 
-            <div className="rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-7 sm:p-9">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#67E8F9]">About 24,832</p>
+            <div className="rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-7 sm:p-9">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[#D8D4CA]">About 24,832</p>
               <h3 className="mt-5 text-balance text-2xl font-medium tracking-[-0.03em] text-white">
                 The prototype number was a fixture, not a live production total.
               </h3>
@@ -253,14 +252,14 @@ export default function HowItWorksPage() {
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              <article className="rounded-[2rem] border border-cyan-300/15 bg-cyan-300/[0.035] p-7 sm:p-8">
-                <CircleCheck size={20} className="text-[#67E8F9]" aria-hidden="true" />
+              <article className="rounded-2xl border border-stone-300/15 bg-stone-300/[0.035] p-7 sm:p-8">
+                <CircleCheck size={20} className="text-[#D8D4CA]" aria-hidden="true" />
                 <h3 className="mt-8 text-xl font-medium text-white">What it can say</h3>
                 <p className="mt-3 text-sm leading-7 text-[#A1A1AA]">
                   &quot;The earliest country-attributed evidence in this cluster appeared in the United States feed.&quot;
                 </p>
               </article>
-              <article className="rounded-[2rem] border border-white/[0.08] bg-[#111114] p-7 sm:p-8">
+              <article className="rounded-2xl border border-white/[0.08] bg-[#111114] p-7 sm:p-8">
                 <CircleDashed size={20} className="text-[#71717A]" aria-hidden="true" />
                 <h3 className="mt-8 text-xl font-medium text-white">What it cannot say</h3>
                 <p className="mt-3 text-sm leading-7 text-[#A1A1AA]">
@@ -283,7 +282,7 @@ export default function HowItWorksPage() {
               </p>
             </div>
 
-            <div className="space-y-8 rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-7 sm:p-10">
+            <div className="space-y-8 rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-7 sm:p-10">
               {scoreParts.map((part) => (
                 <div key={part.label}>
                   <div className="flex items-end justify-between gap-4">
@@ -291,10 +290,10 @@ export default function HowItWorksPage() {
                       <p className="text-base font-medium text-white">{part.label}</p>
                       <p className="mt-1 max-w-[38rem] text-sm leading-6 text-[#8B8B93]">{part.copy}</p>
                     </div>
-                    <span className="font-mono text-sm tabular-nums text-[#67E8F9]">{part.value}</span>
+                    <span className="font-mono text-sm tabular-nums text-[#D8D4CA]">{part.value}</span>
                   </div>
                   <div className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
-                    <div className="h-full rounded-full bg-[#67E8F9]" style={{ width: part.width }} />
+                    <div className="h-full rounded-full bg-[#D8D4CA]" style={{ width: part.width }} />
                   </div>
                 </div>
               ))}
@@ -305,21 +304,21 @@ export default function HowItWorksPage() {
         <section className="border-t border-white/[0.08] bg-[#0B0B0D]">
           <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-20 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24 lg:py-24">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Compare the method</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Compare the method</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white">
                 Start with the research job.
               </h2>
             </div>
-            <div className="grid gap-px overflow-hidden rounded-[2rem] border border-white/[0.1] bg-white/[0.1] sm:grid-cols-2">
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.1] sm:grid-cols-2">
               <Link href="/alternatives/google-trends" className="group bg-[#0B0B0D] p-7 transition-colors hover:bg-[#111114]">
                 <p className="text-sm font-medium text-white">Google Trends alternatives</p>
                 <p className="mt-3 text-sm leading-6 text-[#71717A]">Known search demand versus source-linked technology evidence.</p>
-                <ArrowRight size={15} className="mt-6 text-[#67E8F9] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <ArrowRight size={15} className="mt-6 text-[#D8D4CA] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
               <Link href="/alternatives/exploding-topics" className="group bg-[#0B0B0D] p-7 transition-colors hover:bg-[#111114]">
                 <p className="text-sm font-medium text-white">Exploding Topics alternatives</p>
                 <p className="mt-3 text-sm leading-6 text-[#71717A]">Curated discovery versus an inspectable score and source trail.</p>
-                <ArrowRight size={15} className="mt-6 text-[#67E8F9] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                <ArrowRight size={15} className="mt-6 text-[#D8D4CA] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
             </div>
           </div>

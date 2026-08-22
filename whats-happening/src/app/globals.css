@@ -1,30 +1,29 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: #050505;
-  --color-secondary-bg: #0B0B0D;
-  --color-card: #111114;
-  --color-card-hover: #17171B;
-  --color-primary-text: #F5F5F5;
-  --color-secondary-text: #8B8B93;
-  --color-border-color: rgba(255, 255, 255, 0.08);
+  --color-background: #070706;
+  --color-secondary-bg: #0d0d0c;
+  --color-card: #11110f;
+  --color-card-hover: #171714;
+  --color-primary-text: #f1efe9;
+  --color-secondary-text: #9b988f;
+  --color-border-color: rgba(226, 222, 213, 0.14);
 
-  --color-accent-cyan: #06b6d4;
-  --color-accent-violet: #8b5cf6;
   --color-accent-blue: #3b82f6;
   --color-accent-orange: #f97316;
   --color-accent-red: #ef4444;
 
-  --font-sans: var(--font-geist-sans), Inter, sans-serif;
+  --font-sans: var(--font-manrope), Arial, sans-serif;
+  --font-display: var(--font-newsreader), Georgia, serif;
   --font-mono: var(--font-geist-mono), monospace;
 }
 
 body {
-  --card-border: rgba(226, 222, 213, 0.18);
-  --card-border-hover: rgba(241, 238, 230, 0.32);
-  --card-border-selected: rgba(248, 246, 240, 0.56);
-  --card-surface: #0b0b0d;
-  --card-surface-hover: #101012;
+  --card-border: rgba(226, 222, 213, 0.16);
+  --card-border-hover: rgba(241, 238, 230, 0.3);
+  --card-border-selected: rgba(248, 246, 240, 0.5);
+  --card-surface: #0d0d0c;
+  --card-surface-hover: #131311;
   background-color: var(--color-background);
   color: var(--color-primary-text);
   font-family: var(--font-sans);
@@ -32,9 +31,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  font-variation-settings: "opsz" 64;
+}
+
+a,
+button,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline-color: #e6e1d8;
+}
+
 /* Base custom styles to make it look premium */
 ::selection {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(230, 225, 216, 0.2);
 }
 
 * {
@@ -43,6 +61,59 @@ body {
 }
 
 @layer components {
+  .page-grid {
+    background-color: var(--color-background);
+  }
+
+  .eyebrow {
+    color: rgba(241, 239, 233, 0.5);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  .primary-action {
+    align-items: center;
+    background: #ece8df;
+    border-radius: 0.65rem;
+    color: #0a0a09;
+    display: inline-flex;
+    font-size: 0.8rem;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 2.9rem;
+    padding-inline: 1.25rem;
+    transition: background-color 150ms ease, transform 150ms ease;
+  }
+
+  .primary-action:hover {
+    background: #fffdf8;
+  }
+
+  .primary-action:active {
+    transform: translateY(1px);
+  }
+
+  .secondary-action {
+    align-items: center;
+    border: 1px solid var(--card-border);
+    border-radius: 0.65rem;
+    color: #e3e0d8;
+    display: inline-flex;
+    font-size: 0.8rem;
+    font-weight: 650;
+    justify-content: center;
+    min-height: 2.9rem;
+    padding-inline: 1.25rem;
+    transition: background-color 150ms ease, border-color 150ms ease;
+  }
+
+  .secondary-action:hover {
+    background: rgba(241, 239, 233, 0.05);
+    border-color: var(--card-border-hover);
+  }
+
   .editorial-card {
     border-color: var(--card-border);
     background-color: var(--card-surface);

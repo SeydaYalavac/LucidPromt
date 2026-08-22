@@ -4,25 +4,18 @@ import { motion } from "framer-motion";
 import { useSignals } from "@/hooks/useTrendData";
 import { useLocale } from "@/i18n/locale";
 
-const sourceColor: Record<string, string> = {
-  github: "text-[#06b6d4]",
-  hacker_news: "text-[#f97316]",
-  google_trends: "text-[#8b5cf6]",
-};
-
 export function LiveFeed() {
   const { data } = useSignals(8);
   const feed = data?.signals || [];
   const { t } = useLocale();
   return (
-    <section className="w-full py-12 border-t border-white/5 bg-[#050505]">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="h-2 w-2 rounded-full bg-[#67E8F9]" />
-          <h2 className="text-sm font-bold uppercase tracking-[0.2em] text-[#8B8B93]">{t("feed.title")}</h2>
+    <section className="w-full bg-[#070706] py-16 sm:py-20">
+      <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
+        <div className="mb-8 flex items-center justify-between border-b border-white/[0.1] pb-5">
+          <h2 className="eyebrow">{t("feed.title")}</h2><span className="flex items-center gap-2 text-[10px] uppercase tracking-[0.14em] text-white/35"><i className="h-1.5 w-1.5 rounded-full bg-[#D8D4CA]" /> live</span>
         </div>
         
-        <div className="flex flex-col gap-4">
+        <div className="divide-y divide-white/[0.08]">
           {feed.map((item, i) => (
             <motion.div
               key={item.id}
@@ -30,10 +23,10 @@ export function LiveFeed() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
-              className="flex items-center gap-6"
+              className="grid gap-3 py-4 sm:grid-cols-[10rem_1fr] sm:items-center"
             >
-              <span className="text-[10px] font-bold text-[#8B8B93] w-24 text-right uppercase">{item.source.replace("_", " ")}</span>
-              <p className={`text-sm font-medium ${sourceColor[item.source] || "text-white"}`}>{item.title}</p>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/35">{item.source.replace("_", " ")}</span>
+              <p className="text-sm font-medium text-[#D8D5CD]">{item.title}</p>
             </motion.div>
           ))}
           {!feed.length && <p className="text-sm text-[#8B8B93]">{t("feed.empty")}</p>}

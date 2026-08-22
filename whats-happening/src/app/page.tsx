@@ -55,7 +55,7 @@ const pageJsonLd = {
 
 export default function Home() {
   return (
-    <div className="relative min-h-screen bg-[#050505] selection:bg-white/10 overflow-x-hidden">
+    <div className="relative min-h-screen overflow-x-hidden bg-background selection:bg-white/10">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
