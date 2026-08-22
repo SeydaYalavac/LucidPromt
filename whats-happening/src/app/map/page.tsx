@@ -4,7 +4,7 @@ import { SignalMap } from "@/components/SignalMap";
 
 export const metadata: Metadata = {
   title: "Global AI activity map | What's Happening",
-  description: "Explore current source-attributed AI activity by market, rising topic, evidence count, and freshness.",
+  description: "Select a lit place to open its current, source-attributed AI news and evidence.",
   alternates: { canonical: "/map" },
 };
 export default function MapPage() { return <PageShell><SignalMap /></PageShell>; }
