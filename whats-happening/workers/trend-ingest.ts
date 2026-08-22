@@ -3,13 +3,14 @@ import { clusterSignals, earliestAttributedSignal, scoreSignals, slugifyTitle } 
 import { sanitizeExcerpt, summarizeEvidenceSignal } from "../src/lib/trend-content";
 import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
-import { DAILY_TREND_TARGET } from "../src/lib/trend-feed";
+import { activeTrendCutoff, DAILY_TREND_TARGET } from "../src/lib/trend-feed";
 import { categoryForSignals } from "../src/lib/trend-category";
 import { prepareSourceSignals } from "./prepare-signals";
 import { MAP_COUNTRIES } from "./map-countries";
 import { backfillableCountryAttribution, evidenceCountryRows } from "./country-attribution";
 import { countryAttributionFromMetadata } from "../src/lib/country-attribution";
-import type { Signal, SourceName, SourceSignal } from "../src/types/trends";
+import { inspectTrendBriefingCoverage, type BriefingBackfillTrend } from "./trend-briefing-backfill";
+import type { Signal, SourceName, SourceSignal, Trend } from "../src/types/trends";
 
 const sourceNames = (process.env.INGEST_SOURCES || "hacker_news,github,google_trends")
   .split(",")
@@ -23,6 +24,68 @@ type StoredSignal = {
   source_url: string;
   metadata: Record<string, unknown> | null;
 };
+
+function batches<T>(items: T[], size: number) {
+  const groups: T[][] = [];
+  for (let index = 0; index < items.length; index += size) groups.push(items.slice(index, index + size));
+  return groups;
+}
+
+async function backfillTrendBriefings(supabase: ReturnType<typeof getSupabaseAdmin>) {
+  const { data, error } = await supabase
+    .from("trends")
+    .select("id,title,summary,what_happened,why_now,last_seen_at,updated_at")
+    .gte("last_seen_at", activeTrendCutoff().toISOString())
+    .limit(10_000);
+  if (error) throw error;
+
+  const trends = (data || []) as BriefingBackfillTrend[];
+  const signalResults = await Promise.all(
+    batches(trends.map((trend) => trend.id), 100).map((trendIds) =>
+      supabase
+        .from("signals")
+        .select("*")
+        .in("trend_id", trendIds)
+        .order("observed_at", { ascending: false })
+        .order("published_at", { ascending: false })
+        .limit(10_000),
+    ),
+  );
+  const signalError = signalResults.find((result) => result.error)?.error;
+  if (signalError) throw signalError;
+  const signals = signalResults.flatMap((result) => result.data || []) as Signal[];
+  const signalsByTrend = new Map<string, Signal[]>();
+  for (const signal of signals) {
+    signalsByTrend.set(signal.trend_id, [...(signalsByTrend.get(signal.trend_id) || []), signal]);
+  }
+
+  const inspections = trends.map((trend) => ({
+    trend,
+    inspection: inspectTrendBriefingCoverage(trend, signalsByTrend.get(trend.id) || []),
+  }));
+  const pending = inspections.filter(({ inspection }) => inspection.completeAfter && Object.keys(inspection.patch).length > 0);
+
+  for (const group of batches(pending, 10)) {
+    const results = await Promise.all(group.map(({ trend, inspection }) =>
+      supabase.from("trends").update(inspection.patch as Partial<Trend>).eq("id", trend.id),
+    ));
+    const updateError = results.find((result) => result.error)?.error;
+    if (updateError) throw updateError;
+  }
+
+  return {
+    activeRecords: trends.length,
+    eligibleRecords: inspections.filter(({ inspection }) => inspection.eligible).length,
+    completeBefore: inspections.filter(({ inspection }) => inspection.completeBefore).length,
+    completeAfter: inspections.filter(({ inspection }) => inspection.completeAfter).length,
+    validAttributedSourceCoverage: inspections.filter(({ inspection }) => inspection.hasAttributedSource).length,
+    unsupportedRecords: inspections.filter(({ inspection }) => !inspection.eligible).length,
+    failOpenRecords: inspections.filter(({ inspection }) => inspection.failOpen).length,
+    metadataLeaks: inspections.filter(({ inspection }) => inspection.metadataLeak).length,
+    deepBriefings: inspections.filter(({ inspection }) => inspection.depth === "deep").length,
+    backfilledRecords: pending.length,
+  };
+}
 
 async function backfillCountryAttributions(
   supabase: ReturnType<typeof getSupabaseAdmin>,
@@ -190,6 +253,8 @@ async function run() {
     }
   }
 
+  const briefingCoverage = await backfillTrendBriefings(supabase);
+
   const status = succeeded.length === 0 ? "failed" : errors.length ? "partial" : "complete";
   const { error: finishError } = await supabase
     .from("ingestion_runs")
@@ -216,6 +281,7 @@ async function run() {
     createdTrends,
     countryAttributions,
     countriesDiscoveredFromEvidence: discoveredCountries.length,
+    briefingCoverage,
     errors,
   }));
   if (succeeded.length === 0) process.exitCode = 1;
