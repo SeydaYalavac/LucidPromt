@@ -58,7 +58,7 @@ export function clusterSignals(signals: SourceSignal[]) {
 
 export function earliestAttributedSignal(signals: SourceSignal[]) {
   const attributed = [...signals]
-    .filter((signal) => signal.countryCode)
+    .filter((signal) => signal.countryCode && signal.countryAttribution?.country_code === signal.countryCode)
     .sort((a, b) => new Date(a.publishedAt).getTime() - new Date(b.publishedAt).getTime()
       || String(a.countryCode).localeCompare(String(b.countryCode)));
   const earliest = attributed[0];

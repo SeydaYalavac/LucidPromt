@@ -1,6 +1,7 @@
 import { isAiSignal, sanitizeExcerpt } from "../src/lib/trend-content";
 import { sanitizeNewsVisual } from "../src/lib/news-visual";
 import { curatedNewsVisualForSourceSignal } from "../src/lib/curated-news-visuals";
+import { sanitizeCountryAttribution } from "../src/lib/country-attribution";
 import type { SourceSignal } from "../src/types/trends";
 
 function cleanText(value: string, maximum: number) {
@@ -38,6 +39,19 @@ export function prepareSourceSignals(signals: SourceSignal[], now = new Date()) 
       publishedAt: publishedAt.toISOString(),
       metadata: signal.metadata ? { ...signal.metadata } : undefined,
     };
+    const countryAttribution = sanitizeCountryAttribution(
+      signal.countryAttribution || signal.metadata?.country_attribution,
+      { source: signal.source, sourceUrl, countryCode: signal.countryCode },
+    );
+    if (countryAttribution) {
+      normalized.countryCode = countryAttribution.country_code;
+      normalized.countryAttribution = countryAttribution;
+      normalized.metadata = { ...(normalized.metadata || {}), country_attribution: countryAttribution };
+    } else {
+      delete normalized.countryCode;
+      delete normalized.countryAttribution;
+      if (normalized.metadata) delete normalized.metadata.country_attribution;
+    }
     const newsVisual = sanitizeNewsVisual(signal.metadata?.news_visual) || curatedNewsVisualForSourceSignal(normalized, now);
     if (normalized.metadata) {
       if (newsVisual) normalized.metadata.news_visual = newsVisual;

@@ -118,6 +118,19 @@ const attributedDemoMapSignals: Signal[] = demoSignals.map((signal, index) => ({
   title: index === 0 ? "Local-first AI agent runtime reaches a contributor milestone" : "Developers debate auditable AI agents",
   country_id: demoMapCountries[index].id,
   country: demoMapCountries[index],
+  source: "google_trends",
+  source_url: `https://trends.google.com/trending?geo=${demoMapCountries[index].code}`,
+  author_label: "Google Trends",
+  metadata: {
+    market: demoMapCountries[index].code,
+    country_attribution: {
+      country_code: demoMapCountries[index].code,
+      source_type: "google_trends",
+      source_url: `https://trends.google.com/trending?geo=${demoMapCountries[index].code}`,
+      attribution_type: "observed_market",
+      reason: `Google Trends recorded this topic in the ${demoMapCountries[index].code} market. This is observed-market evidence, not event origin.`,
+    },
+  },
 }));
 
 export const demoMapSignals: Signal[] = [
