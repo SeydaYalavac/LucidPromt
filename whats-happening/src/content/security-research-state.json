@@ -3,33 +3,31 @@
   "checkedAt": "2026-08-22",
   "sources": {
     "owasp-prompt": {
-      "fingerprint": "a7fe5aef5d1dfbc899ec3d06876497aed52415ac74e07fe86ae6e2f1fefc9046",
-      "lastModified": "Sat, 22 Aug 2026 11:57:09 GMT",
+      "fingerprint": "3088b9c90e633785562cca9a620d115d990c0b499337e1fea7a896b2e1fbc677",
+      "lastModified": "Fri, 21 Aug 2026 14:40:23 GMT",
       "checkedAt": "2026-08-22"
     },
     "owasp-disclosure": {
-      "fingerprint": "2a38cc28816b40cf9508839dcd86a97f3ffffd83ff6ffdddbbd78bc76a759e6a",
-      "lastModified": "Wed, 19 Aug 2026 14:37:53 GMT",
+      "fingerprint": "bc339cb92ef57a3cb34cf7c1201b235dad91f38330547ea9e00fa1542674a9ec",
+      "lastModified": "Thu, 20 Aug 2026 22:47:28 GMT",
       "checkedAt": "2026-08-22"
     },
     "owasp-supply": {
-      "fingerprint": "2f48f1f83d73b4eee78e48cda1f1a3b4cecb2e50f99647acd63a237d723f51f3",
-      "lastModified": "Thu, 20 Aug 2026 13:08:57 GMT",
+      "fingerprint": "05004589808603401be9fbaf7300142cdcd5f3486d3f25223eb15882af8325a9",
       "checkedAt": "2026-08-22"
     },
     "owasp-poison": {
-      "fingerprint": "dd6e47200d384ee74d8299ed7547dca9e5c7986d4775d54ee72f0854f49c8caa",
-      "lastModified": "Fri, 21 Aug 2026 19:30:34 GMT",
+      "fingerprint": "f2e6bef5f32396a9d0bb959c00a2eff4696ee053283d9cba6bf6036e8a7a06dd",
+      "lastModified": "Fri, 21 Aug 2026 12:42:47 GMT",
       "checkedAt": "2026-08-22"
     },
     "owasp-output": {
-      "fingerprint": "7f57799a37ad7b65346a47d91bdc1f949fc3962079ac6dbb8fefef36cd9dd3d9",
-      "lastModified": "Tue, 18 Aug 2026 15:07:22 GMT",
+      "fingerprint": "2c7f85f3fb54138c5ccc632f1ea34893b63c70b4d91b6e8c08925fd867ac4aed",
       "checkedAt": "2026-08-22"
     },
     "owasp-agency": {
-      "fingerprint": "e7d1aba82846ff177faaffe8f18edf9b2f14e00aec7eb75eb72d1aa2b8d86838",
-      "lastModified": "Thu, 20 Aug 2026 17:07:42 GMT",
+      "fingerprint": "975f04a6cd2be800075efd765a69ae934553a63d7fe7cdd5bfa7a4a6cbed5f07",
+      "lastModified": "Tue, 18 Aug 2026 02:03:26 GMT",
       "checkedAt": "2026-08-22"
     },
     "owasp-prompt-leak": {
@@ -38,22 +36,21 @@
       "checkedAt": "2026-08-22"
     },
     "owasp-vector": {
-      "fingerprint": "05941aa8c4b056be383d496d22e725ac641b87e0c02a0c2d96a0e9adaea23205",
-      "lastModified": "Mon, 10 Aug 2026 18:35:11 GMT",
+      "fingerprint": "3356ee8bad7ab41b7977dcea6867b19d120371317a8a8fa374b60d4c42dd14fd",
+      "lastModified": "Wed, 12 Aug 2026 21:52:45 GMT",
       "checkedAt": "2026-08-22"
     },
     "owasp-misinformation": {
-      "fingerprint": "09ffb1541c72629d2ae71c440467933c66d4f36e940b7e48864516fa0e81b50a",
-      "lastModified": "Thu, 20 Aug 2026 07:27:28 GMT",
+      "fingerprint": "9284f47e47049fa314a2245b36a2ede040d083654dcddc55c9d9a82f3476414d",
+      "lastModified": "Wed, 12 Aug 2026 17:54:34 GMT",
       "checkedAt": "2026-08-22"
     },
     "owasp-consumption": {
-      "fingerprint": "0bc3d5e17e4baf1fcf8e659b4be7ff5e309be58f711a61750552245ef2c9ad3b",
-      "lastModified": "Tue, 11 Aug 2026 19:25:55 GMT",
+      "fingerprint": "dd97e154a100f348422bb3ff751bcd56c10d203db97ae45c9154f898ad897deb",
       "checkedAt": "2026-08-22"
     },
     "nist-aml": {
-      "fingerprint": "aa2bb068ad27560e232ef4097a18841553e61fd19983f97be58bfa5da5f79329",
+      "fingerprint": "f59d47d5aa6265b4b259421132cb4d09fea1e63e49187b5c7b9959f977939f67",
       "checkedAt": "2026-08-22"
     },
     "nist-genai": {
@@ -93,7 +90,7 @@
       "checkedAt": "2026-08-22"
     },
     "semantic-entropy": {
-      "fingerprint": "206849127edfa1603229af5c77f6e339cbdfcb8f31fdbe3add40194f26dfd2b7",
+      "fingerprint": "50ae141abbaa4df883a8b56424641feab355483ce3ef9b1c96cfa0aff9ffe418",
       "checkedAt": "2026-08-22"
     },
     "halueval": {
@@ -115,7 +112,7 @@
   },
   "dossiers": {
     "prompt-injection": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -125,7 +122,7 @@
       }
     },
     "indirect-prompt-injection": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -135,17 +132,17 @@
       }
     },
     "sensitive-information-disclosure": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     },
     "model-supply-chain": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -155,7 +152,7 @@
       }
     },
     "training-data-poisoning": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -165,27 +162,27 @@
       }
     },
     "rag-vector-poisoning": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     },
     "improper-output-handling": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     },
     "excessive-agency": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -195,17 +192,17 @@
       }
     },
     "system-prompt-secrets": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     },
     "jailbreak-resilience": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -215,17 +212,17 @@
       }
     },
     "unbounded-consumption": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     },
     "model-extraction": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -235,7 +232,7 @@
       }
     },
     "membership-inference": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -245,7 +242,7 @@
       }
     },
     "adversarial-input-evasion": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -255,7 +252,7 @@
       }
     },
     "hallucination-risk-model": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -295,7 +292,7 @@
       }
     },
     "self-consistency-uncertainty": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
@@ -315,7 +312,7 @@
       }
     },
     "human-review-calibrated-abstention": {
-      "version": 2,
+      "version": 3,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-22",
       "reviewStatus": "review-required",
