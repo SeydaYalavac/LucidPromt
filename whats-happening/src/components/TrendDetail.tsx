@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowUpRight, Bookmark, Check, ExternalLink, Share2 } from "lucide-react";
+import Link from "next/link";
 import { TrendChat } from "./TrendChat";
 import { useTrend } from "@/hooks/useTrendData";
 import { useSavedTrends } from "@/hooks/useSavedTrends";
@@ -8,10 +9,11 @@ import { shareUrl } from "@/lib/share";
 import { useState } from "react";
 import { captureProductEvent } from "@/lib/analytics";
 import { sourceLabel } from "@/lib/trend-content";
-import type { TrendBriefEvidence } from "@/types/trends";
+import type { TrendBriefEvidence, TrendDetailPayload } from "@/types/trends";
 import { localeCategoryLabel, useLocale } from "@/i18n/locale";
 import { localizeTrendBrief } from "@/i18n/trend";
 import { SourcedNewsVisual } from "./SourcedNewsVisual";
+import { trendInternalLinks } from "@/lib/trend-page-graph";
 
 function dateLabel(value: string, locale = "en") {
   if (!value) return locale === "tr" ? "Zaman bilgisi yok" : "Time unavailable";
@@ -46,15 +48,16 @@ function ClaimSources({
   </span>;
 }
 
-export function TrendDetail({ slug }: { slug: string }) {
+export function TrendDetail({ slug, initialData }: { slug: string; initialData?: TrendDetailPayload }) {
   const { saved, toggleSaved } = useSavedTrends();
   const [shareNotice, setShareNotice] = useState(false);
-  const { data, error, isLoading } = useTrend(slug);
+  const { data, error, isLoading } = useTrend(slug, initialData);
   const { locale, t } = useLocale();
   if (isLoading) return <div className="mx-auto min-h-screen max-w-6xl px-6 pt-32"><div className="h-80 animate-pulse rounded-2xl bg-[#111114]" /></div>;
   if (error || !data) return <div className="mx-auto min-h-screen max-w-6xl px-6 pt-40 text-[#8B8B93]">{t("trend.unavailable")}</div>;
 
   const { trend, signals, mode } = data;
+  const internalLinks = trendInternalLinks(trend, signals);
   const brief = localizeTrendBrief(trend, trend.brief, locale);
   const evidence = brief?.evidence || signals.map((signal, index) => ({
     reference_id: `source-${index + 1}`,
@@ -84,7 +87,15 @@ export function TrendDetail({ slug }: { slug: string }) {
     <article>
     <header className="border-b border-white/[0.1] pb-12">
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[10px] uppercase tracking-[0.15em] text-white/45">
-        <span>{t("trend.article")}</span><span>{localeCategoryLabel(trend.category, locale)}</span><span>{trend.country?.name || t("trend.global")}</span><span>{t("trend.score", { value: trend.score })}</span>
+        <nav aria-label={locale === "tr" ? "Sayfa yolu" : "Breadcrumb"} className="flex flex-wrap items-center gap-2">
+          <Link href="/" className="rounded-sm hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">{locale === "tr" ? "Ana sayfa" : "Home"}</Link>
+          <span aria-hidden="true">/</span>
+          <Link href={internalLinks.category.href} className="rounded-sm hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">{localeCategoryLabel(trend.category, locale)}</Link>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{t("trend.article")}</span>
+        </nav>
+        {internalLinks.countries.length ? internalLinks.countries.map((country) => <Link key={country.href} href={country.href} className="rounded-sm hover:text-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">{country.label}</Link>) : <span>{t("trend.global")}</span>}
+        <span>{t("trend.score", { value: trend.score })}</span>
         {mode === "demo" && <span className="text-amber-200">{t("trend.demo")}</span>}
       </div>
       <h1 className="mt-6 max-w-5xl text-balance text-[clamp(2.8rem,7vw,6.5rem)] font-medium leading-[0.92] tracking-[-0.065em] text-white">{trend.title}</h1>

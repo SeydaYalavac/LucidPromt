@@ -9,12 +9,13 @@ import { useLocale } from "@/i18n/locale";
 import { CollectionHeader } from "./CollectionHeader";
 import { NewsCard } from "./NewsCard";
 
-export function CategoryView({ slug }: { slug: string }) {
+export function CategoryView({ slug, initialData }: { slug: string; initialData?: TrendListPayload }) {
   const router = useRouter();
   const { locale } = useLocale();
   const { data, error, isLoading } = useSWR<TrendListPayload>(
     `/api/trends?category=${encodeURIComponent(slug)}&limit=200`,
     productDataFetcher,
+    { fallbackData: initialData },
   );
   const trends = data?.trends || [];
 

@@ -68,8 +68,8 @@ export function useTrends(options: { globalPulse?: boolean; limit?: number } = {
   return useSWR<TrendListPayload>(`/api/trends?${query}`, fetcher, { refreshInterval: 30_000 });
 }
 
-export function useTrend(slug: string) {
-  return useSWR<TrendDetailPayload>(slug ? `/api/trends/${slug}` : null, fetcher, { refreshInterval: 30_000 });
+export function useTrend(slug: string, fallbackData?: TrendDetailPayload) {
+  return useSWR<TrendDetailPayload>(slug ? `/api/trends/${slug}` : null, fetcher, { fallbackData, refreshInterval: 30_000 });
 }
 
 export function useSignals(limit = 20) {
