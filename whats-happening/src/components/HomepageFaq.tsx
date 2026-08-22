@@ -14,7 +14,7 @@ export function HomepageFaq() {
     >
       <div className="mx-auto grid max-w-7xl gap-14 px-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(0,1.28fr)] lg:gap-24">
         <div className="lg:sticky lg:top-28 lg:self-start">
-          <p className="font-mono text-xs font-semibold uppercase tracking-[0.22em] text-[#67e8f9]">
+          <p className="font-mono text-xs font-semibold uppercase tracking-[0.22em] text-[#D8D4CA]">
             {t("faq.kicker")}
           </p>
           <h2
@@ -36,7 +36,7 @@ export function HomepageFaq() {
             >
               <span
                 aria-hidden="true"
-                className="font-mono text-xs font-medium tabular-nums text-[#67e8f9]"
+                className="font-mono text-xs font-medium tabular-nums text-[#D8D4CA]"
               >
                 {String(index + 1).padStart(2, "0")}
               </span>

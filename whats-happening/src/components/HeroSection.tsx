@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ChevronDown } from "lucide-react";
+import { ArrowRight, Search } from "lucide-react";
+import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSignals, useTrends } from "@/hooks/useTrendData";
@@ -25,31 +26,23 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative flex min-h-[95vh] flex-col items-center justify-center px-4 pt-24 pb-12">
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0B0B0D] via-[#050505] to-[#050505]"></div>
-      
+    <section className="page-grid relative border-b border-white/[0.08] px-5 pb-20 pt-36 sm:px-8 sm:pb-24 sm:pt-44">
+      <div className="mx-auto grid w-full max-w-[1440px] gap-14 lg:grid-cols-[minmax(0,1.38fr)_minmax(300px,0.62fr)] lg:items-end lg:gap-20">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="flex w-full max-w-6xl flex-col items-center text-center"
+        className="max-w-5xl"
       >
-        <h1 className="text-balance text-[clamp(40px,6.5vw,96px)] font-bold leading-[0.9] tracking-tighter text-white">
+        <p className="eyebrow">{locale === "tr" ? "Kaynaklı AI trend istihbaratı" : "Source-linked AI trend intelligence"}</p>
+        <h1 className="mt-7 text-balance text-[clamp(2.75rem,8.5vw,8.8rem)] font-medium leading-[0.84] tracking-[-0.068em] text-[#F1EFE9] sm:text-[clamp(3.8rem,8.5vw,8.8rem)]">
           {t("hero.title").split("\n").map((line, index) => <span key={line}>{line}{index < 2 && <br />}</span>)}
         </h1>
-        <p className="mt-8 max-w-2xl text-pretty text-lg font-medium leading-relaxed text-[#A3A3AA] md:text-2xl">
+        <p className="mt-8 max-w-2xl text-pretty text-base leading-7 text-[#AAA79F] sm:text-lg sm:leading-8">
           {t("hero.description")}
         </p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-12 w-full max-w-2xl"
-      >
-        <form onSubmit={(event) => { event.preventDefault(); router.push(query.trim() ? `/trending?q=${encodeURIComponent(query.trim())}` : "/trending"); }} className="group relative flex h-20 w-full items-center overflow-hidden rounded-full border border-white/10 bg-white/[0.03] px-8 shadow-2xl backdrop-blur-xl transition-all hover:bg-white/[0.05] focus-within:border-white/30 focus-within:bg-white/[0.06] focus-within:ring-4 focus-within:ring-white/5">
-          <Search className="text-[#8B8B93] transition-colors group-focus-within:text-white" size={28} />
+        <form onSubmit={(event) => { event.preventDefault(); router.push(query.trim() ? `/trending?q=${encodeURIComponent(query.trim())}` : "/trending"); }} className="group relative mt-10 flex min-h-16 w-full max-w-2xl items-center border-y border-white/[0.16] bg-[#0D0D0C] px-5 transition-colors hover:bg-[#11110F] focus-within:border-white/35">
+          <Search className="text-white/45 transition-colors group-focus-within:text-white" size={21} />
           
           <div className="relative flex-1 h-full ml-6">
             <input
@@ -69,7 +62,7 @@ export function HeroSection() {
                   animate={{ y: 0 }}
                   exit={{ y: -10 }}
                   transition={{ duration: 0.4 }}
-                  className="text-xl text-[#8B8B93]"
+                className="text-sm text-[#8F8C85] sm:text-base"
                 >
                   {placeholders[placeholderIndex]}
                 </motion.span>
@@ -81,33 +74,28 @@ export function HeroSection() {
             <span className="font-sans font-medium">Enter</span>
           </div>
         </form>
+        <Link href="/trending" className="mt-5 inline-flex min-h-11 items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-white/55 transition-colors hover:text-white">{t("hero.explore")} <ArrowRight size={14} /></Link>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.6 }}
-        className="mt-16 flex flex-col items-center gap-6"
+        className="border-t border-white/[0.16] pt-6 lg:border-l lg:border-t-0 lg:pl-8 lg:pt-0"
       >
-        <div className="flex items-center gap-3 rounded-full border border-white/5 bg-white/[0.02] px-6 py-2">
-          <span className={`h-2 w-2 rounded-full ${dataUnavailable ? "bg-amber-300" : "bg-[#67E8F9]"}`} aria-hidden="true" />
-          <span className="text-xs font-bold uppercase tracking-widest text-white">
+        <div className="flex items-center gap-3 border-b border-white/[0.1] pb-6">
+          <span className={`h-2 w-2 rounded-full ${dataUnavailable ? "bg-amber-300" : "bg-[#D8D4CA]"}`} aria-hidden="true" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-white">
             {dataUnavailable ? t("hero.dataUnavailable") : t("hero.dataConnected")}
           </span>
-          <div className="ml-2 flex items-center gap-3 text-xs text-[#8B8B93] font-medium">
-            <span>{signalData ? t("hero.signalsLoaded", { count: signalData.signals.length }) : t("hero.signalCountUnavailable")}</span>
-            <span className="h-1 w-1 rounded-full bg-white/20"></span>
-            <span>{trendData ? t("hero.trendsLoaded", { count: trendData.trends.length }) : t("hero.trendCountUnavailable")}</span>
-            <span className="h-1 w-1 rounded-full bg-white/20"></span>
-            <span>{t("hero.sourceLinked")}</span>
-          </div>
         </div>
-
-        <button type="button" onClick={() => document.getElementById("trending")?.scrollIntoView({ behavior: "smooth" })} className="group mt-12 flex min-h-11 flex-col items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-[#8B8B93] transition-colors hover:text-white">
-          <span>{t("hero.explore")}</span>
-          <ChevronDown size={16} className="animate-bounce" />
-        </button>
+        <dl className="divide-y divide-white/[0.1]">
+          <div className="flex items-end justify-between gap-4 py-6"><dt className="eyebrow">{locale === "tr" ? "Sinyaller" : "Signals"}</dt><dd className="text-4xl font-medium tracking-[-0.05em] text-[#ECE8DF]">{signalData ? signalData.signals.length : "—"}</dd></div>
+          <div className="flex items-end justify-between gap-4 py-6"><dt className="eyebrow">{locale === "tr" ? "Trendler" : "Trends"}</dt><dd className="text-4xl font-medium tracking-[-0.05em] text-[#ECE8DF]">{trendData ? trendData.trends.length : "—"}</dd></div>
+          <div className="flex items-center justify-between gap-4 py-6"><dt className="eyebrow">{locale === "tr" ? "Kanıt" : "Evidence"}</dt><dd className="max-w-[10rem] text-right text-[10px] font-semibold uppercase tracking-[0.1em] text-white/70">{t("hero.sourceLinked")}</dd></div>
+        </dl>
       </motion.div>
+      </div>
     </section>
   );
 }

@@ -169,7 +169,7 @@ export function SignalMap() {
     </header>
 
     <section className={`relative mt-2 overflow-hidden rounded-[1.5rem] border border-[rgba(226,222,213,0.2)] bg-[#070809] ${selectedActivity && selectedPoint ? "xl:grid xl:grid-cols-[minmax(0,1fr)_410px]" : ""}`} aria-label={l("Interactive world AI activity map", "Etkileşimli dünya yapay zeka etkinlik haritası")} aria-describedby="map-evidence-limit">
-      <div className="relative h-[58svh] min-h-[410px] max-h-[700px] overflow-hidden xl:h-[700px]" style={{ backgroundImage: "radial-gradient(circle at 50% 48%, rgba(255,255,255,0.035), transparent 55%)" }}>
+      <div className="relative h-[58svh] min-h-[410px] max-h-[700px] overflow-hidden bg-[#0A0A09] xl:h-[700px]">
         <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex items-start justify-between gap-4 p-4 sm:p-6">
           <div className="border-l border-white/35 pl-3">
             <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-white/38">{data?.mode === "demo" ? l("Demo interaction preview", "Demo etkileşim önizlemesi") : l("Live evidence window", "Canlı kanıt aralığı")}</p>

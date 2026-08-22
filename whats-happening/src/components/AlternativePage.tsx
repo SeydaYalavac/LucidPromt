@@ -63,13 +63,12 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
           </div>
 
           <aside
-            className="relative overflow-hidden rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8"
+            className="relative overflow-hidden rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8"
             aria-label="Research path"
           >
-            <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-cyan-300/[0.06] blur-3xl" />
             <div className="relative flex items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
               <div>
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#67E8F9]">
+                <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#D8D4CA]">
                   Research fork
                 </p>
                 <p className="mt-2 text-sm text-[#A1A1AA]">Start with the evidence you need</p>
@@ -84,8 +83,8 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
                 <p className="mt-1 text-xs leading-5 text-[#71717A]">Its established research model</p>
               </div>
               <GitFork size={17} className="rotate-90 text-[#3F3F46]" aria-hidden="true" />
-              <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.045] p-5">
-                <Radio size={17} className="text-[#67E8F9]" aria-hidden="true" />
+              <div className="rounded-2xl border border-stone-300/20 bg-stone-300/[0.045] p-5">
+                <Radio size={17} className="text-[#D8D4CA]" aria-hidden="true" />
                 <p className="mt-5 text-sm font-medium text-white">What&apos;s Happening</p>
                 <p className="mt-1 text-xs leading-5 text-[#8B8B93]">Source-linked technology signals</p>
               </div>
@@ -109,7 +108,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
         <section className="border-y border-white/[0.08] bg-[#080809]">
           <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24 lg:py-28">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Quick answer</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Quick answer</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
                 Pick the evidence model before the tool.
               </h2>
@@ -148,7 +147,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
                 <article key={name as string} className="grid gap-4 py-8 sm:grid-cols-[0.42fr_1fr] sm:gap-8">
                   <div className="flex items-center gap-3">
                     <span
-                      className={`h-2 w-2 rounded-full ${active ? "bg-[#67E8F9]" : "bg-white/20"}`}
+                      className={`h-2 w-2 rounded-full ${active ? "bg-[#D8D4CA]" : "bg-white/20"}`}
                       aria-hidden="true"
                     />
                     <h3 className="text-sm font-medium text-white">{name as string}</h3>
@@ -163,7 +162,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
         <section className="border-y border-white/[0.08] bg-[#0B0B0D]">
           <div className="mx-auto w-full max-w-7xl px-6 py-24 lg:py-32">
             <div className="max-w-3xl">
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Decision table</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Decision table</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
                 Six differences that change the choice.
               </h2>
@@ -172,13 +171,13 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
               </p>
             </div>
 
-            <div className="mt-12 overflow-x-auto rounded-[2rem] border border-white/[0.1]">
+            <div className="mt-12 overflow-x-auto rounded-2xl border border-white/[0.1]">
               <table className="w-full min-w-[980px] border-collapse text-left">
                 <thead className="bg-white/[0.03]">
                   <tr>
                     <th className="w-[16%] px-6 py-5 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-[#71717A]">Axis</th>
                     <th className="w-[25%] px-6 py-5 text-sm font-medium text-white">{data.competitor}</th>
-                    <th className="w-[29%] bg-cyan-300/[0.035] px-6 py-5 text-sm font-medium text-[#B9F5FC]">What&apos;s Happening</th>
+                    <th className="w-[29%] bg-stone-300/[0.035] px-6 py-5 text-sm font-medium text-[#B9F5FC]">What&apos;s Happening</th>
                     <th className="w-[30%] px-6 py-5 text-sm font-medium text-white">What it means</th>
                   </tr>
                 </thead>
@@ -187,7 +186,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
                     <tr key={row.axis} className="align-top">
                       <th scope="row" className="px-6 py-6 text-sm font-medium text-white">{row.axis}</th>
                       <td className="px-6 py-6 text-sm leading-7 text-[#A1A1AA]">{row.competitor}</td>
-                      <td className="bg-cyan-300/[0.025] px-6 py-6 text-sm leading-7 text-[#B8B8C0]">{row.whatsHappening}</td>
+                      <td className="bg-stone-300/[0.025] px-6 py-6 text-sm leading-7 text-[#B8B8C0]">{row.whatsHappening}</td>
                       <td className="px-6 py-6 text-sm leading-7 text-[#8B8B93]">{row.decision}</td>
                     </tr>
                   ))}
@@ -203,7 +202,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
         <section className="mx-auto w-full max-w-7xl px-6 py-24 lg:py-32">
           <div className="grid gap-14 lg:grid-cols-[0.86fr_1.14fr] lg:items-start lg:gap-24">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Our difference</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Our difference</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
                 The score keeps its receipts.
               </h2>
@@ -215,7 +214,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
               </p>
             </div>
 
-            <div className="rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8">
+            <div className="rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8">
               <div className="grid gap-3 sm:grid-cols-3">
                 {[
                   [FileSearch, "Hacker News", "official API"],
@@ -225,7 +224,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
                   const SourceIcon = Icon as typeof FileSearch;
                   return (
                     <div key={label as string} className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
-                      <SourceIcon size={17} className="text-[#67E8F9]" aria-hidden="true" />
+                      <SourceIcon size={17} className="text-[#D8D4CA]" aria-hidden="true" />
                       <p className="mt-4 text-sm font-medium text-white">{label as string}</p>
                       <p className="mt-1 font-mono text-[0.62rem] uppercase tracking-[0.13em] text-[#52525B]">{source as string}</p>
                     </div>
@@ -233,10 +232,10 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
                 })}
               </div>
               <div className="my-4 flex justify-center" aria-hidden="true">
-                <span className="h-9 w-px bg-cyan-300/25" />
+                <span className="h-9 w-px bg-stone-300/25" />
               </div>
-              <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.035] p-5">
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-[#67E8F9]">Inspect the chain</p>
+              <div className="rounded-2xl border border-stone-300/15 bg-stone-300/[0.035] p-5">
+                <p className="font-mono text-[0.68rem] uppercase tracking-[0.16em] text-[#D8D4CA]">Inspect the chain</p>
                 <p className="mt-3 text-sm leading-7 text-[#A1A1AA]">
                   Observation links → earliest country-tagged evidence → 45/35/20 score → concise Why Layer
                 </p>
@@ -270,18 +269,18 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
 
         <section className="mx-auto w-full max-w-7xl px-6 py-24 lg:py-32">
           <div className="max-w-3xl">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Best fit</p>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Best fit</p>
             <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
               Choose by the decision in front of you.
             </h2>
           </div>
-          <div className="mt-12 grid gap-px overflow-hidden rounded-[2rem] border border-white/[0.1] bg-white/[0.1] lg:grid-cols-2">
+          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.1] lg:grid-cols-2">
             {[
               [data.competitor, data.bestFit.competitor, false],
               ["What's Happening", data.bestFit.whatsHappening, true],
             ].map(([name, copy, active]) => (
               <article key={name as string} className={`p-7 sm:p-9 ${active ? "bg-[#101518]" : "bg-[#0B0B0D]"}`}>
-                <p className={`font-mono text-xs uppercase tracking-[0.16em] ${active ? "text-[#67E8F9]" : "text-[#71717A]"}`}>
+                <p className={`font-mono text-xs uppercase tracking-[0.16em] ${active ? "text-[#D8D4CA]" : "text-[#71717A]"}`}>
                   {name as string}
                 </p>
                 <p className="mt-6 text-pretty text-base leading-8 text-[#C4C4CA]">{copy as string}</p>
@@ -293,7 +292,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
         <section id="faq" className="border-y border-white/[0.08] bg-[#080809] scroll-mt-28">
           <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24 lg:py-32">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">FAQ</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">FAQ</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
                 The practical questions.
               </h2>
@@ -330,7 +329,7 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
                       href={source.url}
                       target={external ? "_blank" : undefined}
                       rel={external ? "noreferrer" : undefined}
-                      className="inline-flex items-center gap-2 text-sm font-medium text-white hover:text-[#67E8F9]"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-white hover:text-[#D8D4CA]"
                     >
                       {source.label}
                       {external && <ExternalLink size={13} aria-hidden="true" />}
@@ -344,8 +343,8 @@ export function AlternativePage({ data }: { data: AlternativePageData }) {
         </section>
 
         <section className="mx-auto w-full max-w-7xl px-6 pb-24 lg:pb-32">
-          <div className="rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-8 sm:p-10">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Continue the research</p>
+          <div className="rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-8 sm:p-10">
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Continue the research</p>
             <div className="mt-7 grid gap-px overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.08] sm:grid-cols-2 lg:grid-cols-3">
               {data.related.map((item) => (
                 <Link key={item.href} href={item.href} className="group bg-[#0B0B0D] p-5 transition-colors hover:bg-[#111114]">

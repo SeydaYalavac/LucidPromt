@@ -21,7 +21,7 @@ function ToolMark({ name, active = false }: { name: string; active?: boolean }) 
     <div
       className={`flex min-h-14 items-center justify-between gap-4 rounded-2xl border px-5 ${
         active
-          ? "border-cyan-300/25 bg-cyan-300/[0.055]"
+          ? "border-stone-300/25 bg-stone-300/[0.055]"
           : "border-white/[0.08] bg-white/[0.025]"
       }`}
     >
@@ -29,7 +29,7 @@ function ToolMark({ name, active = false }: { name: string; active?: boolean }) 
         {name}
       </span>
       <span
-        className={`h-2 w-2 rounded-full ${active ? "bg-[#67E8F9]" : "bg-white/20"}`}
+        className={`h-2 w-2 rounded-full ${active ? "bg-[#D8D4CA]" : "bg-white/20"}`}
         aria-hidden="true"
       />
     </div>
@@ -89,10 +89,10 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
             </p>
           </div>
 
-          <aside className="relative overflow-hidden rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8" aria-label="Comparison orientation">
+          <aside className="relative overflow-hidden rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8" aria-label="Comparison orientation">
             <div className="flex items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
               <div>
-                <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#67E8F9]">
+                <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#D8D4CA]">
                   Decision lens
                 </p>
                 <p className="mt-2 text-sm text-[#A1A1AA]">Three different research jobs</p>
@@ -124,7 +124,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
         <section className="border-y border-white/[0.08] bg-[#080809]">
           <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 py-20 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24 lg:py-28">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Quick answer</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Quick answer</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
                 Pick the workflow, not the longest feature list.
               </h2>
@@ -161,7 +161,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
                 <article key={name} className="grid gap-4 py-7 sm:grid-cols-[0.42fr_1fr] sm:gap-8">
                   <div className="flex items-center gap-3">
                     <span
-                      className={`h-2 w-2 rounded-full ${index === 2 ? "bg-[#67E8F9]" : "bg-white/20"}`}
+                      className={`h-2 w-2 rounded-full ${index === 2 ? "bg-[#D8D4CA]" : "bg-white/20"}`}
                       aria-hidden="true"
                     />
                     <h3 className="text-sm font-medium text-white">{name}</h3>
@@ -176,7 +176,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
         <section className="border-y border-white/[0.08] bg-[#0B0B0D]">
           <div className="mx-auto w-full max-w-7xl px-6 py-24 lg:py-32">
             <div className="max-w-3xl">
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Feature comparison</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Feature comparison</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
                 Six axes that change the research decision.
               </h2>
@@ -185,14 +185,14 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
               </p>
             </div>
 
-            <div className="mt-12 overflow-x-auto rounded-[2rem] border border-white/[0.1]">
+            <div className="mt-12 overflow-x-auto rounded-2xl border border-white/[0.1]">
               <table className="w-full min-w-[940px] border-collapse text-left">
                 <thead className="bg-white/[0.03]">
                   <tr>
                     <th className="w-[17%] px-6 py-5 font-mono text-[0.68rem] uppercase tracking-[0.16em] text-[#71717A]">Axis</th>
                     <th className="w-[27.6%] px-6 py-5 text-sm font-medium text-white">{data.competitor}</th>
                     <th className="w-[27.6%] px-6 py-5 text-sm font-medium text-white">{data.alternative}</th>
-                    <th className="w-[27.8%] bg-cyan-300/[0.035] px-6 py-5 text-sm font-medium text-[#B9F5FC]">What&apos;s Happening</th>
+                    <th className="w-[27.8%] bg-stone-300/[0.035] px-6 py-5 text-sm font-medium text-[#B9F5FC]">What&apos;s Happening</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/[0.08]">
@@ -201,7 +201,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
                       <th scope="row" className="px-6 py-6 text-sm font-medium text-white">{row.axis}</th>
                       <td className="px-6 py-6 text-sm leading-7 text-[#A1A1AA]">{row.competitor}</td>
                       <td className="px-6 py-6 text-sm leading-7 text-[#A1A1AA]">{row.alternative}</td>
-                      <td className="bg-cyan-300/[0.025] px-6 py-6 text-sm leading-7 text-[#B8B8C0]">{row.whatsHappening}</td>
+                      <td className="bg-stone-300/[0.025] px-6 py-6 text-sm leading-7 text-[#B8B8C0]">{row.whatsHappening}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -216,7 +216,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
         <section className="mx-auto w-full max-w-7xl px-6 py-24 lg:py-32">
           <div className="grid gap-14 lg:grid-cols-[0.86fr_1.14fr] lg:items-start lg:gap-24">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Our difference</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Our difference</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
                 The score keeps its receipts.
               </h2>
@@ -228,7 +228,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
               </p>
             </div>
 
-            <div className="rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8">
+            <div className="rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-6 sm:p-8">
               <div className="grid gap-3 sm:grid-cols-3">
                 {[
                   [SearchCheck, "Hacker News", "official API"],
@@ -238,7 +238,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
                   const SourceIcon = Icon as typeof SearchCheck;
                   return (
                     <div key={label as string} className="rounded-2xl border border-white/[0.08] bg-white/[0.025] p-4">
-                      <SourceIcon size={17} className="text-[#67E8F9]" aria-hidden="true" />
+                      <SourceIcon size={17} className="text-[#D8D4CA]" aria-hidden="true" />
                       <p className="mt-4 text-sm font-medium text-white">{label as string}</p>
                       <p className="mt-1 font-mono text-[0.62rem] uppercase tracking-[0.13em] text-[#52525B]">{source as string}</p>
                     </div>
@@ -247,7 +247,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
               </div>
 
               <div className="my-4 flex justify-center" aria-hidden="true">
-                <span className="h-9 w-px bg-cyan-300/25" />
+                <span className="h-9 w-px bg-stone-300/25" />
               </div>
 
               <div className="grid gap-3 sm:grid-cols-3">
@@ -263,8 +263,8 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
                 ))}
               </div>
 
-              <div className="mt-4 flex items-start gap-3 rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.035] p-5">
-                <Radio size={17} className="mt-0.5 shrink-0 text-[#67E8F9]" aria-hidden="true" />
+              <div className="mt-4 flex items-start gap-3 rounded-2xl border border-stone-300/15 bg-stone-300/[0.035] p-5">
+                <Radio size={17} className="mt-0.5 shrink-0 text-[#D8D4CA]" aria-hidden="true" />
                 <p className="text-sm leading-6 text-[#A1A1AA]">
                   Source links + earliest country-tagged evidence + Why Layer
                 </p>
@@ -298,20 +298,20 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
 
         <section className="mx-auto w-full max-w-7xl px-6 py-24 lg:py-32">
           <div className="max-w-3xl">
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Best fit</p>
+            <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Best fit</p>
             <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
               Choose by the decision in front of you.
             </h2>
           </div>
 
-          <div className="mt-12 grid gap-px overflow-hidden rounded-[2rem] border border-white/[0.1] bg-white/[0.1] lg:grid-cols-3">
+          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.1] lg:grid-cols-3">
             {[
               [data.competitor, data.choiceGuidance.competitor],
               [data.alternative, data.choiceGuidance.alternative],
               ["What's Happening", data.choiceGuidance.whatsHappening],
             ].map(([name, copy], index) => (
               <article key={name} className={`p-7 sm:p-9 ${index === 2 ? "bg-[#101518]" : "bg-[#0B0B0D]"}`}>
-                <p className={`font-mono text-xs uppercase tracking-[0.16em] ${index === 2 ? "text-[#67E8F9]" : "text-[#71717A]"}`}>
+                <p className={`font-mono text-xs uppercase tracking-[0.16em] ${index === 2 ? "text-[#D8D4CA]" : "text-[#71717A]"}`}>
                   {name}
                 </p>
                 <p className="mt-6 text-pretty text-base leading-8 text-[#C4C4CA]">{copy}</p>
@@ -323,7 +323,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
         <section id="faq" className="border-y border-white/[0.08] bg-[#080809] scroll-mt-28">
           <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24 lg:py-32">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">FAQ</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">FAQ</p>
               <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
                 The practical questions.
               </h2>
@@ -360,7 +360,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
                       href={source.url}
                       target={external ? "_blank" : undefined}
                       rel={external ? "noreferrer" : undefined}
-                      className="inline-flex items-center gap-2 text-sm font-medium text-white hover:text-[#67E8F9]"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-white hover:text-[#D8D4CA]"
                     >
                       {source.label}
                       {external && <ExternalLink size={13} aria-hidden="true" />}
@@ -374,9 +374,9 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
         </section>
 
         <section className="mx-auto w-full max-w-7xl px-6 pb-24 lg:pb-32">
-          <div className="flex flex-col items-start justify-between gap-8 rounded-[2rem] border border-white/[0.1] bg-[#0B0B0D] p-8 sm:p-10 lg:flex-row lg:items-center">
+          <div className="flex flex-col items-start justify-between gap-8 rounded-2xl border border-white/[0.1] bg-[#0B0B0D] p-8 sm:p-10 lg:flex-row lg:items-center">
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">Next comparison</p>
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">Next comparison</p>
               <h2 className="mt-4 text-balance text-2xl font-medium tracking-[-0.03em] text-white sm:text-3xl">
                 {data.sibling.label}
               </h2>

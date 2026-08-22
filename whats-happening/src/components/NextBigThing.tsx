@@ -12,16 +12,15 @@ export function NextBigThing() {
   if (!candidates.length) return null;
 
   return (
-    <section className="w-full bg-[#0B0B0D] py-32">
-      <div className="mx-auto max-w-7xl px-6">
-        <h2 className="text-[clamp(40px,5vw,80px)] font-bold leading-none tracking-tighter text-white">{t("next.title")}</h2>
-        <p className="mt-4 text-xl text-[#8B8B93]">{t("next.description")}</p>
-        <div className="mt-16 grid gap-6 md:grid-cols-3">
-          {candidates.map((trend) => (
-            <Link key={trend.id} href={`/trend/${trend.slug}`} className="editorial-card editorial-card-interactive relative flex min-h-64 flex-col justify-between overflow-hidden rounded-3xl border p-8 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">
-              <div className="absolute left-0 top-0 h-px w-full bg-white/[0.06]"><div className="h-full bg-[#D8D4CA]/80" style={{ width: `${trend.score}%` }} /></div>
-              <div className="flex items-center justify-between"><span className="text-4xl font-bold text-white">{trend.score}</span><span className="text-xs font-bold uppercase tracking-widest text-white/55">{t("next.score")}</span></div>
-              <div className="mt-10"><p className="text-xs font-bold uppercase tracking-widest text-[#8B8B93]">{localeCategoryLabel(trend.category, locale)}</p><h3 className="mt-2 text-2xl font-bold text-white">{trend.title}</h3><span className="mt-5 flex items-center gap-1 text-sm font-bold text-white/65"><ArrowUpRight size={16} /> {t("next.novelty", { value: trend.novelty_score })}</span></div>
+    <section className="w-full border-y border-white/[0.08] bg-[#0D0D0C] py-20 sm:py-28">
+      <div className="mx-auto max-w-[1440px] px-5 sm:px-8">
+        <div className="grid gap-5 lg:grid-cols-[0.8fr_1.2fr] lg:items-end"><h2 className="text-[clamp(2.8rem,5vw,5.5rem)] font-medium leading-[0.9] tracking-[-0.055em] text-white">{t("next.title")}</h2><p className="max-w-xl text-sm leading-6 text-[#96938C] lg:justify-self-end">{t("next.description")}</p></div>
+        <div className="mt-12 border-y border-white/[0.12]">
+          {candidates.map((trend, index) => (
+            <Link key={trend.id} href={`/trend/${trend.slug}`} className="group grid min-h-32 gap-5 border-b border-white/[0.1] py-7 transition-colors last:border-b-0 hover:bg-white/[0.025] sm:grid-cols-[4rem_1fr_auto] sm:items-center sm:px-3">
+              <span className="font-mono text-xs tracking-[0.16em] text-white/30">0{index + 1}</span>
+              <div><p className="eyebrow">{localeCategoryLabel(trend.category, locale)}</p><h3 className="mt-2 text-3xl font-medium tracking-[-0.025em] text-white sm:text-4xl">{trend.title}</h3></div>
+              <div className="flex items-center justify-between gap-8 sm:justify-end"><span className="font-mono text-xs uppercase tracking-[0.12em] text-white/40">{t("next.score")} <b className="ml-2 text-lg font-medium text-white">{trend.score}</b></span><ArrowUpRight size={18} className="text-white/45 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-white" /></div>
             </Link>
           ))}
         </div>

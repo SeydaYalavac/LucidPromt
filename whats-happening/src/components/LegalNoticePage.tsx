@@ -10,16 +10,12 @@ import {
 
 export function LegalNoticePage({ notice }: { notice: LegalNotice }) {
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#050505] text-[#F5F5F5] selection:bg-cyan-300/20">
+    <div className="min-h-screen overflow-x-hidden bg-[#050505] text-[#F5F5F5] selection:bg-stone-300/20">
       <GlobalNavbar />
       <main>
         <section className="relative mx-auto w-full max-w-7xl px-6 pb-20 pt-36 sm:pt-44 lg:pb-28">
-          <div
-            className="pointer-events-none absolute right-0 top-20 h-72 w-72 rounded-full bg-cyan-300/[0.055] blur-3xl"
-            aria-hidden="true"
-          />
           <div className="relative max-w-4xl">
-            <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-[#67E8F9]">
+            <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">
               <FileCheck2 size={14} aria-hidden="true" /> Current practice / {noticeDate}
             </p>
             <h1 className="mt-7 text-balance text-[clamp(3.4rem,8vw,7rem)] font-semibold leading-[0.88] tracking-[-0.07em] text-white">
@@ -30,8 +26,8 @@ export function LegalNoticePage({ notice }: { notice: LegalNotice }) {
             </p>
           </div>
 
-          <div className="relative mt-12 max-w-4xl rounded-[1.75rem] border border-cyan-300/20 bg-cyan-300/[0.055] p-6 sm:p-8">
-            <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#67E8F9]">
+          <div className="relative mt-12 max-w-4xl rounded-[1.75rem] border border-stone-300/20 bg-stone-300/[0.055] p-6 sm:p-8">
+            <p className="font-mono text-[0.68rem] uppercase tracking-[0.2em] text-[#D8D4CA]">
               Status note
             </p>
             <p className="mt-4 max-w-[68ch] text-pretty text-base leading-7 text-[#D4D4D8]">
@@ -48,7 +44,7 @@ export function LegalNoticePage({ notice }: { notice: LegalNotice }) {
             <ul className="mt-5 space-y-5">
               {notice.atAGlance.map((item, index) => (
                 <li key={item} className="grid grid-cols-[1.5rem_1fr] gap-3 text-sm leading-6 text-[#A1A1AA]">
-                  <span className="font-mono text-[0.68rem] tabular-nums text-[#67E8F9]">
+                  <span className="font-mono text-[0.68rem] tabular-nums text-[#D8D4CA]">
                     0{index + 1}
                   </span>
                   <span>{item}</span>
@@ -93,7 +89,7 @@ export function LegalNoticePage({ notice }: { notice: LegalNotice }) {
                       <ul className="mt-7 space-y-4">
                         {section.bullets.map((item) => (
                           <li key={item} className="grid grid-cols-[0.5rem_1fr] gap-4 text-pretty text-base leading-7 text-[#A1A1AA]">
-                            <span className="mt-[0.7rem] h-1.5 w-1.5 rounded-full bg-[#67E8F9]" aria-hidden="true" />
+                            <span className="mt-[0.7rem] h-1.5 w-1.5 rounded-full bg-[#D8D4CA]" aria-hidden="true" />
                             <span>{item}</span>
                           </li>
                         ))}

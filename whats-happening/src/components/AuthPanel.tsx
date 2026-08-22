@@ -132,7 +132,7 @@ function InputField({
         />
         <input
           {...props}
-          className="h-12 w-full rounded-xl border border-white/10 bg-white/[0.045] pl-11 pr-4 text-[15px] text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#06b6d4]/70 focus:bg-white/[0.065] disabled:cursor-not-allowed disabled:opacity-45"
+          className="h-12 w-full rounded-xl border border-white/10 bg-white/[0.045] pl-11 pr-4 text-[15px] text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#D8D4CA]/70 focus:bg-white/[0.065] disabled:cursor-not-allowed disabled:opacity-45"
         />
       </span>
     </label>
@@ -315,9 +315,9 @@ export function AuthPanel({
   }, [isConfigured, mode]);
 
   return (
-    <div className="w-full max-w-[470px] rounded-[28px] border border-white/10 bg-[#0B0B0D] p-6 shadow-2xl shadow-black/40 sm:p-8">
+    <div className="w-full max-w-[470px] rounded-2xl border border-white/10 bg-[#11110f] p-6 sm:p-8">
       <div className="mb-8">
-        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl border border-[#06b6d4]/25 bg-[#06b6d4]/10 text-[#22d3ee]">
+        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-lg border border-[#D8D4CA]/25 bg-[#D8D4CA]/10 text-[#D8D4CA]">
           <LockKeyhole size={20} aria-hidden="true" />
         </div>
         <h1 className="text-balance text-3xl font-semibold tracking-[-0.035em] text-white">
@@ -344,7 +344,7 @@ export function AuthPanel({
           </p>
           <p className="mt-2 truncate text-sm text-emerald-100/65">{session.user.email}</p>
           <div className="mt-4 flex items-center gap-4 text-sm">
-            <Link href={next} className="font-semibold text-white hover:text-[#67e8f9]">
+            <Link href={next} className="font-semibold text-white hover:text-[#D8D4CA]">
               {l("Continue", "Devam et")}
             </Link>
             <button
@@ -371,7 +371,7 @@ export function AuthPanel({
             {signupSourceOptions.map((option) => (
               <label
                 key={option.value}
-                className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-3.5 text-sm text-white/70 transition-colors has-[:checked]:border-[#06b6d4]/60 has-[:checked]:bg-[#06b6d4]/10 has-[:checked]:text-white hover:border-white/20 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#22d3ee]"
+                className="flex min-h-11 cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-white/[0.035] px-3.5 text-sm text-white/70 transition-colors has-[:checked]:border-[#D8D4CA]/60 has-[:checked]:bg-[#D8D4CA]/10 has-[:checked]:text-white hover:border-white/20 focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[#D8D4CA]"
               >
                 <input
                   type="radio"
@@ -384,7 +384,7 @@ export function AuthPanel({
                     setError(null);
                   }}
                   disabled={busy}
-                  className="h-4 w-4 accent-[#06b6d4]"
+                  className="h-4 w-4 accent-[#D8D4CA]"
                 />
                 <span>{locale === "tr" ? signupSourceLabelsTr[option.value] : option.label}</span>
               </label>
@@ -401,7 +401,7 @@ export function AuthPanel({
                 rows={3}
                 disabled={busy}
                 placeholder={l("Optional, up to 200 characters", "İsteğe bağlı, en fazla 200 karakter")}
-                className="mt-2 w-full resize-none rounded-xl border border-white/10 bg-white/[0.045] px-4 py-3 text-[15px] leading-6 text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#06b6d4]/70 focus:bg-white/[0.065] disabled:cursor-not-allowed disabled:opacity-45"
+                className="mt-2 w-full resize-none rounded-xl border border-white/10 bg-white/[0.045] px-4 py-3 text-[15px] leading-6 text-white outline-none transition-colors placeholder:text-white/25 focus:border-[#D8D4CA]/70 focus:bg-white/[0.065] disabled:cursor-not-allowed disabled:opacity-45"
               />
               <span className="mt-1.5 block text-right font-mono text-[11px] tabular-nums text-white/35">
                 {aiPromptText.length}/200
@@ -508,7 +508,7 @@ export function AuthPanel({
         <button
           type="submit"
           disabled={formDisabled}
-          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#06b6d4] text-sm font-bold text-[#021013] transition-colors hover:bg-[#22d3ee] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#22d3ee] disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[#F1EFE9] text-sm font-bold text-[#11110f] transition-colors hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D8D4CA] disabled:cursor-not-allowed disabled:opacity-40"
         >
           {busy && !activeProvider && <LoaderCircle size={17} className="animate-spin" />}
           {mode === "signin" && l("Sign in", "Oturum aç")}
@@ -549,7 +549,7 @@ export function AuthPanel({
         {mode === "signin" && (
           <p>
             {l("New here?", "Burada yeni misin?")} {" "}
-            <Link href={authHref("signup")} onClick={() => captureProductEvent("signup_cta_clicked", { source: "auth_panel" })} className="font-semibold text-white hover:text-[#67e8f9]">
+            <Link href={authHref("signup")} onClick={() => captureProductEvent("signup_cta_clicked", { source: "auth_panel" })} className="font-semibold text-white hover:text-[#D8D4CA]">
               {l("Create an account", "Hesap oluştur")}
             </Link>
           </p>
@@ -557,13 +557,13 @@ export function AuthPanel({
         {mode === "signup" && (
           <p>
             {l("Already have an account?", "Zaten hesabın var mı?")} {" "}
-            <Link href={authHref("signin")} className="font-semibold text-white hover:text-[#67e8f9]">
+            <Link href={authHref("signin")} className="font-semibold text-white hover:text-[#D8D4CA]">
               {l("Sign in", "Oturum aç")}
             </Link>
           </p>
         )}
         {(mode === "forgot" || mode === "update") && (
-          <Link href={authHref("signin")} className="font-semibold text-white hover:text-[#67e8f9]">
+          <Link href={authHref("signin")} className="font-semibold text-white hover:text-[#D8D4CA]">
             {l("Back to sign in", "Oturum açmaya dön")}
           </Link>
         )}
@@ -577,7 +577,7 @@ export function AuthContext() {
   const l = (english: string, turkish: string) => locale === "tr" ? turkish : english;
   return (
     <div className="max-w-[480px]">
-      <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.19em] text-[#67e8f9]">
+      <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.19em] text-[#D8D4CA]">
         <Radio size={14} aria-hidden="true" /> {l("Account access", "Hesap erişimi")}
       </p>
       <h2 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-white lg:text-6xl">
