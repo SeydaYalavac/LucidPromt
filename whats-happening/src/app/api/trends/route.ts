@@ -14,6 +14,7 @@ import {
   utcDayStart,
 } from "@/lib/trend-feed";
 import type { Signal } from "@/types/trends";
+import { canonicalCategoryQuery } from "@/lib/discovery";
 
 function batches<T>(items: T[], size: number) {
   const groups: T[][] = [];
@@ -30,7 +31,13 @@ export async function GET(request: NextRequest) {
   const country = request.nextUrl.searchParams.get("country");
 
   if (isDemoMode()) {
-    const qualified = demoTrends.filter((trend) => isAiTrend(trend) && (!globalPulse || trend.is_global_pulse));
+    const canonicalCategory = category ? canonicalCategoryQuery(category) : null;
+    const qualified = demoTrends.filter((trend) =>
+      isAiTrend(trend)
+      && (!globalPulse || trend.is_global_pulse)
+      && (!canonicalCategory || trend.category.toLowerCase() === canonicalCategory.toLowerCase())
+      && (!country || trend.country?.slug === country),
+    );
     const trends = qualified.slice(offset, offset + limit);
     const dayStart = utcDayStart(now);
     return NextResponse.json(
@@ -68,7 +75,7 @@ export async function GET(request: NextRequest) {
       .gte("last_seen_at", activeTrendCutoff(now).toISOString())
       .limit(1_000);
     if (globalPulse) query = query.eq("is_global_pulse", true);
-    if (category) query = query.ilike("category", category.replace(/-/g, " "));
+    if (category) query = query.ilike("category", canonicalCategoryQuery(category));
     if (country) query = query.eq("country.slug", country);
     const { data, error } = await query;
     if (error) throw error;

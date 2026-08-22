@@ -25,9 +25,9 @@ export function TrendingView({ initialQuery = "" }: { initialQuery?: string }) {
   const activeCategory = categories.includes(category as (typeof categories)[number]) ? category : "All";
 
   const filtered = useMemo(() => {
-    const result = (data?.trends || []).filter((trend) => matchesTrend(trend, query, activeCategory)).filter((trend) => !savedOnly || saved.includes(trend.slug));
+    const result = (data?.trends || []).filter((trend) => matchesTrend(trend, query, activeCategory, localeCategoryLabel(trend.category, locale))).filter((trend) => !savedOnly || saved.includes(trend.slug));
     return [...result].sort((a, b) => sort === "newest" ? new Date(b.last_seen_at).getTime() - new Date(a.last_seen_at).getTime() : sort === "velocity" ? b.velocity_score - a.velocity_score : b.score - a.score);
-  }, [activeCategory, data?.trends, query, saved, savedOnly, sort]);
+  }, [activeCategory, data?.trends, locale, query, saved, savedOnly, sort]);
 
   useEffect(() => {
     const target = loadMoreRef.current;

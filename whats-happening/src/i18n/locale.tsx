@@ -107,6 +107,10 @@ const tr = {
   "category.business": "İş dünyası",
   "category.sports": "Spor",
   "category.entertainment": "Eğlence",
+  "category.artificial intelligence": "Yapay zeka",
+  "category.developer tools": "Geliştirici araçları",
+  "category.world": "Dünya",
+  "category.space": "Uzay",
   "state.loading": "Trend kayıtları yükleniyor",
   "state.heading": "Arayüz hazır. Canlı akış henüz bağlı değil.",
   "state.unavailable": "Canlı trend verisi üretim bağlantısını bekliyor.",
@@ -232,7 +236,8 @@ export function useLocale() {
 
 export function localeCategoryLabel(category: string, locale: Locale) {
   if (locale === "en") return category;
-  const key = `category.${category.toLocaleLowerCase()}` as TranslationKey;
+  const normalizedCategory = category.trim().replace(/\s+/g, " ").toLocaleLowerCase();
+  const key = `category.${normalizedCategory}` as TranslationKey;
   return key in tr ? tr[key] : category;
 }
 

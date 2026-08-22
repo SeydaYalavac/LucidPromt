@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, Command, Search, X } from "lucide-react";
 import { primaryNavigation } from "@/lib/discovery";
 import { useTrends } from "@/hooks/useTrendData";
-import { useLocale, type TranslationKey } from "@/i18n/locale";
+import { localeCategoryLabel, useLocale, type TranslationKey } from "@/i18n/locale";
 
 export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -14,7 +14,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
   const { data } = useTrends({ limit: 200 });
-  const { t } = useLocale();
+  const { locale, t } = useLocale();
   const navigationLabels: Record<string, TranslationKey> = {
     "/world": "nav.world", "/trending": "nav.trending", "/explore": "nav.explore", "/map": "nav.map", "/pricing": "nav.pricing",
   };
@@ -23,9 +23,9 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
     if (!query.trim()) return [];
     const normalized = query.trim().toLocaleLowerCase();
     return (data?.trends || [])
-      .filter((trend) => [trend.title, trend.category, trend.country?.name].filter(Boolean).some((value) => value!.toLocaleLowerCase().includes(normalized)))
+      .filter((trend) => [trend.title, trend.category, localeCategoryLabel(trend.category, locale), trend.country?.name].filter(Boolean).some((value) => value!.toLocaleLowerCase().includes(normalized)))
       .slice(0, 6);
-  }, [data?.trends, query]);
+  }, [data?.trends, locale, query]);
 
   useEffect(() => {
     if (!open) return;
@@ -93,7 +93,7 @@ export function SearchOverlay({ open, onClose }: { open: boolean; onClose: () =>
           <div id="search-results" className="mt-8 grid gap-2" aria-live="polite">
             {query && results.map((trend, index) => (
               <Link key={trend.id} href={`/trend/${trend.slug}`} onClick={onClose} onMouseEnter={() => setActiveIndex(index)} className={`group grid min-h-16 grid-cols-[1fr_auto] items-center gap-4 rounded-2xl px-4 py-3 transition-colors ${index === activeIndex ? "bg-white/[0.08]" : "hover:bg-white/[0.05]"}`}>
-                <span><span className="block text-base font-medium text-white">{trend.title}</span><span className="mt-1 block text-xs uppercase tracking-widest text-[#8B8B93]">{trend.category} · {trend.country?.name || t("search.countryUnknown")}</span></span>
+                <span><span className="block text-base font-medium text-white">{trend.title}</span><span className="mt-1 block text-xs uppercase tracking-widest text-[#8B8B93]">{localeCategoryLabel(trend.category, locale)} · {trend.country?.name || t("search.countryUnknown")}</span></span>
                 <ArrowRight className="text-white/35 transition-transform group-hover:translate-x-1 group-hover:text-white" size={18} />
               </Link>
             ))}
