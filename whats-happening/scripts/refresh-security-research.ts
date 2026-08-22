@@ -1,10 +1,10 @@
-import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { securityDossiers, securitySources } from "../src/content/security-research";
 import { getAffectedDossierIds } from "../src/lib/security-research";
+import { fingerprintSourceBody } from "../src/lib/security-source-fingerprint";
 
-type SourceState = { fingerprint: string; checkedAt: string; etag?: string; lastModified?: string };
+type SourceState = { fingerprint: string; checkedAt: string };
 type DossierState = {
   version: number;
   lastVerified: string;
@@ -23,10 +23,6 @@ const statePath = resolve(process.cwd(), "src/content/security-research-state.js
 const today = new Date().toISOString().slice(0, 10);
 const baseline = process.argv.includes("--baseline");
 
-function digest(value: string) {
-  return createHash("sha256").update(value).digest("hex");
-}
-
 async function fingerprintSource(url: string) {
   const response = await fetch(url, {
     redirect: "follow",
@@ -34,16 +30,14 @@ async function fingerprintSource(url: string) {
     signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  const etag = response.headers.get("etag") ?? undefined;
-  const lastModified = response.headers.get("last-modified") ?? undefined;
-  const contentLength = response.headers.get("content-length") ?? "";
-  const stableHeaders = [etag, lastModified, contentLength].filter(Boolean).join("|");
-  const body = stableHeaders ? "" : (await response.text()).replace(/<script[\s\S]*?<\/script>/gi, "").replace(/\s+/g, " ").trim();
-  return { fingerprint: digest(`${response.url}|${stableHeaders || body}`), etag, lastModified };
+  const contentType = response.headers.get("content-type") ?? "application/octet-stream";
+  const body = new Uint8Array(await response.arrayBuffer());
+  return { fingerprint: fingerprintSourceBody(response.url, contentType, body) };
 }
 
 async function main() {
   const previous = JSON.parse(await readFile(statePath, "utf8")) as ResearchState;
+  const migratingFingerprintFormat = previous.schemaVersion < 3;
   const sources = { ...previous.sources };
   const changedSourceIds: string[] = [];
   const failures: string[] = [];
@@ -51,11 +45,11 @@ async function main() {
 
   for (const source of securitySources) {
     try {
-      const next = await fingerprintSource(source.url);
+      const next = await fingerprintSource(source.monitorUrl ?? source.url);
       const prior = previous.sources[source.id];
       sources[source.id] = { ...next, checkedAt: today };
       checkedSourceIds.add(source.id);
-      if (!baseline && prior && prior.fingerprint !== next.fingerprint) changedSourceIds.push(source.id);
+      if (!baseline && !migratingFingerprintFormat && prior && prior.fingerprint !== next.fingerprint) changedSourceIds.push(source.id);
     } catch (error) {
       failures.push(`${source.id}: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -64,13 +58,21 @@ async function main() {
   const affected = new Set(getAffectedDossierIds(changedSourceIds));
   const dossiers = Object.fromEntries(securityDossiers.map((dossier) => {
     const prior = previous.dossiers[dossier.id];
-    const initial: DossierState = prior ?? {
+    let initial: DossierState = prior ?? {
       version: 1,
       lastVerified: today,
       evidenceCheckedAt: today,
       reviewStatus: "verified",
       changeSummary: { en: "Initial defensive research review.", tr: "İlk savunma araştırması incelemesi." },
     };
+    if (migratingFingerprintFormat) {
+      initial = {
+        ...initial,
+        version: 1,
+        reviewStatus: "verified",
+        changeSummary: { en: "Initial defensive research review.", tr: "İlk savunma araştırması incelemesi." },
+      };
+    }
     const evidenceCheckedAt = dossier.sourceIds.every((sourceId) => checkedSourceIds.has(sourceId))
       ? today
       : initial.evidenceCheckedAt;
@@ -88,7 +90,7 @@ async function main() {
   }));
 
   const checkedAt = failures.length === 0 ? today : previous.checkedAt;
-  const next: ResearchState = { schemaVersion: 1, checkedAt, sources, dossiers };
+  const next: ResearchState = { schemaVersion: 3, checkedAt, sources, dossiers };
   await writeFile(statePath, `${JSON.stringify(next, null, 2)}\n`, "utf8");
   console.log(JSON.stringify({ checked: Object.keys(sources).length, changedSourceIds, affectedDossiers: [...affected], failures }, null, 2));
   if (failures.length === securitySources.length) process.exitCode = 1;
