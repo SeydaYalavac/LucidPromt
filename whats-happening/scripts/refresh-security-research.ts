@@ -47,12 +47,14 @@ async function main() {
   const sources = { ...previous.sources };
   const changedSourceIds: string[] = [];
   const failures: string[] = [];
+  const checkedSourceIds = new Set<string>();
 
   for (const source of securitySources) {
     try {
       const next = await fingerprintSource(source.url);
       const prior = previous.sources[source.id];
       sources[source.id] = { ...next, checkedAt: today };
+      checkedSourceIds.add(source.id);
       if (!baseline && prior && prior.fingerprint !== next.fingerprint) changedSourceIds.push(source.id);
     } catch (error) {
       failures.push(`${source.id}: ${error instanceof Error ? error.message : String(error)}`);
@@ -69,11 +71,14 @@ async function main() {
       reviewStatus: "verified",
       changeSummary: { en: "Initial defensive research review.", tr: "İlk savunma araştırması incelemesi." },
     };
-    if (!affected.has(dossier.id)) return [dossier.id, { ...initial, evidenceCheckedAt: today }];
+    const evidenceCheckedAt = dossier.sourceIds.every((sourceId) => checkedSourceIds.has(sourceId))
+      ? today
+      : initial.evidenceCheckedAt;
+    if (!affected.has(dossier.id)) return [dossier.id, { ...initial, evidenceCheckedAt }];
     return [dossier.id, {
       ...initial,
       version: initial.version + 1,
-      evidenceCheckedAt: today,
+      evidenceCheckedAt,
       reviewStatus: "review-required" as const,
       changeSummary: {
         en: "Linked official evidence changed; dossier review is required.",
@@ -82,7 +87,8 @@ async function main() {
     }];
   }));
 
-  const next: ResearchState = { schemaVersion: 1, checkedAt: today, sources, dossiers };
+  const checkedAt = failures.length === 0 ? today : previous.checkedAt;
+  const next: ResearchState = { schemaVersion: 1, checkedAt, sources, dossiers };
   await writeFile(statePath, `${JSON.stringify(next, null, 2)}\n`, "utf8");
   console.log(JSON.stringify({ checked: Object.keys(sources).length, changedSourceIds, affectedDossiers: [...affected], failures }, null, 2));
   if (failures.length === securitySources.length) process.exitCode = 1;
