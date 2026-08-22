@@ -34,7 +34,7 @@ const explicitAiPatterns = [
   /\b(?:large language models?|language models?|foundation models?|frontier models?|vision[- ]language models?|multimodal models?|diffusion models?|neural networks?|computer vision|natural language processing)\b/i,
   /\b(?:LLMs?|NLP|RAG)\b/,
   /\b(?:retrieval[- ]augmented generation|fine[- ]tuning|prompt engineering|model alignment|model safety|model evaluations?|mechanistic interpretability|inference (?:accelerator|chip|engine|runtime|server)|text[- ]to[- ](?:image|video)|image[- ]to[- ]video)\b/i,
-  /\b(?:openai|anthropic|chatgpt|deepmind|hugging face|mistral ai|perplexity ai|stability ai|midjourney|dall[- ]?e|deepseek(?:-[\w.-]+)?|qwen(?:[0-9][\w.-]*)?)\b/i,
+  /\b(?:openai|anthropic|chatgpt|deepmind|hugging face|mistral ai|perplexity ai|stability ai|midjourney|dall(?:[- \u00b7]e)|deepseek(?:-[\w.-]+)?|qwen(?:[0-9][\w.-]*)?)\b/i,
   /\b(?:vllm|ollama|langchain|langgraph|llamaindex|pytorch|tensorflow|tensorrt[- ]llm|llama\.cpp|comfyui)\b/i,
   /\bgpt(?:-?[0-9][\w.-]*|[_-][a-z][\w.-]*)\b/i,
 ];

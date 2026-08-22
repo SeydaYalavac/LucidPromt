@@ -39,6 +39,7 @@ describe("AI-only scope", () => {
     "A coding team ships an AI data extraction assistant",
     "The EU AI Act enters its next enforcement phase",
     "Mechanistic interpretability results for a foundation model",
+    "DALL-E image generation update",
   ])("accepts verifiable AI evidence: %s", (text) => {
     expect(hasAiRelevance(text)).toBe(true);
   });
@@ -55,6 +56,7 @@ describe("AI-only scope", () => {
     ["Fidelity crypto", "Bitcoin fund inflows increased"],
     ["Show HN: All your saved articles in one place", "Sort reading by topic and avoid omnipresent AI slop"],
     ["Show HN: Mini DBA", "Database monitoring with a tasteful amount of AI to help out"],
+    ["unione sarda", "Travolta dalle polemiche dopo il blitz dei Nas, chiude la prosciutteria Pata Negra di Quartu"],
   ])("rejects non-AI or name-only evidence: %s", (title, excerpt) => {
     expect(isAiSignal({ title, excerpt })).toBe(false);
   });
