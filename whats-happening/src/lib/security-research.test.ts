@@ -54,6 +54,8 @@ describe("AI security research corpus", () => {
       .toBe(fingerprintSourceBody("https://example.com/source", "text/html", Buffer.from(second)));
     expect(fingerprintSourceBody("https://example.com/source", "text/html", Buffer.from(first)))
       .not.toBe(fingerprintSourceBody("https://example.com/source", "text/html", Buffer.from(changed)));
+    expect(fingerprintSourceBody("https://cdn.example.com/source?token=one", "text/html", Buffer.from(first)))
+      .toBe(fingerprintSourceBody("https://cdn.example.com/source?token=two", "text/html", Buffer.from(first)));
   });
 
   it("rejects access challenges instead of treating them as source changes", () => {
