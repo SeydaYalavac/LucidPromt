@@ -79,7 +79,7 @@
       "checkedAt": "2026-08-23"
     },
     "halueval": {
-      "fingerprint": "6fc1cc962c1d5d77d0340d51dcc2761582999e18c95a745a0c2c1456570f1960",
+      "fingerprint": "a050d9ebdddfb0129ea68522d509c1ab43e5686e2eaa825a168dbea03a3878e0",
       "checkedAt": "2026-08-23"
     },
     "model-stealing": {
@@ -253,23 +253,23 @@
       }
     },
     "atomic-claim-verification": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-23",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     },
     "nli-entailment-checking": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-23",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     },
     "self-consistency-uncertainty": {
@@ -283,23 +283,23 @@
       }
     },
     "hallucination-evaluation-sets": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-23",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     },
     "human-review-calibrated-abstention": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-21",
       "evidenceCheckedAt": "2026-08-23",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial defensive research review.",
-        "tr": "İlk savunma araştırması incelemesi."
+        "en": "Linked official evidence changed; dossier review is required.",
+        "tr": "Bağlı resmî kanıt değişti; dosya incelemesi gerekiyor."
       }
     }
   }
