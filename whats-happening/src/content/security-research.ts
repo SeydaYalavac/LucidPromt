@@ -5,6 +5,7 @@ export type SecuritySource = {
   title: string;
   publisher: string;
   url: string;
+  monitorUrl?: string;
 };
 
 export type MethodComparison = {
@@ -48,7 +49,13 @@ export const securitySources: SecuritySource[] = [
   { id: "selfcheckgpt", title: "SelfCheckGPT: Zero-Resource Black-Box Hallucination Detection for Generative Large Language Models", publisher: "Primary research", url: "https://arxiv.org/abs/2303.08896" },
   { id: "truthfulqa", title: "TruthfulQA: Measuring How Models Mimic Human Falsehoods", publisher: "Primary research", url: "https://arxiv.org/abs/2109.07958" },
   { id: "factscore", title: "FActScore: Fine-grained Atomic Evaluation of Factual Precision in Long Form Text Generation", publisher: "Primary research", url: "https://arxiv.org/abs/2305.14251" },
-  { id: "semantic-entropy", title: "Detecting hallucinations in large language models using semantic entropy", publisher: "Nature", url: "https://www.nature.com/articles/s41586-024-07421-0" },
+  {
+    id: "semantic-entropy",
+    title: "Detecting hallucinations in large language models using semantic entropy",
+    publisher: "Nature",
+    url: "https://www.nature.com/articles/s41586-024-07421-0",
+    monitorUrl: "https://arxiv.org/abs/2302.09664",
+  },
   { id: "halueval", title: "HaluEval: A Large-Scale Hallucination Evaluation Benchmark for Large Language Models", publisher: "ACL Anthology", url: "https://aclanthology.org/2023.emnlp-main.397/" },
   { id: "model-stealing", title: "Stealing Machine Learning Models via Prediction APIs", publisher: "USENIX Security", url: "https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/tramer" },
   { id: "membership-inference", title: "Membership Inference Attacks Against Machine Learning Models", publisher: "IEEE Symposium on Security and Privacy", url: "https://www.cs.cornell.edu/~shmat/shmat_oak17.pdf" },
@@ -375,4 +382,3 @@ export const sourceById = new Map(securitySources.map((source) => [source.id, so
 export function localize(value: LocalizedText, locale: "en" | "tr") {
   return value[locale];
 }
-
