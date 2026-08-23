@@ -1,54 +1,18 @@
 import type { MetadataRoute } from "next";
-import { SITE_URL } from "../lib/site";
+import { readMapActivity, readTrendList } from "@/lib/server/trend-data";
+import { buildSitemap, staticSitemapEntries } from "@/lib/sitemap";
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: SITE_URL,
-      changeFrequency: "daily",
-      priority: 1,
-    },
-    {
-      url: `${SITE_URL}/about`,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/how-it-works`,
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${SITE_URL}/pricing`,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/security-research`,
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    ...[
-      "compare/exploding-topics-vs-google-trends",
-      "compare/exploding-topics-vs-glimpse",
-      "alternatives/google-trends",
-      "alternatives/exploding-topics",
-      "alternatives/glimpse",
-      "alternatives/trends-co",
-    ].map((path) => ({
-      url: `${SITE_URL}/${path}`,
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    })),
-    ...["privacy", "terms"].map((path) => ({
-      url: `${SITE_URL}/${path}`,
-      changeFrequency: "monthly" as const,
-      priority: 0.4,
-    })),
-    ...["world", "trending", "explore", "map"].map((path) => ({
-      url: `${SITE_URL}/${path}`,
-      changeFrequency: "daily" as const,
-      priority: 0.7,
-    })),
-  ];
+export const dynamic = "force-dynamic";
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const now = new Date();
+  try {
+    const [trendPayload, mapPayload] = await Promise.all([
+      readTrendList({ limit: 1_000, offset: 0, mode: "live", now }),
+      readMapActivity(now),
+    ]);
+    return buildSitemap(trendPayload.trends, mapPayload.activities);
+  } catch {
+    return staticSitemapEntries;
+  }
 }

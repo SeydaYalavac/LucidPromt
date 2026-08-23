@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { GET as getLlmsText, llmsText } from "../app/llms.txt/route";
 import robots from "../app/robots";
-import sitemap from "../app/sitemap";
 import { SITE_URL } from "../lib/site";
+import { buildSitemap } from "../lib/sitemap";
 
 describe("crawler metadata", () => {
   it("publishes a canonical sitemap and keeps APIs out of crawl traffic", () => {
@@ -13,7 +13,7 @@ describe("crawler metadata", () => {
   });
 
   it("lists every launch-critical public route on one canonical host", () => {
-    const urls = sitemap().map(({ url }) => url);
+    const urls = buildSitemap([], []).map(({ url }) => url);
 
     expect(urls).toEqual([
       SITE_URL,

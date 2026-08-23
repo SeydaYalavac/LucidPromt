@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import sitemap from "../app/sitemap";
+import { buildSitemap } from "../lib/sitemap";
 import {
   privacyNotice,
   supportAddress,
@@ -36,7 +36,7 @@ describe("legal notices", () => {
   });
 
   it("lists both notices in the production sitemap", () => {
-    const urls = sitemap().map((entry) => entry.url);
+    const urls = buildSitemap([], []).map((entry) => entry.url);
 
     expect(urls).toContain("https://www.whatshappeninginai.com/privacy");
     expect(urls).toContain("https://www.whatshappeninginai.com/terms");
