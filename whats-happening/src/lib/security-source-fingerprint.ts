@@ -30,9 +30,9 @@ export function normalizeHtmlForFingerprint(html: string) {
     .trim();
 }
 
-export function fingerprintSourceBody(url: string, contentType: string, body: Uint8Array) {
+export function fingerprintSourceBody(_url: string, contentType: string, body: Uint8Array) {
   if (/application\/pdf|application\/octet-stream/i.test(contentType)) {
-    return digest(Buffer.concat([Buffer.from(`${url}\n`), Buffer.from(body)]));
+    return digest(body);
   }
 
   const decoded = new TextDecoder().decode(body);
@@ -43,5 +43,5 @@ export function fingerprintSourceBody(url: string, contentType: string, body: Ui
   if (/\bclient challenge\b/i.test(meaningful) || /required part of this site couldn[’']t load/i.test(meaningful)) {
     throw new Error("Source returned a client challenge");
   }
-  return digest(`${url}\n${meaningful}`);
+  return digest(meaningful);
 }

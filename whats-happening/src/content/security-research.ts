@@ -56,8 +56,20 @@ export const securitySources: SecuritySource[] = [
     url: "https://www.nature.com/articles/s41586-024-07421-0",
     monitorUrl: "https://arxiv.org/abs/2302.09664",
   },
-  { id: "halueval", title: "HaluEval: A Large-Scale Hallucination Evaluation Benchmark for Large Language Models", publisher: "ACL Anthology", url: "https://aclanthology.org/2023.emnlp-main.397/" },
-  { id: "model-stealing", title: "Stealing Machine Learning Models via Prediction APIs", publisher: "USENIX Security", url: "https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/tramer" },
+  {
+    id: "halueval",
+    title: "HaluEval: A Large-Scale Hallucination Evaluation Benchmark for Large Language Models",
+    publisher: "ACL Anthology",
+    url: "https://aclanthology.org/2023.emnlp-main.397/",
+    monitorUrl: "https://arxiv.org/abs/2305.11747",
+  },
+  {
+    id: "model-stealing",
+    title: "Stealing Machine Learning Models via Prediction APIs",
+    publisher: "USENIX Security",
+    url: "https://www.usenix.org/conference/usenixsecurity16/technical-sessions/presentation/tramer",
+    monitorUrl: "https://arxiv.org/abs/1609.02943",
+  },
   { id: "membership-inference", title: "Membership Inference Attacks Against Machine Learning Models", publisher: "IEEE Symposium on Security and Privacy", url: "https://www.cs.cornell.edu/~shmat/shmat_oak17.pdf" },
 ];
 

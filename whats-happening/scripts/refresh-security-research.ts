@@ -22,6 +22,7 @@ type ResearchState = {
 const statePath = resolve(process.cwd(), "src/content/security-research-state.json");
 const today = new Date().toISOString().slice(0, 10);
 const baseline = process.argv.includes("--baseline");
+const fingerprintSchemaVersion = 4;
 
 async function fingerprintSource(url: string) {
   const response = await fetch(url, {
@@ -37,7 +38,7 @@ async function fingerprintSource(url: string) {
 
 async function main() {
   const previous = JSON.parse(await readFile(statePath, "utf8")) as ResearchState;
-  const migratingFingerprintFormat = previous.schemaVersion < 3;
+  const migratingFingerprintFormat = previous.schemaVersion < fingerprintSchemaVersion;
   const sources = { ...previous.sources };
   const changedSourceIds: string[] = [];
   const failures: string[] = [];
@@ -90,7 +91,7 @@ async function main() {
   }));
 
   const checkedAt = failures.length === 0 ? today : previous.checkedAt;
-  const next: ResearchState = { schemaVersion: 3, checkedAt, sources, dossiers };
+  const next: ResearchState = { schemaVersion: fingerprintSchemaVersion, checkedAt, sources, dossiers };
   await writeFile(statePath, `${JSON.stringify(next, null, 2)}\n`, "utf8");
   console.log(JSON.stringify({ checked: Object.keys(sources).length, changedSourceIds, affectedDossiers: [...affected], failures }, null, 2));
   if (failures.length === securitySources.length) process.exitCode = 1;
