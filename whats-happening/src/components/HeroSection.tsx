@@ -35,7 +35,7 @@ export function HeroSection() {
         className="max-w-5xl"
       >
         <p className="eyebrow">{locale === "tr" ? "Kaynaklı AI trend istihbaratı" : "Source-linked AI trend intelligence"}</p>
-        <h1 className="mt-7 text-balance text-[clamp(2.75rem,8.5vw,8.8rem)] font-medium leading-[0.84] tracking-[-0.068em] text-[#F1EFE9] sm:text-[clamp(3.8rem,8.5vw,8.8rem)]">
+        <h1 className="mt-7 text-balance text-[clamp(2.75rem,8.5vw,8.8rem)] font-medium leading-[0.9] tracking-[-0.05em] text-[#F1EFE9] sm:text-[clamp(3.25rem,5.2vw,6rem)]">
           {t("hero.title").split("\n").map((line, index) => <span key={line}>{line}{index < 2 && <br />}</span>)}
         </h1>
         <p className="mt-8 max-w-2xl text-pretty text-base leading-7 text-[#AAA79F] sm:text-lg sm:leading-8">
