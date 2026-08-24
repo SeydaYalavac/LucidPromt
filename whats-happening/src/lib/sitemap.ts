@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import type { CountryActivity, Trend } from "@/types/trends";
 import { SITE_URL } from "./site";
 import { absoluteUrl, categoryPath, countryPath, trendPath } from "./trend-page-graph";
+import researchState from "../content/security-research-state.json";
 
 export const staticSitemapEntries: MetadataRoute.Sitemap = [
   {
@@ -29,6 +30,12 @@ export const staticSitemapEntries: MetadataRoute.Sitemap = [
     changeFrequency: "daily",
     priority: 0.8,
   },
+  ...["ai-security-vulnerabilities", "hallucination-detection"].map((slug) => ({
+    url: `${SITE_URL}/guides/${slug}`,
+    lastModified: researchState.checkedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+  })),
   ...[
     "compare/exploding-topics-vs-google-trends",
     "compare/exploding-topics-vs-glimpse",
