@@ -7,6 +7,21 @@ export const AI_REFERRER_HOSTS = [
   "copilot.microsoft.com",
 ] as const;
 
+export const DIRECTORY_REFERRER_HOSTS = [
+  "sitelike.org",
+  "versily.com",
+  "tools.launchllama.co",
+  "trylaunch.ai",
+] as const;
+
+const FIRST_REFERRER_UTM_SOURCES = {
+  "chatgpt.com": "ai_assistant",
+  "sitelike.org": "directory_or_review_site",
+  "versily.com": "directory_or_review_site",
+  "tools.launchllama.co": "directory_or_review_site",
+  "trylaunch.ai": "directory_or_review_site",
+} as const;
+
 export const SIGNUP_SOURCE_OPTIONS = [
   { value: "search_engine", label: "Search engine" },
   { value: "ai_assistant", label: "AI assistant" },
@@ -17,11 +32,12 @@ export const SIGNUP_SOURCE_OPTIONS = [
 ] as const;
 
 export type SignupSource = (typeof SIGNUP_SOURCE_OPTIONS)[number]["value"];
-export type ReferrerChannel = "ai_assistant";
+export type ReferrerChannel = "ai_assistant" | "directory_or_review_site";
 
 export type SignupSourceEventProperties = {
   source: SignupSource;
   referrer_channel?: ReferrerChannel;
+  first_referrer_channel?: ReferrerChannel;
   $set_once: {
     acquisition_source: SignupSource;
     first_referrer_channel?: ReferrerChannel;
@@ -45,21 +61,49 @@ export function randomizeAiOption(
   return options;
 }
 
-export function deriveAiReferrerChannel(
+function normalizeHostname(hostname: string) {
+  return hostname.toLowerCase().replace(/^www\./, "");
+}
+
+export function isReferrerChannel(value: unknown): value is ReferrerChannel {
+  return value === "ai_assistant" || value === "directory_or_review_site";
+}
+
+export function preserveFirstReferrerChannel(
+  storedChannel: unknown,
+  detectedChannel: ReferrerChannel | undefined,
+): ReferrerChannel | undefined {
+  return isReferrerChannel(storedChannel) ? storedChannel : detectedChannel;
+}
+
+export function buildFirstReferrerEventProperties(
+  channel: ReferrerChannel | undefined,
+): { first_referrer_channel?: ReferrerChannel } {
+  return channel ? { first_referrer_channel: channel } : {};
+}
+
+export function deriveFirstReferrerChannel(
   referrerUrl: string,
   currentUrl: string,
 ): ReferrerChannel | undefined {
   try {
     const utmSource = new URL(currentUrl).searchParams.get("utm_source")?.toLowerCase();
-    if (utmSource === "chatgpt.com") return "ai_assistant";
+    if (utmSource && Object.hasOwn(FIRST_REFERRER_UTM_SOURCES, utmSource)) {
+      return FIRST_REFERRER_UTM_SOURCES[
+        utmSource as keyof typeof FIRST_REFERRER_UTM_SOURCES
+      ];
+    }
   } catch {
     // Ignore malformed or unavailable page URLs.
   }
 
   try {
-    const referrerHost = new URL(referrerUrl).hostname.toLowerCase();
+    const referrerHost = normalizeHostname(new URL(referrerUrl).hostname);
     if ((AI_REFERRER_HOSTS as readonly string[]).includes(referrerHost)) {
       return "ai_assistant";
+    }
+    if ((DIRECTORY_REFERRER_HOSTS as readonly string[]).includes(referrerHost)) {
+      return "directory_or_review_site";
     }
   } catch {
     // Empty and malformed referrers are ordinary direct traffic.
@@ -79,6 +123,7 @@ export function buildSignupSourceEventProperties(
 
   if (referrerChannel) {
     properties.referrer_channel = referrerChannel;
+    properties.first_referrer_channel = referrerChannel;
     properties.$set_once.first_referrer_channel = referrerChannel;
   }
 

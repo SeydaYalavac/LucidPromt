@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   AI_REFERRER_HOSTS,
+  DIRECTORY_REFERRER_HOSTS,
   SIGNUP_SOURCE_OPTIONS,
+  buildFirstReferrerEventProperties,
   buildSignupSourceEventProperties,
-  deriveAiReferrerChannel,
+  deriveFirstReferrerChannel,
+  preserveFirstReferrerChannel,
   randomizeAiOption,
 } from "./signup-attribution";
 
@@ -11,12 +14,12 @@ describe("signup attribution", () => {
   it("recognizes only the approved AI referrer hosts", () => {
     for (const host of AI_REFERRER_HOSTS) {
       expect(
-        deriveAiReferrerChannel(`https://${host}/conversation`, "https://www.whatshappeninginai.com/signup"),
+        deriveFirstReferrerChannel(`https://${host}/conversation`, "https://www.whatshappeninginai.com/signup"),
       ).toBe("ai_assistant");
     }
 
     expect(
-      deriveAiReferrerChannel(
+      deriveFirstReferrerChannel(
         "https://chatgpt.com.attacker.example/path",
         "https://www.whatshappeninginai.com/signup",
       ),
@@ -25,11 +28,54 @@ describe("signup attribution", () => {
 
   it("recognizes ChatGPT's explicit outbound UTM source", () => {
     expect(
-      deriveAiReferrerChannel(
+      deriveFirstReferrerChannel(
         "",
         "https://www.whatshappeninginai.com/?utm_source=chatgpt.com&utm_medium=referral",
       ),
     ).toBe("ai_assistant");
+  });
+
+  it("recognizes only verified directory hosts and allowlisted UTM sources", () => {
+    for (const host of DIRECTORY_REFERRER_HOSTS) {
+      expect(
+        deriveFirstReferrerChannel(
+          `https://www.${host}/products/what-s-happening`,
+          "https://www.whatshappeninginai.com/",
+        ),
+      ).toBe("directory_or_review_site");
+
+      expect(
+        deriveFirstReferrerChannel(
+          "",
+          `https://www.whatshappeninginai.com/?utm_source=${host}`,
+        ),
+      ).toBe("directory_or_review_site");
+    }
+
+    expect(
+      deriveFirstReferrerChannel(
+        "https://versily.com.attacker.example/products/what-s-happening",
+        "https://www.whatshappeninginai.com/",
+      ),
+    ).toBeUndefined();
+    expect(
+      deriveFirstReferrerChannel(
+        "",
+        "https://www.whatshappeninginai.com/?utm_source=unverified-directory",
+      ),
+    ).toBeUndefined();
+  });
+
+  it("preserves the first bounded class when a later visit has another source", () => {
+    expect(
+      preserveFirstReferrerChannel(
+        "ai_assistant",
+        "directory_or_review_site",
+      ),
+    ).toBe("ai_assistant");
+    expect(
+      preserveFirstReferrerChannel(undefined, "directory_or_review_site"),
+    ).toBe("directory_or_review_site");
   });
 
   it("moves the AI option without changing the option set", () => {
@@ -52,11 +98,38 @@ describe("signup attribution", () => {
     expect(properties).toEqual({
       source: "ai_assistant",
       referrer_channel: "ai_assistant",
+      first_referrer_channel: "ai_assistant",
       $set_once: {
         acquisition_source: "ai_assistant",
         first_referrer_channel: "ai_assistant",
       },
     });
+  });
+
+  it("uses the same bounded first-touch class for a directory signup", () => {
+    const pageViewProperties = buildFirstReferrerEventProperties(
+      "directory_or_review_site",
+    );
+    const signupProperties = buildSignupSourceEventProperties(
+      "directory_or_review_site",
+      "directory_or_review_site",
+    );
+
+    expect(pageViewProperties).toEqual({
+      first_referrer_channel: "directory_or_review_site",
+    });
+    expect(signupProperties).toEqual({
+      source: "directory_or_review_site",
+      referrer_channel: "directory_or_review_site",
+      first_referrer_channel: "directory_or_review_site",
+      $set_once: {
+        acquisition_source: "directory_or_review_site",
+        first_referrer_channel: "directory_or_review_site",
+      },
+    });
+    expect(signupProperties.first_referrer_channel).toBe(
+      pageViewProperties.first_referrer_channel,
+    );
   });
 
   it("keeps non-AI attribution bounded to the selected source", () => {
