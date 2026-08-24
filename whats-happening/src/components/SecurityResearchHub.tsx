@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { ChevronDown, ExternalLink, Search, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { guidePath, securityGuides, type SecurityGuideSlug } from "@/content/security-guides";
 import { securityDossiers, sourceById, type LocalizedText } from "@/content/security-research";
 import researchState from "@/content/security-research-state.json";
 import { useLocale } from "@/i18n/locale";
@@ -32,6 +34,9 @@ const copy = {
     verified: "last verified",
     reviewRequired: "evidence review required",
     methods: "Hallucination-control comparison",
+    guides: "Evergreen field guides",
+    guidesIntro: "Start with a structured operating guide, then use the dossiers below for individual failure modes and source records.",
+    readGuide: "Read guide",
     detects: "What it detects",
     failure: "Failure condition",
     operations: "Operational use",
@@ -58,6 +63,9 @@ const copy = {
     verified: "son doğrulama",
     reviewRequired: "kanıt incelemesi gerekiyor",
     methods: "Halüsinasyon kontrolü karşılaştırması",
+    guides: "Kalıcı saha rehberleri",
+    guidesIntro: "Yapılandırılmış bir işletim rehberiyle başlayın; ardından hata biçimleri ve kaynak kayıtları için aşağıdaki dosyaları kullanın.",
+    readGuide: "Rehberi oku",
     detects: "Neyi tespit eder",
     failure: "Başarısızlık koşulu",
     operations: "Operasyonel kullanım",
@@ -93,6 +101,7 @@ export function SecurityResearchHub() {
   const [category, setCategory] = useState<SecurityCategory>("All");
   const results = useMemo(() => searchSecurityDossiers(query, category, language), [query, category, language]);
   const states = researchState.dossiers as Record<string, DossierState>;
+  const guides = Object.values(securityGuides) as (typeof securityGuides)[SecurityGuideSlug][];
 
   return (
     <div className="mx-auto max-w-[1440px] px-5 pb-24 pt-32 sm:px-8 lg:px-12 lg:pt-40">
@@ -116,6 +125,19 @@ export function SecurityResearchHub() {
         <p className="border-b border-white/[0.12] py-4 sm:border-b-0 sm:border-r sm:pr-5"><strong className="mr-2 font-mono text-white">{securityDossiers.length}</strong>{t.dossier}</p>
         <p className="border-b border-white/[0.12] py-4 sm:border-b-0 sm:border-r sm:px-5"><strong className="mr-2 font-mono text-white">{Object.keys(researchState.sources).length}</strong>{t.sources}</p>
         <p className="py-4 sm:pl-5"><strong className="mr-2 font-mono text-white">{formatDate(researchState.checkedAt, language)}</strong>{t.checked}</p>
+      </section>
+
+      <section className="grid gap-8 border-b border-white/[0.12] py-10 lg:grid-cols-[minmax(15rem,0.55fr)_minmax(0,1.45fr)] lg:items-start lg:py-12" aria-labelledby="security-guides-heading">
+        <div>
+          <h2 id="security-guides-heading" className="text-2xl font-medium tracking-[-0.03em] text-white">{t.guides}</h2>
+          <p className="mt-3 max-w-[42ch] text-sm leading-6 text-[#92929A]">{t.guidesIntro}</p>
+        </div>
+        <div className="grid gap-px border border-white/[0.12] bg-white/[0.12] sm:grid-cols-2">
+          {guides.map((guide) => <Link key={guide.slug} href={guidePath(guide.slug)} className="group flex min-h-52 flex-col justify-between bg-[#09090A] p-6 transition-colors hover:bg-[#0F0F10] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+            <div><p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#77777F]">{guide.kicker[language]}</p><h3 className="mt-4 text-2xl font-medium tracking-[-0.035em] text-[#EEEEEC]">{guide.title[language]}</h3><p className="mt-3 text-sm leading-6 text-[#92929A]">{guide.description[language]}</p></div>
+            <span className="mt-7 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-white">{t.readGuide}<span aria-hidden="true">→</span></span>
+          </Link>)}
+        </div>
       </section>
 
       <section className="pt-10">

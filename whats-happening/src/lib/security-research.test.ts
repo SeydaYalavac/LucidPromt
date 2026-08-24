@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { securityDossiers, securitySources } from "../content/security-research";
 import { getAffectedDossierIds, searchSecurityDossiers } from "./security-research";
 import { fingerprintSourceBody, normalizeHtmlForFingerprint } from "./security-source-fingerprint";
+import { getGuideAudit, getVerifiedGuideDossiers, securityGuideSlugsForText, securityGuides } from "../content/security-guides";
 
 describe("AI security research corpus", () => {
   it("contains at least 20 complete bilingual defensive dossiers", () => {
@@ -63,5 +64,27 @@ describe("AI security research corpus", () => {
 
     expect(() => fingerprintSourceBody("https://example.com/source", "text/html", Buffer.from(challenge)))
       .toThrow("Source returned a client challenge");
+  });
+
+  it("publishes exactly two complete bilingual guides from audited dossiers", () => {
+    expect(Object.keys(securityGuides)).toHaveLength(2);
+    for (const guide of Object.values(securityGuides)) {
+      const dossiers = getVerifiedGuideDossiers(guide);
+      const audit = getGuideAudit(guide);
+      expect(dossiers.map((dossier) => dossier.id)).toEqual(guide.dossierIds);
+      expect(audit.complete).toBe(true);
+      expect(audit.sourceCount).toBeGreaterThan(0);
+      expect(guide.title.en.length).toBeGreaterThan(20);
+      expect(guide.title.tr.length).toBeGreaterThan(20);
+    }
+  });
+
+  it("links only factually matching trend copy to a security guide", () => {
+    expect(securityGuideSlugsForText("New prompt injection defenses for AI agents"))
+      .toEqual(["ai-security-vulnerabilities"]);
+    expect(securityGuideSlugsForText("Semantic entropy for hallucination detection"))
+      .toEqual(["hallucination-detection"]);
+    expect(securityGuideSlugsForText("A new image generation model launched"))
+      .toEqual([]);
   });
 });

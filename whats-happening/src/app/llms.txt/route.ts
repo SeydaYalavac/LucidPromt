@@ -19,6 +19,11 @@ What's Happening is a public web product for founders and analysts tracking emer
 - [Map](${SITE_URL}/map): Country-attributed map interface, with an explicit unavailable state when no production records can load.
 - [Defensive AI security research](${SITE_URL}/security-research): Searchable English and Turkish dossiers covering AI risk models, controls, validation, limitations, and authoritative evidence.
 
+## AI security guides
+
+- [AI security vulnerabilities](${SITE_URL}/guides/ai-security-vulnerabilities): A bilingual, source-linked defensive guide to prompt injection, model supply chains, data poisoning, output handling, excessive agency, secrets and unbounded consumption.
+- [Hallucination detection](${SITE_URL}/guides/hallucination-detection): A bilingual, source-linked guide to retrieval grounding, atomic claim checks, entailment, uncertainty, evaluation sets and human review.
+
 ## Comparison guides
 
 - [Exploding Topics vs Google Trends](${SITE_URL}/compare/exploding-topics-vs-google-trends): A source-cited comparison of discovery and known-query validation workflows.
