@@ -1,3 +1,5 @@
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { GET as getLlmsText, llmsText } from "../app/llms.txt/route";
 import robots from "../app/robots";
@@ -5,6 +7,14 @@ import { SITE_URL } from "../lib/site";
 import { buildSitemap } from "../lib/sitemap";
 
 describe("crawler metadata", () => {
+  it("publishes a valid root IndexNow ownership key", async () => {
+    const key = "c4db8e99c737483d9e9758d24f62651c";
+    const keyFile = await readFile(path.join(process.cwd(), "public", `${key}.txt`), "utf8");
+
+    expect(key).toMatch(/^[A-Za-z0-9-]{8,128}$/);
+    expect(keyFile.trim()).toBe(key);
+  });
+
   it("publishes a canonical sitemap and keeps APIs out of crawl traffic", () => {
     expect(robots()).toEqual({
       rules: { userAgent: "*", allow: "/", disallow: "/api/" },
