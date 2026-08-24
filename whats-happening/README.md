@@ -86,7 +86,7 @@ Supabase değerleri yoksa giriş ekranı formu kapatır ve kurulumun sürdüğü
 
 Tin-hosted PostHog, route view'dan ilk geliştirici sohbet mesajına kadar olan aktivasyon akışını ölçer. Uygulama `$pageview`, `signup_cta_clicked`, `auth_attempted`, `auth_completed`, `user_authenticated`, `developer_chat_message_sent` ve `developer_chat_message_failed` event'lerini gönderir. Form alanları, email adresleri, display name ve sohbet mesajı gövdesi analytics'e gönderilmez; yalnızca sabit route, CTA kaynağı, auth modu/provider'ı, sonuç durumu ve public trend slug'ı kullanılır.
 
-Autocapture, otomatik pageleave, exception capture ve session recording kapalıdır. Client varsayılan olarak yönetilen public ingestion ayarlarını kullanır; başka bir PostHog projesine geçişte `NEXT_PUBLIC_POSTHOG_KEY` ve `NEXT_PUBLIC_POSTHOG_HOST` ile bu public hedefler override edilebilir.
+Geniş tıklama autocapture, otomatik pageleave ve exception capture atılır veya kapatılır; session recording tüm metni, girdileri, öznitelikleri ve ağ gövdelerini maskeler. `?tin_test=1` ile açılan üretim kontrolü yalnızca mevcut browser session'ını işaretler ve o session'da PostHog initialization, standart event, autocapture ve session recording'i tamamen kapatır. Client varsayılan olarak yönetilen public ingestion ayarlarını kullanır; başka bir PostHog projesine geçişte `NEXT_PUBLIC_POSTHOG_KEY` ve `NEXT_PUBLIC_POSTHOG_HOST` ile bu public hedefler override edilebilir.
 
 ## Why Layer: yalnızca bir defa
 
