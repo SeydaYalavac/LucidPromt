@@ -1,5 +1,6 @@
 import posthog from "posthog-js";
 import { scrubAutomaticAcquisitionProperties } from "@/lib/analytics-privacy";
+import { isCurrentSessionMarkedForProductionTest } from "@/lib/analytics-test-session";
 import {
   buildSignupSourceEventProperties,
   deriveFirstReferrerChannel,
@@ -52,7 +53,14 @@ const capturedOnce = new Set<string>();
 const FIRST_REFERRER_CHANNEL_PROPERTY = "first_referrer_channel";
 
 export function initProductAnalytics() {
-  if (initialized || typeof window === "undefined") return;
+  if (typeof window === "undefined") return false;
+
+  if (isCurrentSessionMarkedForProductionTest()) {
+    if (initialized) posthog.stopSessionRecording();
+    return false;
+  }
+
+  if (initialized) return true;
 
   posthog.init(MANAGED_POSTHOG_KEY, {
     api_host: MANAGED_POSTHOG_HOST,
@@ -87,6 +95,7 @@ export function initProductAnalytics() {
       recordHeaders: false,
     },
     before_send: (event) => {
+      if (isCurrentSessionMarkedForProductionTest()) return null;
       // Autocapture powers PostHog's rage-click detector, but broad click events are
       // intentionally discarded. Only the privacy-masked $rageclick event is kept.
       if (event?.event === "$autocapture") return null;
@@ -104,13 +113,14 @@ export function initProductAnalytics() {
   }
   posthog.startSessionRecording(true);
   initialized = true;
+  return true;
 }
 
 export function captureProductEvent<EventName extends keyof ProductEventProperties>(
   event: EventName,
   properties: ProductEventProperties[EventName],
 ) {
-  initProductAnalytics();
+  if (!initProductAnalytics()) return;
   posthog.capture(event, properties);
 }
 
@@ -122,22 +132,24 @@ export function captureProductEventOnce<
   properties: ProductEventProperties[EventName],
 ) {
   if (capturedOnce.has(dedupeKey)) return;
+  if (!initProductAnalytics()) return;
   capturedOnce.add(dedupeKey);
   captureProductEvent(event, properties);
 }
 
 export function identifyProductUser(userId: string) {
-  initProductAnalytics();
+  if (!initProductAnalytics()) return;
   posthog.identify(userId);
 }
 
 export function getFirstReferrerChannel(): ReferrerChannel | undefined {
-  initProductAnalytics();
+  if (!initProductAnalytics()) return undefined;
   const storedReferrerChannel = posthog.get_property(FIRST_REFERRER_CHANNEL_PROPERTY);
   return isReferrerChannel(storedReferrerChannel) ? storedReferrerChannel : undefined;
 }
 
 export function captureSignupSource(source: SignupSource) {
+  if (!initProductAnalytics()) return;
   const referrerChannel = getFirstReferrerChannel();
   posthog.capture(
     "signup_source",
@@ -146,7 +158,7 @@ export function captureSignupSource(source: SignupSource) {
 }
 
 export function resetProductUser() {
-  initProductAnalytics();
+  if (!initProductAnalytics()) return;
   posthog.reset();
 }
 
