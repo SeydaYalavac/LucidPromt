@@ -1,7 +1,10 @@
 import posthog from "posthog-js";
+import { scrubAutomaticAcquisitionProperties } from "@/lib/analytics-privacy";
 import {
   buildSignupSourceEventProperties,
-  deriveAiReferrerChannel,
+  deriveFirstReferrerChannel,
+  isReferrerChannel,
+  preserveFirstReferrerChannel,
   type ReferrerChannel,
   type SignupSource,
   type SignupSourceEventProperties,
@@ -14,7 +17,11 @@ const MANAGED_POSTHOG_HOST =
   process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
 type ProductEventProperties = {
-  "$pageview": { route: string; $current_url: string };
+  "$pageview": {
+    route: string;
+    $current_url: string;
+    first_referrer_channel?: ReferrerChannel;
+  };
   signup_cta_clicked: { source: "auth_panel" | "global_nav" | "mobile_nav" };
   source_evidence_viewed: { trend_slug: string; source_type: string };
   trend_saved: { trend_slug: string; source: "category" | "country" | "detail" | "explore" | "trending" | "world" };
@@ -43,46 +50,6 @@ type ProductEventProperties = {
 let initialized = false;
 const capturedOnce = new Set<string>();
 const FIRST_REFERRER_CHANNEL_PROPERTY = "first_referrer_channel";
-
-function withoutQueryOrHash(value: unknown) {
-  if (typeof value !== "string") return value;
-  if (value.startsWith("$")) return value;
-  try {
-    const url = new URL(value, window.location.origin);
-    return `${url.origin}${url.pathname}`;
-  } catch {
-    return value.split(/[?#]/, 1)[0];
-  }
-}
-
-function scrubAutomaticUrlProperties(properties: Record<string, unknown>) {
-  for (const key of [
-    "$current_url",
-    "$initial_current_url",
-    "$referrer",
-    "$initial_referrer",
-    "$session_entry_url",
-    "$session_entry_referrer",
-  ]) {
-    properties[key] = withoutQueryOrHash(properties[key]);
-  }
-
-  const initialPersonInfo = properties.$initial_person_info;
-  if (initialPersonInfo && typeof initialPersonInfo === "object") {
-    const values = initialPersonInfo as Record<string, unknown>;
-    values.r = withoutQueryOrHash(values.r);
-    values.u = withoutQueryOrHash(values.u);
-  }
-
-  const clientSessionProps = properties.$client_session_props;
-  if (clientSessionProps && typeof clientSessionProps === "object") {
-    const values = clientSessionProps as { props?: Record<string, unknown> };
-    if (values.props) {
-      values.props.r = withoutQueryOrHash(values.props.r);
-      values.props.u = withoutQueryOrHash(values.props.u);
-    }
-  }
-}
 
 export function initProductAnalytics() {
   if (initialized || typeof window === "undefined") return;
@@ -124,11 +91,14 @@ export function initProductAnalytics() {
       // intentionally discarded. Only the privacy-masked $rageclick event is kept.
       if (event?.event === "$autocapture") return null;
       if (!event?.properties) return event;
-      scrubAutomaticUrlProperties(event.properties);
+      scrubAutomaticAcquisitionProperties(event.properties);
       return event;
     },
   });
-  const referrerChannel = deriveAiReferrerChannel(document.referrer, window.location.href);
+  const referrerChannel = preserveFirstReferrerChannel(
+    posthog.get_property(FIRST_REFERRER_CHANNEL_PROPERTY),
+    deriveFirstReferrerChannel(document.referrer, window.location.href),
+  );
   if (referrerChannel) {
     posthog.register_once({ [FIRST_REFERRER_CHANNEL_PROPERTY]: referrerChannel });
   }
@@ -161,11 +131,14 @@ export function identifyProductUser(userId: string) {
   posthog.identify(userId);
 }
 
-export function captureSignupSource(source: SignupSource) {
+export function getFirstReferrerChannel(): ReferrerChannel | undefined {
   initProductAnalytics();
   const storedReferrerChannel = posthog.get_property(FIRST_REFERRER_CHANNEL_PROPERTY);
-  const referrerChannel: ReferrerChannel | undefined =
-    storedReferrerChannel === "ai_assistant" ? storedReferrerChannel : undefined;
+  return isReferrerChannel(storedReferrerChannel) ? storedReferrerChannel : undefined;
+}
+
+export function captureSignupSource(source: SignupSource) {
+  const referrerChannel = getFirstReferrerChannel();
   posthog.capture(
     "signup_source",
     buildSignupSourceEventProperties(source, referrerChannel),

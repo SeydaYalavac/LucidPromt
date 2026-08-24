@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { getBrowserSupabase } from "@/lib/supabase/browser";
+import { buildFirstReferrerEventProperties } from "@/lib/signup-attribution";
 import {
   captureProductEvent,
+  getFirstReferrerChannel,
   identifyProductUser,
   resetProductUser,
   stableRouteName,
@@ -21,6 +23,7 @@ export function ProductAnalytics() {
     captureProductEvent("$pageview", {
       route: stableRouteName(pathname),
       $current_url: `${window.location.origin}${pathname}`,
+      ...buildFirstReferrerEventProperties(getFirstReferrerChannel()),
     });
   }, [pathname]);
 
