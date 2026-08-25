@@ -38,7 +38,9 @@ jobs:
           LOOKBACK_HOURS: ${{ inputs.lookback_hours }}
         run: |
           umask 077
-          auth_read_file="$(mktemp)"
+          auth_read_dir="$(mktemp -d)"
+          auth_read_file="$auth_read_dir/candidates.json"
+          echo "AUTH_READ_DIR=$auth_read_dir" >> "$GITHUB_ENV"
           echo "AUTH_READ_FILE=$auth_read_file" >> "$GITHUB_ENV"
           npm run auth:contact-read -- --lookback-hours "$LOOKBACK_HOURS" --output "$auth_read_file"
           test "$(stat -c '%a' "$auth_read_file")" = "600"
@@ -48,4 +50,7 @@ jobs:
         run: |
           if [ -n "${AUTH_READ_FILE:-}" ] && [ -f "$AUTH_READ_FILE" ]; then
             shred -u "$AUTH_READ_FILE" || rm -f "$AUTH_READ_FILE"
+          fi
+          if [ -n "${AUTH_READ_DIR:-}" ] && [ -d "$AUTH_READ_DIR" ]; then
+            rmdir "$AUTH_READ_DIR"
           fi

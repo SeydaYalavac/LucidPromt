@@ -116,8 +116,10 @@ describe("auth contact candidates", () => {
 
     expect(workflow).toContain("workflow_dispatch:");
     expect(workflow).toContain("permissions:\n  contents: read");
+    expect(workflow).toContain("mktemp -d");
     expect(workflow).toContain("if: always()");
     expect(workflow).toContain("shred -u");
+    expect(workflow).toContain("rmdir");
     expect(workflow).not.toContain("upload-artifact");
     expect(workflow).not.toMatch(/https?:\/\//);
   });
