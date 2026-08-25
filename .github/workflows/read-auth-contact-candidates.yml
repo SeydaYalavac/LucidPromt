@@ -1,0 +1,51 @@
+name: Read verified Auth contact candidates
+
+on:
+  workflow_dispatch:
+    inputs:
+      lookback_hours:
+        description: Recent signup window in hours (1-744)
+        required: true
+        default: "48"
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: auth-contact-candidate-read
+  cancel-in-progress: false
+
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: whats-happening
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: whats-happening/package-lock.json
+      - run: npm ci
+      - name: Read the narrow contact view
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          LOOKBACK_HOURS: ${{ inputs.lookback_hours }}
+        run: |
+          umask 077
+          auth_read_file="$(mktemp)"
+          echo "AUTH_READ_FILE=$auth_read_file" >> "$GITHUB_ENV"
+          npm run auth:contact-read -- --lookback-hours "$LOOKBACK_HOURS" --output "$auth_read_file"
+          test "$(stat -c '%a' "$auth_read_file")" = "600"
+      - name: Destroy the ephemeral contact file
+        if: always()
+        working-directory: /
+        run: |
+          if [ -n "${AUTH_READ_FILE:-}" ] && [ -f "$AUTH_READ_FILE" ]; then
+            shred -u "$AUTH_READ_FILE" || rm -f "$AUTH_READ_FILE"
+          fi
