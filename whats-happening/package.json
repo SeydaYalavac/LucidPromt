@@ -10,6 +10,7 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "ingest": "tsx workers/trend-ingest.ts",
+    "auth:contact-read": "tsx scripts/read-auth-contact-candidates.ts",
     "research:refresh": "tsx scripts/refresh-security-research.ts",
     "research:baseline": "tsx scripts/refresh-security-research.ts --baseline"
   },

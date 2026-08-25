@@ -122,3 +122,5 @@ Production'a almadan önce gizlilik politikasına veri kaynaklarını, saklama s
 ## Operasyon
 
 GitHub Actions workflow'u her 10 dakikada bir çalışır ve aynı anda ikinci ingestion run'ını başlatmaz. Hata alan kaynak diğerlerini durdurmaz; `ingestion_runs` tablosu partial/failed durumunu ve kısa hata metnini kaydeder. Varsayılan kaynak seti anahtarsız HN, GitHub ve 28 resmi Google Trends RSS pazarıdır. Worker ülke kataloğunu her çalışmada güvenli biçimde upsert eder. `GOOGLE_TRENDS_GEOS` ile bu küme daraltılabilir. Reddit, X, Tavily ve Exa ancak anahtarları verilip `INGEST_SOURCES` içine eklenince çalışır.
+
+`Read verified Auth contact candidates` workflow'u yalnızca manuel çalışır ve son 1-744 saatteki doğrulanmış kayıtları denetler. E-posta içeren dar sonuç hiçbir HTTP yanıtına, client paketine, loga veya GitHub artifact'ına yazılmaz; mode `0600` geçici runner dosyası işlem sonunda her durumda yok edilir. Log yalnız taranan, doğrulanan, test olarak dışlanan ve uygun bulunan kayıt sayılarını gösterir.
