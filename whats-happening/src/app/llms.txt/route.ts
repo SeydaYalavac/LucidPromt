@@ -6,7 +6,13 @@ export const llmsText = `# What's Happening
 
 > Source-linked trend intelligence for inspecting scored technology signals, source trails, and the earliest available country-tagged evidence.
 
-What's Happening is a public web product for founders and analysts tracking emerging technology. It documents an intended signal workflow built around official source feeds, a 45/35/20 breakout score, source links, concise explanations, and careful country attribution. Production trend data and account access are currently unavailable, and public data views report that limitation instead of presenting demo records as live activity.
+What's Happening is a public web product for founders and analysts tracking emerging technology. It uses official source feeds, a 45/35/20 breakout score, source links, concise explanations, and careful country attribution. Start with the two evergreen guides for durable evidence, then use the research hub for individual failure modes and source records.
+
+## Evidence guides
+
+- [AI security vulnerabilities](${SITE_URL}/guides/ai-security-vulnerabilities): Seven source-linked defensive checkpoints for prompt injection, model supply chains, data poisoning, output handling, excessive agency, secrets and unbounded consumption.
+- [Hallucination detection](${SITE_URL}/guides/hallucination-detection): A source-linked detection stack for retrieval grounding, atomic claim checks, entailment, uncertainty, evaluation sets and human review.
+- [Defensive AI security research](${SITE_URL}/security-research): Searchable English and Turkish dossiers with risk models, controls, validation steps, limits and authoritative source records.
 
 ## Product
 
@@ -17,12 +23,6 @@ What's Happening is a public web product for founders and analysts tracking emer
 - [Trending](${SITE_URL}/trending): Ranked trend interface, with an explicit unavailable state when no production records can load.
 - [Explore](${SITE_URL}/explore): Category interface, with an explicit unavailable state when no production records can load.
 - [Map](${SITE_URL}/map): Country-attributed map interface, with an explicit unavailable state when no production records can load.
-- [Defensive AI security research](${SITE_URL}/security-research): Searchable English and Turkish dossiers covering AI risk models, controls, validation, limitations, and authoritative evidence.
-
-## AI security guides
-
-- [AI security vulnerabilities](${SITE_URL}/guides/ai-security-vulnerabilities): A bilingual, source-linked defensive guide to prompt injection, model supply chains, data poisoning, output handling, excessive agency, secrets and unbounded consumption.
-- [Hallucination detection](${SITE_URL}/guides/hallucination-detection): A bilingual, source-linked guide to retrieval grounding, atomic claim checks, entailment, uncertainty, evaluation sets and human review.
 
 ## Comparison guides
 

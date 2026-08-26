@@ -54,13 +54,20 @@ describe("crawler metadata", () => {
   it("publishes factual llms.txt guidance with canonical public links only", async () => {
     const response = getLlmsText();
     const linkedUrls = Array.from(llmsText.matchAll(/\]\((https:\/\/[^)]+)\)/g), (match) => match[1]);
+    const evidenceUrls = [
+      `${SITE_URL}/guides/ai-security-vulnerabilities`,
+      `${SITE_URL}/guides/hallucination-detection`,
+      `${SITE_URL}/security-research`,
+    ];
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("text/plain; charset=utf-8");
     expect(await response.text()).toBe(llmsText);
     expect(linkedUrls.length).toBe(18);
+    expect(linkedUrls.slice(0, evidenceUrls.length)).toEqual(evidenceUrls);
+    expect(evidenceUrls.every((url) => linkedUrls.filter((linkedUrl) => linkedUrl === url).length === 1)).toBe(true);
     expect(linkedUrls.every((url) => url === SITE_URL || url.startsWith(`${SITE_URL}/`))).toBe(true);
-    expect(llmsText).toContain("Production trend data and account access are currently unavailable");
+    expect(llmsText).toContain("Start with the two evergreen guides for durable evidence");
     expect(llmsText).not.toContain(`${SITE_URL}/signin`);
     expect(llmsText).not.toContain(`${SITE_URL}/signup`);
     expect(llmsText).not.toContain(`${SITE_URL}/api/`);
