@@ -18,6 +18,7 @@ const sourceFiles = [
   "src/components/Footer.tsx",
   "src/components/AuthPanel.tsx",
   "src/components/AuthScreen.tsx",
+  "src/lib/auth-copy.ts",
   "src/components/SearchOverlay.tsx",
   "src/components/TrendDetail.tsx",
   "src/components/TrendCollection.tsx",

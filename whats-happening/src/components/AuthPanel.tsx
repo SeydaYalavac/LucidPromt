@@ -23,8 +23,9 @@ import {
   type SignupSource,
 } from "@/lib/signup-attribution";
 import { useLocale } from "@/i18n/locale";
+import { getAuthAvailabilityCopy, getAuthModeCopy, type AuthCopyMode } from "@/lib/auth-copy";
 
-export type AuthMode = "signin" | "signup" | "forgot" | "update";
+export type AuthMode = AuthCopyMode;
 type SocialProvider = Extract<Provider, "google" | "github" | "apple">;
 
 const socialProviders: Array<{ id: SocialProvider; label: string }> = [
@@ -65,44 +66,6 @@ function ProviderMark({ provider }: { provider: SocialProvider }) {
   if (provider === "apple") return <AppleMark />;
   return <GitHubMark />;
 }
-
-const modeCopy: Record<AuthMode, { title: string; description: string }> = {
-  signin: {
-    title: "Welcome back",
-    description: "Account access will resume after the production data connection is configured.",
-  },
-  signup: {
-    title: "Create your account",
-    description: "Account creation is not available on this deployment yet.",
-  },
-  forgot: {
-    title: "Reset your password",
-    description: "We’ll email a secure recovery link to your account address.",
-  },
-  update: {
-    title: "Choose a new password",
-    description: "Use at least eight characters you don’t use anywhere else.",
-  },
-};
-
-const modeCopyTr: Record<AuthMode, { title: string; description: string }> = {
-  signin: {
-    title: "Tekrar hoş geldin",
-    description: "Üretim veri bağlantısı yapılandırıldığında hesap erişimi yeniden açılacak.",
-  },
-  signup: {
-    title: "Hesabını oluştur",
-    description: "Bu dağıtımda hesap oluşturma henüz kullanılamıyor.",
-  },
-  forgot: {
-    title: "Parolanı sıfırla",
-    description: "Hesap adresine güvenli bir kurtarma bağlantısı göndereceğiz.",
-  },
-  update: {
-    title: "Yeni bir parola seç",
-    description: "Başka bir yerde kullanmadığın en az sekiz karakter kullan.",
-  },
-};
 
 const signupSourceLabelsTr: Record<SignupSource, string> = {
   search_engine: "Arama motoru",
@@ -164,7 +127,7 @@ export function AuthPanel({
   const [activeProvider, setActiveProvider] = useState<SocialProvider | null>(null);
   const [error, setError] = useState<string | null>(initialError || null);
   const [notice, setNotice] = useState<string | null>(null);
-  const copy = locale === "tr" ? modeCopyTr[mode] : modeCopy[mode];
+  const copy = getAuthModeCopy(mode, locale, isConfigured);
   const authHref = (nextMode: AuthMode) => nextMode === "signin" || nextMode === "signup"
     ? `/${nextMode}?next=${encodeURIComponent(next)}`
     : `/auth?mode=${nextMode}&next=${encodeURIComponent(next)}`;
@@ -572,9 +535,10 @@ export function AuthPanel({
   );
 }
 
-export function AuthContext() {
+export function AuthContext({ isConfigured }: { isConfigured: boolean }) {
   const { locale } = useLocale();
   const l = (english: string, turkish: string) => locale === "tr" ? turkish : english;
+  const copy = getAuthAvailabilityCopy(locale, isConfigured);
   return (
     <div className="max-w-[480px]">
       <p className="flex items-center gap-2 font-mono text-xs uppercase tracking-[0.19em] text-[#D8D4CA]">
@@ -583,14 +547,9 @@ export function AuthContext() {
       <h2 className="mt-6 text-balance text-4xl font-semibold leading-[1.08] tracking-[-0.045em] text-white lg:text-6xl">
         {l("Identity for source-linked discussion.", "Kaynak bağlantılı tartışmalar için kimlik.")}
       </h2>
-      <p className="mt-6 max-w-[46ch] text-pretty text-base leading-7 text-[#92929b]">
-        {l(
-          "Account identity and trend discussion are designed, but unavailable until the production data and authentication services are connected.",
-          "Hesap kimliği ve trend tartışmaları hazırlandı, ancak üretim verisi ve kimlik doğrulama hizmetleri bağlanana kadar kullanılamıyor.",
-        )}
-      </p>
+      <p className="mt-6 max-w-[46ch] text-pretty text-base leading-7 text-[#92929b]">{copy.description}</p>
       <div className="mt-10 rounded-2xl border border-amber-300/15 bg-amber-300/[0.045] p-5 text-sm leading-6 text-amber-100/75">
-        {l("Production status: account access unavailable. No credentials entered on this page are submitted.", "Üretim durumu: hesap erişimi kullanılamıyor. Bu sayfaya girilen hiçbir kimlik bilgisi gönderilmez.")}
+        {copy.status}
       </div>
     </div>
   );
