@@ -309,7 +309,7 @@ export default function HowItWorksPage() {
                 Start with the research job.
               </h2>
             </div>
-            <div className="grid gap-px overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.1] sm:grid-cols-2">
+            <div className="grid gap-px overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.1] sm:grid-cols-3">
               <Link href="/alternatives/google-trends" className="group bg-[#0B0B0D] p-7 transition-colors hover:bg-[#111114]">
                 <p className="text-sm font-medium text-white">Google Trends alternatives</p>
                 <p className="mt-3 text-sm leading-6 text-[#71717A]">Known search demand versus source-linked technology evidence.</p>
@@ -318,6 +318,11 @@ export default function HowItWorksPage() {
               <Link href="/alternatives/exploding-topics" className="group bg-[#0B0B0D] p-7 transition-colors hover:bg-[#111114]">
                 <p className="text-sm font-medium text-white">Exploding Topics alternatives</p>
                 <p className="mt-3 text-sm leading-6 text-[#71717A]">Curated discovery versus an inspectable score and source trail.</p>
+                <ArrowRight size={15} className="mt-6 text-[#D8D4CA] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+              </Link>
+              <Link href="/compare/trend-analysis-tools" className="group bg-[#0B0B0D] p-7 transition-colors hover:bg-[#111114]">
+                <p className="text-sm font-medium text-white">Trend analysis tool comparison</p>
+                <p className="mt-3 text-sm leading-6 text-[#71717A]">Search demand, monitoring, and source-linked AI evidence.</p>
                 <ArrowRight size={15} className="mt-6 text-[#D8D4CA] transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
               </Link>
             </div>

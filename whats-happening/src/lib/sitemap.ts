@@ -39,6 +39,7 @@ export const staticSitemapEntries: MetadataRoute.Sitemap = [
   ...[
     "compare/exploding-topics-vs-google-trends",
     "compare/exploding-topics-vs-glimpse",
+    "compare/trend-analysis-tools",
     "alternatives/google-trends",
     "alternatives/exploding-topics",
     "alternatives/glimpse",

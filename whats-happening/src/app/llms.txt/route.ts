@@ -28,6 +28,7 @@ What's Happening is a public web product for founders and analysts tracking emer
 
 - [Exploding Topics vs Google Trends](${SITE_URL}/compare/exploding-topics-vs-google-trends): A source-cited comparison of discovery and known-query validation workflows.
 - [Exploding Topics vs Glimpse](${SITE_URL}/compare/exploding-topics-vs-glimpse): A source-cited comparison of curated discovery and search-data workflows.
+- [Trend analysis tool comparison](${SITE_URL}/compare/trend-analysis-tools): Google Trends, Glimpse, and source-linked AI research compared by evidence and fit.
 
 ## Alternative guides
 
