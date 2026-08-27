@@ -35,6 +35,7 @@ describe("crawler metadata", () => {
       `${SITE_URL}/guides/hallucination-detection`,
       `${SITE_URL}/compare/exploding-topics-vs-google-trends`,
       `${SITE_URL}/compare/exploding-topics-vs-glimpse`,
+      `${SITE_URL}/compare/trend-analysis-tools`,
       `${SITE_URL}/alternatives/google-trends`,
       `${SITE_URL}/alternatives/exploding-topics`,
       `${SITE_URL}/alternatives/glimpse`,
@@ -63,7 +64,7 @@ describe("crawler metadata", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("text/plain; charset=utf-8");
     expect(await response.text()).toBe(llmsText);
-    expect(linkedUrls.length).toBe(18);
+    expect(linkedUrls.length).toBe(19);
     expect(linkedUrls.slice(0, evidenceUrls.length)).toEqual(evidenceUrls);
     expect(evidenceUrls.every((url) => linkedUrls.filter((linkedUrl) => linkedUrl === url).length === 1)).toBe(true);
     expect(linkedUrls.every((url) => url === SITE_URL || url.startsWith(`${SITE_URL}/`))).toBe(true);

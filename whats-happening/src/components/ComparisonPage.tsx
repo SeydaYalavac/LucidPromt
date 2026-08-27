@@ -134,7 +134,7 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
                 {data.quickAnswer}
               </p>
               <p className="mt-6 font-mono text-xs uppercase tracking-[0.16em] text-[#52525B]">
-                Reviewed against first-party product sources on 21 August 2026
+                Reviewed against first-party product sources on {data.reviewedOn ?? "21 August 2026"}
               </p>
             </div>
           </div>
@@ -277,12 +277,14 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
           <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-6 py-16 sm:flex-row sm:items-start sm:gap-8">
             <CircleAlert size={22} className="mt-1 shrink-0 text-amber-100/80" aria-hidden="true" />
             <div>
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-amber-100/70">Current production limit</p>
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-amber-100/70">
+                {data.productionStatus?.label ?? "Current production limit"}
+              </p>
               <h2 className="mt-4 text-balance text-2xl font-medium tracking-[-0.03em] text-white">
-                The public interface is available. The live trend journey is not.
+                {data.productionStatus?.title ?? "The public interface is available. The live trend journey is not."}
               </h2>
               <p className="mt-4 max-w-[62rem] text-pretty text-sm leading-7 text-[#A1A1AA]">
-                Production has no connected trend data service or authentication configuration. Trend results, source trails, accounts, and chat therefore cannot complete their real loop. The product reports that state directly instead of presenting fixtures as live activity.
+                {data.productionStatus?.body ?? "Production has no connected trend data service or authentication configuration. Trend results, source trails, accounts, and chat therefore cannot complete their real loop. The product reports that state directly instead of presenting fixtures as live activity."}
               </p>
               <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm">
                 <Link href="/explore" className="text-white underline decoration-white/20 underline-offset-4 hover:decoration-white/60">
@@ -319,6 +321,31 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
             ))}
           </div>
         </section>
+
+        {data.deepDive?.map((section, index) => (
+          <section
+            key={section.heading}
+            className={index % 2 === 0 ? "border-t border-white/[0.08] bg-[#080809]" : "border-t border-white/[0.08]"}
+          >
+            <div className="mx-auto grid w-full max-w-7xl gap-10 px-6 py-20 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24 lg:py-24">
+              <div>
+                <p className="font-mono text-xs uppercase tracking-[0.2em] text-[#D8D4CA]">
+                  {section.eyebrow}
+                </p>
+                <h2 className="mt-5 text-balance text-3xl font-medium tracking-[-0.04em] text-white sm:text-4xl">
+                  {section.heading}
+                </h2>
+              </div>
+              <div className="space-y-6 border-t border-white/[0.08] pt-7 lg:border-t-0 lg:pt-0">
+                {section.paragraphs.map((paragraph) => (
+                  <p key={paragraph} className="max-w-[58rem] text-pretty text-base leading-8 text-[#A1A1AA]">
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
+            </div>
+          </section>
+        ))}
 
         <section id="faq" className="border-y border-white/[0.08] bg-[#080809] scroll-mt-28">
           <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 py-24 lg:grid-cols-[0.72fr_1.28fr] lg:gap-24 lg:py-32">
