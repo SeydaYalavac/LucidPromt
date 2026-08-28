@@ -24,6 +24,7 @@ const copy = {
     limits: "Known limits",
     workflow: "Operational sequence",
     evidence: "Evidence for this checkpoint",
+    directAnswer: "Direct answer",
     next: "Continue the research",
     nextBody: "Search all 21 defensive dossiers, compare hallucination-control methods and inspect every source record.",
     nextAction: "Open the full research desk",
@@ -47,6 +48,7 @@ const copy = {
     limits: "Bilinen sınırlar",
     workflow: "Operasyon sırası",
     evidence: "Bu kontrol noktasının kanıtı",
+    directAnswer: "Doğrudan yanıt",
     next: "Araştırmaya devam edin",
     nextBody: "21 savunma dosyasının tamamında arama yapın, halüsinasyon kontrol yöntemlerini karşılaştırın ve her kaynak kaydını inceleyin.",
     nextAction: "Tam araştırma masasını aç",
@@ -122,6 +124,16 @@ export function SecurityGuidePage({ slug }: { slug: SecurityGuideSlug }) {
       <p className="border-b border-white/[0.12] py-4 sm:border-b-0 sm:border-r sm:px-5"><strong className="mr-2 font-mono text-white">{audit.sourceCount}</strong>{t.sources}</p>
       <p className="border-b border-white/[0.12] py-4 sm:border-b-0 sm:border-r sm:px-5"><strong className="mr-2 font-mono text-white">{formatDate(audit.checkedAt, language)}</strong>{t.evidenceChecked}</p>
       <p className="py-4 sm:pl-5"><strong className="mr-2 font-mono text-white">{formatDate(audit.lastVerified, language)}</strong>{t.contentReviewed}</p>
+    </section>
+
+    <section className="border-b border-white/[0.12] py-10 sm:py-14" aria-labelledby="direct-answer-heading">
+      <div className="grid gap-5 sm:grid-cols-[4rem_minmax(0,1fr)]">
+        <p className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/40">{t.directAnswer}</p>
+        <div>
+          <h2 id="direct-answer-heading" className="max-w-4xl text-balance text-2xl font-medium tracking-[-0.035em] text-white sm:text-3xl">{guide.answerQuestion[language]}</h2>
+          <p className="mt-4 max-w-[68ch] text-pretty text-base leading-8 text-[#D0D0D3]">{guide.directAnswer[language]}<SourceMarks sourceIds={guide.answerSourceIds} label={t.evidence} /></p>
+        </div>
+      </div>
     </section>
 
     {audit.reviewRequired && <aside className="mt-10 flex items-start gap-3 border border-amber-200/25 bg-amber-200/[0.05] p-5 text-sm leading-6 text-amber-100"><ShieldAlert className="mt-0.5 shrink-0" size={18} aria-hidden="true" /><p><strong>{t.reviewRequired}.</strong> {t.auditWarning}</p></aside>}

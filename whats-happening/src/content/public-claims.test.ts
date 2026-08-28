@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { homepageFaqs } from "./homepage-faq";
+import { homepageFaqs, homepageFaqsTr } from "./homepage-faq";
 
 const sourceFiles = [
   "src/app/layout.tsx",
@@ -77,5 +77,9 @@ describe("public capability claims", () => {
     const faqCopy = homepageFaqs.map(({ question, answer }) => `${question} ${answer}`).join(" ");
     expect(faqCopy).toContain("earliest country-tagged evidence");
     expect(faqCopy).toContain("does not predict future popularity");
+    expect(faqCopy).toContain("source-backed AI security guidance");
+    expect(homepageFaqs.at(-1)?.links).toHaveLength(2);
+    expect(homepageFaqsTr.at(-1)?.links?.map((link) => link.href))
+      .toEqual(homepageFaqs.at(-1)?.links?.map((link) => link.href));
   });
 });

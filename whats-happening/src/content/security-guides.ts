@@ -10,6 +10,9 @@ export type SecurityGuide = {
   description: LocalizedText;
   promise: LocalizedText;
   audience: LocalizedText;
+  answerQuestion: LocalizedText;
+  directAnswer: LocalizedText;
+  answerSourceIds: string[];
   dossierIds: string[];
 };
 
@@ -38,6 +41,15 @@ export const securityGuides: Record<SecurityGuideSlug, SecurityGuide> = {
       en: "For teams designing, reviewing or operating AI applications with retrieval, tools or sensitive data.",
       tr: "Bilgi getirme, araçlar veya hassas veriler kullanan yapay zeka uygulamalarını tasarlayan, inceleyen ya da işleten ekipler için.",
     },
+    answerQuestion: {
+      en: "What is the best way to reduce AI security vulnerabilities?",
+      tr: "Yapay zeka güvenlik açıklarını azaltmanın en iyi yolu nedir?",
+    },
+    directAnswer: {
+      en: "Use layered controls outside the model. Treat prompts, retrieved content and model output as untrusted. Enforce least-privilege permissions in deterministic code. Validate every tool call and output. Require approval for high-impact actions. Test each trust boundary before release.",
+      tr: "Model dışında katmanlı kontroller kullanın. Promptları, getirilen içeriği ve model çıktısını güvenilmeyen veri sayın. En az ayrıcalık ilkesini deterministik kodda uygulayın. Her araç çağrısını ve çıktıyı doğrulayın. Yüksek etkili eylemler için onay isteyin. Yayın öncesinde her güven sınırını test edin.",
+    },
+    answerSourceIds: ["owasp-prompt", "owasp-output", "owasp-agency", "nist-genai"],
     dossierIds: [
       "prompt-injection",
       "model-supply-chain",
@@ -64,6 +76,15 @@ export const securityGuides: Record<SecurityGuideSlug, SecurityGuide> = {
       en: "For teams evaluating factual answers, long-form generation or retrieval-augmented systems.",
       tr: "Olgusal yanıtları, uzun metin üretimini veya bilgi getirme destekli sistemleri değerlendiren ekipler için.",
     },
+    answerQuestion: {
+      en: "What is the best way to detect AI hallucinations?",
+      tr: "Yapay zeka halüsinasyonlarını tespit etmenin en iyi yolu nedir?",
+    },
+    directAnswer: {
+      en: "Use a layered verification process. Split output into atomic claims. Check each claim against approved evidence. Measure uncertainty across independent responses. Send unsupported or high-impact claims to human review. No single score proves factual accuracy.",
+      tr: "Katmanlı bir doğrulama süreci kullanın. Çıktıyı atomik iddialara ayırın. Her iddiayı onaylı kanıtlarla karşılaştırın. Bağımsız yanıtlar arasındaki belirsizliği ölçün. Desteklenmeyen ya da yüksek etkili iddiaları insan incelemesine gönderin. Tek bir puan olgusal doğruluğu kanıtlamaz.",
+    },
+    answerSourceIds: ["factscore", "semantic-entropy", "nist-genai"],
     dossierIds: [
       "hallucination-risk-model",
       "retrieval-grounding",
