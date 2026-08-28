@@ -4,6 +4,7 @@ import { APPROVED_WARM_NOTE_SUBJECT } from "./auth-contact-handoff";
 import {
   APPROVED_WARM_NOTE_BODY,
   dedupeAndMaybeSendCandidate,
+  verifyAuthContactMailbox,
 } from "./auth-contact-mailbox";
 
 const candidate: AuthContactCandidate = {
@@ -28,6 +29,13 @@ function jsonResponse(body: unknown, status = 200) {
 }
 
 describe("Auth contact mailbox consumption", () => {
+  it("verifies protected mailbox access without returning its identity", async () => {
+    const fetchImpl = vi.fn(async () => jsonResponse({ address: "mailbox@company.dev" }));
+
+    await expect(verifyAuthContactMailbox({ ...config, fetchImpl })).resolves.toBeUndefined();
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
   it("deduplicates only an exact recipient and exact subject pair", async () => {
     const fetchImpl = vi.fn(async () => jsonResponse({
       threads: [

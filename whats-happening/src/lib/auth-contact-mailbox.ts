@@ -17,6 +17,8 @@ type MailboxConfig = {
   fetchImpl?: typeof fetch;
 };
 
+export type AuthContactMailboxConfig = MailboxConfig;
+
 function stableApiError(): never {
   throw new Error("AUTH_CONTACT_MAILBOX_FAILED");
 }
@@ -64,6 +66,16 @@ async function mailboxRequest(
     if (!body || typeof body !== "object" || Array.isArray(body)) return stableApiError();
     return body as Record<string, unknown>;
   } catch {
+    return stableApiError();
+  }
+}
+
+export async function verifyAuthContactMailbox(config: MailboxConfig): Promise<void> {
+  const result = await mailboxRequest(
+    config,
+    `/projects/${encodeURIComponent(config.projectId)}/support-mailbox/whoami`,
+  );
+  if (typeof result.address !== "string" || !result.address.includes("@")) {
     return stableApiError();
   }
 }
