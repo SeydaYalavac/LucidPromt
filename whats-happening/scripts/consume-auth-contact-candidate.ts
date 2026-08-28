@@ -1,6 +1,11 @@
+import { rm } from "node:fs/promises";
 import { resolve } from "node:path";
 import { consumeAuthContactHandoff } from "../src/lib/auth-contact-handoff";
-import { dedupeAndMaybeSendCandidate } from "../src/lib/auth-contact-mailbox";
+import {
+  dedupeAndMaybeSendCandidate,
+  verifyAuthContactMailbox,
+  type AuthContactMailboxConfig,
+} from "../src/lib/auth-contact-mailbox";
 
 function argumentValue(name: string): string | null {
   const prefix = `--${name}=`;
@@ -19,16 +24,22 @@ function requiredEnvironment(name: string): string {
 async function run() {
   const input = argumentValue("input")?.trim();
   if (!input) throw new Error("AUTH_CONTACT_HANDOFF_INPUT_REQUIRED");
+  const resolvedInput = resolve(input);
 
-  const result = await consumeAuthContactHandoff(resolve(input), async (candidate, subject) =>
-    dedupeAndMaybeSendCandidate(candidate, subject, {
-      apiBase: requiredEnvironment("TIN_SUPPORT_API_BASE").replace(/\/$/u, ""),
-      projectId: requiredEnvironment("TIN_SUPPORT_PROJECT_ID"),
-      token: requiredEnvironment("TIN_SUPPORT_RUNTIME_TOKEN"),
-      sendApprovedNote: process.argv.includes("--send-approved-note"),
-    }));
-
-  console.log(JSON.stringify(result));
+  const config: AuthContactMailboxConfig = {
+    apiBase: requiredEnvironment("TIN_SUPPORT_API_BASE").replace(/\/$/u, ""),
+    projectId: requiredEnvironment("TIN_SUPPORT_PROJECT_ID"),
+    token: requiredEnvironment("TIN_SUPPORT_RUNTIME_TOKEN"),
+    sendApprovedNote: process.argv.includes("--send-approved-note"),
+  };
+  try {
+    await verifyAuthContactMailbox(config);
+    const result = await consumeAuthContactHandoff(resolvedInput, async (candidate, subject) =>
+      dedupeAndMaybeSendCandidate(candidate, subject, config));
+    console.log(JSON.stringify(result));
+  } finally {
+    await rm(resolvedInput, { force: true });
+  }
 }
 
 run().catch(() => {
