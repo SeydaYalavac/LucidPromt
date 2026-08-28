@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { securityDossiers, securitySources } from "../content/security-research";
+import { securityDossiers, securitySources, sourceById } from "../content/security-research";
 import { getAffectedDossierIds, searchSecurityDossiers } from "./security-research";
 import { fingerprintSourceBody, normalizeHtmlForFingerprint } from "./security-source-fingerprint";
 import { getGuideAudit, getVerifiedGuideDossiers, securityGuideSlugsForText, securityGuides } from "../content/security-guides";
@@ -76,6 +76,13 @@ describe("AI security research corpus", () => {
       expect(audit.sourceCount).toBeGreaterThan(0);
       expect(guide.title.en.length).toBeGreaterThan(20);
       expect(guide.title.tr.length).toBeGreaterThan(20);
+      expect(guide.answerQuestion.en).toMatch(/\?$/);
+      expect(guide.answerQuestion.tr).toMatch(/\?$/);
+      expect(guide.directAnswer.en.split(/\s+/).length).toBeLessThanOrEqual(50);
+      expect(guide.directAnswer.tr).toBeTruthy();
+      expect(guide.answerSourceIds.length).toBeGreaterThanOrEqual(3);
+      expect(guide.answerSourceIds.every((sourceId) => sourceById.has(sourceId))).toBe(true);
+      expect(guide.answerSourceIds.every((sourceId) => audit.sources.some((source) => source.id === sourceId))).toBe(true);
     }
   });
 

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { homepageFaqs, homepageFaqsTr } from "@/content/homepage-faq";
 import { useLocale } from "@/i18n/locale";
 
@@ -47,6 +48,9 @@ export function HomepageFaq() {
                 <p className="mt-4 max-w-[64ch] text-pretty text-base leading-7 text-[#A3A3AA]">
                   {item.answer}
                 </p>
+                {item.links?.length ? <p className="mt-4 flex max-w-[64ch] flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.12em]">
+                  {item.links.map((link) => <Link key={link.href} href={link.href} className="text-[#D8D4CA] underline decoration-white/25 underline-offset-4 hover:text-white">{link.label}</Link>)}
+                </p> : null}
               </div>
             </article>
           ))}

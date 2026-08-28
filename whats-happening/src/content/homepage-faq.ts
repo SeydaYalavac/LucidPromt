@@ -1,6 +1,7 @@
 export type HomepageFaq = {
   question: string;
   answer: string;
+  links?: Array<{ href: string; label: string }>;
 };
 
 export const homepageFaqs: HomepageFaq[] = [
@@ -34,6 +35,15 @@ export const homepageFaqs: HomepageFaq[] = [
     answer:
       "The public product views cost $0. Account-based early access is also priced at $0, but account creation and live trend records are unavailable until the production data service is connected. There is no checkout or paid plan today.",
   },
+  {
+    question: "Does What's Happening publish source-backed AI security guidance?",
+    answer:
+      "Yes. What's Happening publishes bilingual guides for reducing AI security vulnerabilities and detecting hallucinations. Each guide gives a direct operational answer. Every checkpoint links to authoritative evidence. Each page shows its latest evidence audit. The guides inform defensive review. They do not replace security testing or expert judgment.",
+    links: [
+      { href: "/guides/ai-security-vulnerabilities", label: "AI security vulnerabilities guide" },
+      { href: "/guides/hallucination-detection", label: "Hallucination detection guide" },
+    ],
+  },
 ];
 
 export const homepageFaqsTr: HomepageFaq[] = [
@@ -43,4 +53,12 @@ export const homepageFaqsTr: HomepageFaq[] = [
   { question: "Yükseliş izleme sinyali nedir?", answer: "Yükseliş izleme sinyali, güçlü yeniliğe ve artan gözlemlenmiş ilgiye sahip ancak Küresel Nabız eşiğini geçmemiş puanlı bir trend adayıdır. Nelerin incelenmeye değer olabileceğini sıralar; gelecekteki popülerliği tahmin etmez." },
   { question: "Trend verileri ne kadar güncel?", answer: "Canlı veri hizmeti yapılandırıldığında kaynak alımı her 10 dakikada bir çalışacak şekilde tasarlanmıştır ve ana sayfa aktif trendleri 15 ila 30 saniyede bir yeniler. Canlı veri kullanılamıyorsa ürün, demo kayıtlarını güncel etkinlik gibi göstermek yerine bunu açıkça belirtir." },
   { question: "What's Happening ne kadar?", answer: "Herkese açık ürün görünümleri 0 ABD dolarıdır. Hesap tabanlı erken erişim de 0 ABD doları olarak fiyatlandırılmıştır; üretim veri hizmeti bağlanana kadar hesap oluşturma ve canlı trend kayıtları kullanılamaz. Bugün ödeme veya ücretli plan yoktur." },
+  {
+    question: "What's Happening kaynak destekli yapay zeka güvenlik rehberleri yayımlıyor mu?",
+    answer: "Evet. What's Happening, yapay zeka güvenlik açıklarını azaltma ve halüsinasyonları tespit etme konusunda iki dilli rehberler yayımlar. Her rehber doğrudan bir operasyon yanıtı verir. Her kontrol noktası yetkili kanıtlara bağlanır. Her sayfa en son kanıt denetimini gösterir. Rehberler savunma incelemesini destekler. Güvenlik testinin veya uzman görüşünün yerini almaz.",
+    links: [
+      { href: "/guides/ai-security-vulnerabilities", label: "Yapay zeka güvenlik açıkları rehberi" },
+      { href: "/guides/hallucination-detection", label: "Halüsinasyon tespiti rehberi" },
+    ],
+  },
 ];
