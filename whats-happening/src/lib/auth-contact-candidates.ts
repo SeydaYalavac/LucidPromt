@@ -8,6 +8,7 @@ export type AuthUserRecord = {
 
 export type AuthContactCandidate = {
   email: string;
+  first_name: string;
   created_at: string;
   eligible_for_contact: true;
 };
@@ -46,6 +47,8 @@ const RESERVED_TEST_DOMAINS = new Set([
 
 const TEST_LOCAL_PART = /(^|[+._-])(demo|e2e|qa|synthetic|test|testing|tin-test)([+._-]|$)/i;
 const TEST_ENVIRONMENT = /^(demo|development|e2e|qa|staging|synthetic|test)$/i;
+const TRUSTED_NAME_KEYS = ["given_name", "first_name", "full_name", "name", "display_name"] as const;
+const SAFE_FIRST_NAME = /^[\p{L}\p{M}][\p{L}\p{M}'’.-]{0,49}$/u;
 
 function isTruthyTestMarker(value: unknown): boolean {
   return value === true || value === 1 || value === "1" || value === "true";
@@ -77,6 +80,25 @@ export function isMarkedTestIdentity(user: AuthUserRecord): boolean {
   return RESERVED_TEST_DOMAINS.has(domain) || TEST_LOCAL_PART.test(localPart);
 }
 
+export function trustedFirstName(user: AuthUserRecord, email: string): string | null {
+  const localPart = email.slice(0, email.lastIndexOf("@")).normalize("NFKC").toLocaleLowerCase();
+
+  for (const key of TRUSTED_NAME_KEYS) {
+    const value = user.user_metadata?.[key];
+    if (typeof value !== "string") continue;
+
+    const normalized = value.normalize("NFKC").trim();
+    if (!normalized || normalized.length > 80 || /[@\u0000-\u001f\u007f]/u.test(normalized)) continue;
+
+    const firstName = normalized.split(/\s+/u)[0];
+    if (!SAFE_FIRST_NAME.test(firstName)) continue;
+    if (normalized.toLocaleLowerCase() === localPart) continue;
+    return firstName;
+  }
+
+  return null;
+}
+
 function verifiedCandidate(
   user: AuthUserRecord,
   createdSince: Date,
@@ -87,9 +109,12 @@ function verifiedCandidate(
   const createdAt = new Date(user.created_at);
   if (!Number.isFinite(createdAt.getTime()) || createdAt < createdSince) return null;
   if (isMarkedTestIdentity(user)) return null;
+  const firstName = trustedFirstName(user, email);
+  if (!firstName) return null;
 
   return {
     email,
+    first_name: firstName,
     created_at: createdAt.toISOString(),
     eligible_for_contact: true,
   };

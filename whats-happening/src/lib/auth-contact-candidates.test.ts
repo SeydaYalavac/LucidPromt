@@ -33,11 +33,13 @@ describe("auth contact candidates", () => {
 
     expect(result.candidates).toEqual([{
       email: "person@example.dev",
+      first_name: "Private",
       created_at: "2026-08-24T11:00:00.000Z",
       eligible_for_contact: true,
     }]);
     expect(Object.keys(result.candidates[0])).toEqual([
       "email",
+      "first_name",
       "created_at",
       "eligible_for_contact",
     ]);
@@ -73,6 +75,7 @@ describe("auth contact candidates", () => {
       email: `person-${index}@company.dev`,
       email_confirmed_at: "2026-08-25T01:00:00Z",
       created_at: "2026-08-25T01:00:00Z",
+      user_metadata: { display_name: `Person ${index}` },
     }));
     const { source, listUsers } = sourceFor([firstPage, []]);
 
@@ -89,6 +92,37 @@ describe("auth contact candidates", () => {
     expect(isMarkedTestIdentity({ app_metadata: { test_user: 1 } })).toBe(true);
     expect(isMarkedTestIdentity({ user_metadata: { synthetic: "1" } })).toBe(true);
     expect(isMarkedTestIdentity({ email: "contest@company.dev" })).toBe(false);
+  });
+
+  it("requires a trustworthy first name and rejects the email-local-part default", async () => {
+    const { source } = sourceFor([[
+      {
+        email: "no-name@company.dev",
+        email_confirmed_at: "2026-08-25T01:00:00Z",
+        created_at: "2026-08-25T01:00:00Z",
+      },
+      {
+        email: "default-name@company.dev",
+        email_confirmed_at: "2026-08-25T01:00:00Z",
+        created_at: "2026-08-25T01:00:00Z",
+        user_metadata: { display_name: "default-name" },
+      },
+      {
+        email: "ada@company.dev",
+        email_confirmed_at: "2026-08-25T01:00:00Z",
+        created_at: "2026-08-25T01:00:00Z",
+        user_metadata: { display_name: "Ada Lovelace" },
+      },
+    ]]);
+
+    const result = await readAuthContactCandidates(source, cutoff);
+
+    expect(result.candidates).toEqual([{
+      email: "ada@company.dev",
+      first_name: "Ada",
+      created_at: "2026-08-25T01:00:00.000Z",
+      eligible_for_contact: true,
+    }]);
   });
 
   it("fails closed with a stable error that cannot carry provider details", async () => {
@@ -120,7 +154,10 @@ describe("auth contact candidates", () => {
     expect(workflow).toContain("if: always()");
     expect(workflow).toContain("shred -u");
     expect(workflow).toContain("rmdir");
+    expect(workflow).toContain("auth:contact-consume");
+    expect(workflow).toContain("TIN_SUPPORT_RUNTIME_TOKEN: ${{ secrets.TIN_SUPPORT_RUNTIME_TOKEN }}");
     expect(workflow).not.toContain("upload-artifact");
+    expect(workflow).not.toContain("GITHUB_STEP_SUMMARY");
     expect(workflow).not.toMatch(/https?:\/\//);
   });
 });
