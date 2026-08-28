@@ -1,101 +1,101 @@
 {
   "schemaVersion": 4,
-  "checkedAt": "2026-08-27",
+  "checkedAt": "2026-08-28",
   "sources": {
     "owasp-prompt": {
       "fingerprint": "2923887d4c298e2b484a6fe76db7056681276d972afe832b256513b43fa2494f",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-disclosure": {
       "fingerprint": "355d2eeb0cdd0ec97484a47a8aab333de044dd8b5b11efbc3ea2b104122451fe",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-supply": {
       "fingerprint": "afd5f0b4b715bfaea3d4d611c5d1ae51aa6adb13555c78b85ec9c1be127b828a",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-poison": {
       "fingerprint": "e6f07f5255284e0a32fc723c109e508f6f3a5f2fe0ad834d7486e7d7d9a8bf73",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-output": {
       "fingerprint": "a0b7573abec8db6922f971291cdb6a6513e54a72220dd1106c19fddbdd6163e6",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-agency": {
       "fingerprint": "dc88915eb4877265f0782d3c94a82dcf7406255bc8f06660ea3b3881423810ae",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-prompt-leak": {
       "fingerprint": "59d7a8523a3144e9df1c4d8cc191432c60e2469be1fdab7a03f41f714f2b0f31",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-vector": {
       "fingerprint": "2307235397a792e47aee41c1a926f5bee931e07d452c12816919d43f27cb20b7",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-misinformation": {
       "fingerprint": "c5eced4f4dc03050bb7fd18ecb0da0b68b30ed2896bdd41ee3ec95fbb8758e24",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "owasp-consumption": {
       "fingerprint": "05629ca2a706ea0a9f69db8f1474580e23b94fb1f9da6c773aedb8040835bb21",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "nist-aml": {
       "fingerprint": "f7e7dfe3b750aeb26528c491313d48568e36d3735c09811733d7adc244b49a65",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "nist-genai": {
       "fingerprint": "6e73620ab6b64e90ef2c04bf0e0d6246185a2f4b1b13cab0df494496cff89b6a",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "mitre-atlas": {
       "fingerprint": "af5f493bc0c4e809b520bdefc4d5d3961bd5029bb1bebaca6cddc6d132a7e0f4",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "cisa-deploy": {
       "fingerprint": "908fa0da619f17d30b553e58057b4a59872c7426d42ebe630d8b0c39fa1d883d",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "rag-paper": {
       "fingerprint": "11256e4cf2e071db7259fcfc13124cf568fdb622c5142b7c1ca0006a944daebb",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "selfcheckgpt": {
       "fingerprint": "b11e6e452825668c34b68e86ab3ea85ed510086dad62422ca70d650f07a1ef87",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "truthfulqa": {
       "fingerprint": "d59147c85bcdd6e0a073b2bae6aadec44bb16fce5b6ed483dba87ecfb37d475d",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "factscore": {
       "fingerprint": "c55c0c0ce0327caf3c76efa72ba33df594fd1be8b2e712b963fb283ecd72f527",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "semantic-entropy": {
       "fingerprint": "7d78bf0baa4d0961f40e9c1290fbc4ca6ef4d3819f48d61877e49a95cfe305dd",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "halueval": {
       "fingerprint": "3a2c61c09765b233f38c88bd30e5433150d1e7677b81954a4b07ddce74a98ba3",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "model-stealing": {
       "fingerprint": "c5f9bee19509a80254c0e1d59e7c2be1aa6df1b78c15651df3466058da5b9ece",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     },
     "membership-inference": {
       "fingerprint": "8b5b477e6366394f8d37bb87510734dc4886f31a31434835c7e5253946c7a1d0",
-      "checkedAt": "2026-08-27"
+      "checkedAt": "2026-08-28"
     }
   },
   "dossiers": {
     "prompt-injection": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -105,7 +105,7 @@
     "indirect-prompt-injection": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -115,7 +115,7 @@
     "sensitive-information-disclosure": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -125,7 +125,7 @@
     "model-supply-chain": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -135,7 +135,7 @@
     "training-data-poisoning": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -145,7 +145,7 @@
     "rag-vector-poisoning": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -155,7 +155,7 @@
     "improper-output-handling": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -165,7 +165,7 @@
     "excessive-agency": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -175,7 +175,7 @@
     "system-prompt-secrets": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -185,7 +185,7 @@
     "jailbreak-resilience": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -195,7 +195,7 @@
     "unbounded-consumption": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -205,7 +205,7 @@
     "model-extraction": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -215,7 +215,7 @@
     "membership-inference": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -225,7 +225,7 @@
     "adversarial-input-evasion": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -235,7 +235,7 @@
     "hallucination-risk-model": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -245,7 +245,7 @@
     "retrieval-grounding": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -255,7 +255,7 @@
     "atomic-claim-verification": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -265,7 +265,7 @@
     "nli-entailment-checking": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -275,7 +275,7 @@
     "self-consistency-uncertainty": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -285,7 +285,7 @@
     "hallucination-evaluation-sets": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
@@ -295,7 +295,7 @@
     "human-review-calibrated-abstention": {
       "version": 1,
       "lastVerified": "2026-08-21",
-      "evidenceCheckedAt": "2026-08-27",
+      "evidenceCheckedAt": "2026-08-28",
       "reviewStatus": "verified",
       "changeSummary": {
         "en": "Initial defensive research review.",
