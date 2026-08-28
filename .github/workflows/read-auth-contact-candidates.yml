@@ -8,6 +8,11 @@ on:
         required: true
         default: "48"
         type: string
+      send_approved_note:
+        description: Send the founder-approved note after exact deduplication
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -44,6 +49,19 @@ jobs:
           echo "AUTH_READ_FILE=$auth_read_file" >> "$GITHUB_ENV"
           npm run auth:contact-read -- --lookback-hours "$LOOKBACK_HOURS" --output "$auth_read_file"
           test "$(stat -c '%a' "$auth_read_file")" = "600"
+      - name: Consume once and check the exact mailbox recipient and subject
+        env:
+          TIN_SUPPORT_API_BASE: ${{ secrets.TIN_SUPPORT_API_BASE }}
+          TIN_SUPPORT_PROJECT_ID: ${{ secrets.TIN_SUPPORT_PROJECT_ID }}
+          TIN_SUPPORT_RUNTIME_TOKEN: ${{ secrets.TIN_SUPPORT_RUNTIME_TOKEN }}
+          SEND_APPROVED_NOTE: ${{ inputs.send_approved_note }}
+        run: |
+          send_flag=""
+          if [ "$SEND_APPROVED_NOTE" = "true" ]; then
+            send_flag="--send-approved-note"
+          fi
+          npm run auth:contact-consume -- --input "$AUTH_READ_FILE" $send_flag
+          test ! -e "$AUTH_READ_FILE"
       - name: Destroy the ephemeral contact file
         if: always()
         working-directory: /

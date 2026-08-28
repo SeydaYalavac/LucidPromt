@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "ingest": "tsx workers/trend-ingest.ts",
     "auth:contact-read": "tsx scripts/read-auth-contact-candidates.ts",
+    "auth:contact-consume": "tsx scripts/consume-auth-contact-candidate.ts",
     "research:refresh": "tsx scripts/refresh-security-research.ts",
     "research:baseline": "tsx scripts/refresh-security-research.ts --baseline"
   },
