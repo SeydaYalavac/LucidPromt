@@ -95,3 +95,19 @@ export function buildTrendListPayload(
     },
   };
 }
+
+export function buildPublicTrendArchive(trends: Trend[], signals: Signal[], now = new Date()) {
+  const deduped = new Map<string, Trend>();
+
+  for (const trend of trends) {
+    if (!hasUsableTitle(trend)) continue;
+    const key = trend.slug?.trim() || trend.id;
+    if (!key || deduped.has(key)) continue;
+    deduped.set(key, trend);
+  }
+
+  return selectAiScopedTrends([...deduped.values()], signals, now).map((trend) => ({
+    ...trend,
+    evidence_status: trend.brief?.corroboration || ("single_source" as const),
+  }));
+}
