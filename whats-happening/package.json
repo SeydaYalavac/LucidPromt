@@ -13,7 +13,9 @@
     "auth:contact-read": "tsx scripts/read-auth-contact-candidates.ts",
     "auth:contact-consume": "tsx scripts/consume-auth-contact-candidate.ts",
     "research:refresh": "tsx scripts/refresh-security-research.ts",
-    "research:baseline": "tsx scripts/refresh-security-research.ts --baseline"
+    "research:baseline": "tsx scripts/refresh-security-research.ts --baseline",
+    "guides:refresh": "tsx scripts/refresh-evergreen-guides.ts",
+    "guides:baseline": "tsx scripts/refresh-evergreen-guides.ts --baseline"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",

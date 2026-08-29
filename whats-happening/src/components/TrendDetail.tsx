@@ -15,6 +15,7 @@ import { localizeTrendBrief } from "@/i18n/trend";
 import { SourcedNewsVisual } from "./SourcedNewsVisual";
 import { trendInternalLinks } from "@/lib/trend-page-graph";
 import { guidePath, securityGuideSlugsForText, securityGuides } from "@/content/security-guides";
+import { evergreenGuidePath, evergreenGuideSlugsForText, evergreenGuides } from "@/content/evergreen-guides";
 
 function dateLabel(value: string, locale = "en") {
   if (!value) return locale === "tr" ? "Zaman bilgisi yok" : "Time unavailable";
@@ -73,14 +74,16 @@ export function TrendDetail({ slug, initialData }: { slug: string; initialData?:
   }));
   const evidenceById = new Map(evidence.map((item) => [item.reference_id, item]));
   const article = brief?.article;
-  const guideMatches = securityGuideSlugsForText([
+  const guideText = [
     trend.title,
     trend.summary,
     trend.what_happened,
     trend.why_now,
     brief?.what_it_is,
     ...(article?.sections.flatMap((section) => section.claims.map((claim) => claim.text)) ?? []),
-  ].filter(Boolean).join(" "));
+  ].filter(Boolean).join(" ");
+  const guideMatches = securityGuideSlugsForText(guideText);
+  const evergreenMatches = evergreenGuideSlugsForText(guideText);
   const firstEvidence = evidence[0];
   const stats = [
     { label: t("trend.velocity"), value: trend.velocity_score },
@@ -177,6 +180,10 @@ export function TrendDetail({ slug, initialData }: { slug: string; initialData?:
         {guideMatches.length > 0 && <section className="border-l border-white/[0.14] py-2 pl-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">{locale === "tr" ? "İlgili güvenlik rehberi" : "Related security guide"}</p>
           <div className="mt-3 space-y-3">{guideMatches.map((guideSlug) => <Link key={guideSlug} href={guidePath(guideSlug)} className="block text-sm font-medium leading-5 text-white hover:text-[#CFCFD3]">{securityGuides[guideSlug].title[locale]}</Link>)}</div>
+        </section>}
+        {evergreenMatches.length > 0 && <section className="border-l border-white/[0.14] py-2 pl-5">
+          <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">{locale === "tr" ? "İlgili kanıt rehberi" : "Related evidence guide"}</p>
+          <div className="mt-3 space-y-3">{evergreenMatches.map((guideSlug) => <Link key={guideSlug} href={evergreenGuidePath(guideSlug)} className="block text-sm font-medium leading-5 text-white hover:text-[#CFCFD3]">{evergreenGuides[guideSlug].title[locale]}</Link>)}</div>
         </section>}
         <section className="editorial-card rounded-2xl border p-6">
           <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-white/40">{t("trend.trendScore")}</p>
