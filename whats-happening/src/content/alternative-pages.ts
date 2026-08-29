@@ -40,7 +40,7 @@ const whatsHappeningSources = [
   {
     label: "What's Happening access",
     url: `${SITE_URL}/pricing`,
-    note: "Current public access and the account limitation are documented here.",
+    note: "Current $0 public access and verified account paths are documented here.",
   },
 ];
 
@@ -57,7 +57,7 @@ export const googleTrendsAlternative: AlternativePageData = {
   competitorSummary:
     "A Google product for exploring relative search interest, comparing terms or topics, checking regional patterns, and seeing what is trending now.",
   quickAnswer:
-    "Choose Google Trends when you already know the queries to compare and want a working view of Google search interest. Consider What's Happening when you want source-linked technology clusters and an explicit 45/35/20 scoring method. It is not a working replacement today because its production trend data and account access are unavailable.",
+    "Choose Google Trends when you already know the queries to compare and want a working view of Google search interest. Choose What's Happening when you want source-linked AI clusters and an explicit 45/35/20 scoring method. Its live feed publishes up to 100 source-backed trends, with verified email signup and Google sign-in.",
   axes: [
     {
       axis: "Primary evidence",
@@ -92,15 +92,15 @@ export const googleTrendsAlternative: AlternativePageData = {
     {
       axis: "Current readiness",
       competitor: "Working public Google product.",
-      whatsHappening: "Public interface is live; production trend data and accounts are unavailable.",
-      decision: "Use Google Trends for live research today.",
+      whatsHappening: "Live AI feed with up to 100 source-backed trends; verified email signup and Google sign-in.",
+      decision: "Choose by research job, not basic availability.",
     },
   ],
   bestFit: {
     competitor:
       "Use Google Trends to compare known search terms, inspect seasonality, and see where Google search interest is concentrated.",
     whatsHappening:
-      "Follow What's Happening if your research depends on a technology-focused source trail and a score you can audit. Treat it as an early-access method, not a live substitute.",
+      "Use What's Happening when your research depends on a technology-focused source trail and a score you can audit. It is a live early-access product, not a search-interest substitute.",
   },
   faq: [
     {
@@ -121,7 +121,7 @@ export const googleTrendsAlternative: AlternativePageData = {
     {
       question: "Can I use What's Happening instead of Google Trends today?",
       answer:
-        "Not for a live workflow. The public interface is available, but its production data service and authentication are not connected. It reports that state instead of presenting sample records as live activity.",
+        "Yes, when the job is source-linked AI trend discovery. The live feed and verified email or Google account paths work today. Use Google Trends when you need direct search-interest comparisons.",
     },
   ],
   sources: [
@@ -140,7 +140,7 @@ export const googleTrendsAlternative: AlternativePageData = {
   related: [
     { href: "/how-it-works", label: "How the signal engine works", note: "Inspect source coverage and score weights." },
     { href: "/pricing", label: "Current access", note: "Check the public product state." },
-    { href: "/explore", label: "Explore", note: "See how an unavailable feed is reported." },
+    { href: "/explore", label: "Explore", note: "Inspect the live AI trend feed." },
     { href: "/compare/exploding-topics-vs-google-trends", label: "Exploding Topics vs Google Trends", note: "Compare two established research workflows." },
     { href: "/alternatives/exploding-topics", label: "Exploding Topics alternatives", note: "Compare curated discovery with source inspection." },
   ],
@@ -159,7 +159,7 @@ export const explodingTopicsAlternative: AlternativePageData = {
   competitorSummary:
     "A trend-discovery product that combines algorithmic detection with analyst review, then organizes topics, search history, related signals, projects, reports, and API access.",
   quickAnswer:
-    "Choose Exploding Topics when you need a working, prepared discovery database and ongoing research workflow. Consider What's Happening when direct source links and published score weights matter more than breadth. Its live data and account journeys are not connected, so it is not a production replacement today.",
+    "Choose Exploding Topics when you need a prepared discovery database and broad ongoing research workflow. Choose What's Happening when direct source links and published score weights matter more than breadth. Its live feed publishes up to 100 source-backed AI trends, with verified email signup and Google sign-in.",
   axes: [
     {
       axis: "Discovery model",
@@ -182,7 +182,7 @@ export const explodingTopicsAlternative: AlternativePageData = {
     {
       axis: "Monitoring",
       competitor: "Projects, alerts, reports, integrations, and API access are described by the product.",
-      whatsHappening: "No production alerts or working account workflow today.",
+      whatsHappening: "No production alerts today; verified email signup and Google sign-in are available.",
       decision: "Use Exploding Topics for an active monitoring workflow.",
     },
     {
@@ -194,15 +194,15 @@ export const explodingTopicsAlternative: AlternativePageData = {
     {
       axis: "Current readiness",
       competitor: "Established product with public and paid surfaces.",
-      whatsHappening: "Public interface is live; production trend data and accounts are unavailable.",
-      decision: "Use Exploding Topics for live research today.",
+      whatsHappening: "Live AI feed with up to 100 source-backed trends; verified email signup and Google sign-in.",
+      decision: "Choose by research breadth and evidence needs.",
     },
   ],
   bestFit: {
     competitor:
       "Use Exploding Topics when you want the product to surface and organize emerging categories before you have a precise query.",
     whatsHappening:
-      "Follow What's Happening when you want the individual observations, country-tagged context, and score weights in one inspection path. It is early access, not a live replacement.",
+      "Use What's Happening when you want individual observations, country-tagged context, and score weights in one inspection path. It is a live early-access product with a narrower AI focus.",
   },
   faq: [
     {
@@ -223,7 +223,7 @@ export const explodingTopicsAlternative: AlternativePageData = {
     {
       question: "Can What's Happening replace Exploding Topics today?",
       answer:
-        "No. The public interface is available, but production trend data and authentication are not connected. Use an established product for a live research workflow today.",
+        "It can support a live source-linked AI research workflow today. The feed and verified email or Google account paths work. It does not replace Exploding Topics' broader database, alerts, or paid research features.",
     },
   ],
   sources: [
@@ -242,7 +242,7 @@ export const explodingTopicsAlternative: AlternativePageData = {
   related: [
     { href: "/how-it-works", label: "How the signal engine works", note: "Inspect source coverage and score weights." },
     { href: "/pricing", label: "Current access", note: "Check the public product state." },
-    { href: "/explore", label: "Explore", note: "See how an unavailable feed is reported." },
+    { href: "/explore", label: "Explore", note: "Inspect the live AI trend feed." },
     { href: "/compare/exploding-topics-vs-google-trends", label: "Exploding Topics vs Google Trends", note: "Choose between discovery and known-query validation." },
     { href: "/compare/exploding-topics-vs-glimpse", label: "Exploding Topics vs Glimpse", note: "Compare curated discovery and search-depth workflows." },
   ],
@@ -261,7 +261,7 @@ export const glimpseAlternative: AlternativePageData = {
   competitorSummary:
     "A search-data-led trend platform with absolute volume, monthly and yearly growth, related searches, channel breakdowns, alerts, seasonality, and trajectory analysis.",
   quickAnswer:
-    "Choose Glimpse when you need a working search-demand workflow with volume, related queries, tracking, and trajectory analysis. Consider What's Happening when technology-specific source evidence and explicit score weights are the priority. Its production feed and accounts are unavailable today.",
+    "Choose Glimpse when you need search volume, related queries, tracking, and trajectory analysis. Choose What's Happening when source-linked AI evidence and explicit score weights are the priority. Its live feed publishes up to 100 source-backed trends, with verified email signup and Google sign-in.",
   axes: [
     {
       axis: "Discovery model",
@@ -284,7 +284,7 @@ export const glimpseAlternative: AlternativePageData = {
     {
       axis: "Monitoring",
       competitor: "Topic tracking and alerts when followed search activity changes.",
-      whatsHappening: "No production alerting or working account workflow today.",
+      whatsHappening: "No production alerting today; verified email signup and Google sign-in are available.",
       decision: "Use Glimpse when recurring tracking is required now.",
     },
     {
@@ -296,15 +296,15 @@ export const glimpseAlternative: AlternativePageData = {
     {
       axis: "Current readiness",
       competitor: "Established product with a public signup path and live product surfaces.",
-      whatsHappening: "Public interface is live; production trend data and accounts are unavailable.",
-      decision: "Use Glimpse for live search research today.",
+      whatsHappening: "Live AI feed with up to 100 source-backed trends; verified email signup and Google sign-in.",
+      decision: "Choose by search-depth and evidence needs.",
     },
   ],
   bestFit: {
     competitor:
       "Use Glimpse when you need volume, growth, seasonality, related queries, and alerts around topics or niches you choose.",
     whatsHappening:
-      "Follow What's Happening when source-linked technology evidence and an auditable score matter more than search-depth features. It is not a working substitute today.",
+      "Use What's Happening when source-linked AI evidence and an auditable score matter more than search-depth features. It is a live early-access product, not a search-volume substitute.",
   },
   faq: [
     {
@@ -325,7 +325,7 @@ export const glimpseAlternative: AlternativePageData = {
     {
       question: "Is What's Happening available as a live Glimpse alternative?",
       answer:
-        "Not yet. Its public interface is live, but production data and authentication are not connected. It does not replace the missing services with demo activity.",
+        "Yes, for source-linked AI research. Its live feed and verified email or Google account paths work today. It does not include Glimpse's search-volume, tracking, or alert workflows.",
     },
   ],
   sources: [
@@ -344,7 +344,7 @@ export const glimpseAlternative: AlternativePageData = {
   related: [
     { href: "/how-it-works", label: "How the signal engine works", note: "Inspect source coverage and score weights." },
     { href: "/pricing", label: "Current access", note: "Check the public product state." },
-    { href: "/explore", label: "Explore", note: "See how an unavailable feed is reported." },
+    { href: "/explore", label: "Explore", note: "Inspect the live AI trend feed." },
     { href: "/compare/exploding-topics-vs-glimpse", label: "Exploding Topics vs Glimpse", note: "Compare curated discovery with search-depth research." },
     { href: "/alternatives/google-trends", label: "Google Trends alternatives", note: "Compare direct search interest with source inspection." },
   ],
@@ -363,7 +363,7 @@ export const trendsCoAlternative: AlternativePageData = {
   competitorSummary:
     "A HubSpot editorial collection of data-backed business trends, research insights, industry analysis, business ideas, operator guides, reports, and media.",
   quickAnswer:
-    "Choose Trends by The Hustle when you want readable business research, ideas, and operator guidance. Consider What's Happening when you want to inspect technology observations and a disclosed scoring model. Its production feed and account journeys are unavailable, so it is not a live research replacement today.",
+    "Choose Trends by The Hustle when you want readable business research, ideas, and operator guidance. Choose What's Happening when you want to inspect source-linked AI observations and a disclosed scoring model. Its live feed publishes up to 100 source-backed trends, with verified email signup and Google sign-in.",
   axes: [
     {
       axis: "Product format",
@@ -398,8 +398,8 @@ export const trendsCoAlternative: AlternativePageData = {
     {
       axis: "Current readiness",
       competitor: "Current HubSpot editorial pages are publicly readable.",
-      whatsHappening: "Public interface is live; production trend data and accounts are unavailable.",
-      decision: "Use the editorial collection for current business research today.",
+      whatsHappening: "Live AI feed with up to 100 source-backed trends; verified email signup and Google sign-in.",
+      decision: "Choose editorial synthesis or a live evidence workflow.",
     },
   ],
   bestFit: {
@@ -417,7 +417,7 @@ export const trendsCoAlternative: AlternativePageData = {
     {
       question: "What is a good Trends.co alternative?",
       answer:
-        "For editorial business research, the current Trends by The Hustle collection is the direct continuation to inspect. For search-interest validation, use Google Trends. What's Happening is designed for source-linked technology evidence, but its live data service is not connected today.",
+        "For editorial business research, inspect Trends by The Hustle. For search-interest validation, use Google Trends. For a live source-linked AI evidence workflow, use What's Happening.",
     },
     {
       question: "How is What's Happening different from Trends by The Hustle?",
@@ -427,7 +427,7 @@ export const trendsCoAlternative: AlternativePageData = {
     {
       question: "Can I use What's Happening as a live replacement now?",
       answer:
-        "No. The public interface is available, but production trend data and authentication are not connected. It reports that limitation instead of showing sample records as live activity.",
+        "Yes, when you need source-linked AI trend research. The live feed and verified email or Google account paths work today. It does not replace the editorial business analysis in Trends by The Hustle.",
     },
   ],
   sources: [
@@ -446,7 +446,7 @@ export const trendsCoAlternative: AlternativePageData = {
   related: [
     { href: "/how-it-works", label: "How the signal engine works", note: "Inspect source coverage and score weights." },
     { href: "/pricing", label: "Current access", note: "Check the public product state." },
-    { href: "/explore", label: "Explore", note: "See how an unavailable feed is reported." },
+    { href: "/explore", label: "Explore", note: "Inspect the live AI trend feed." },
     { href: "/alternatives/google-trends", label: "Google Trends alternatives", note: "Compare known-query validation with source inspection." },
     { href: "/alternatives/exploding-topics", label: "Exploding Topics alternatives", note: "Compare curated discovery with source inspection." },
   ],

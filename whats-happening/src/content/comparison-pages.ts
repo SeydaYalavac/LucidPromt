@@ -56,7 +56,7 @@ const sharedSources: ComparisonSource[] = [
   {
     label: "What's Happening access",
     url: `${SITE_URL}/pricing`,
-    note: "Verified $0 public access and the current account limitation.",
+    note: "Verified $0 public access and current email and Google account paths.",
   },
 ];
 
@@ -77,14 +77,14 @@ export const googleTrendsComparison: ComparisonPageData = {
   whatsHappeningSummary:
     "An early-access, source-linked approach that is designed to cluster official Hacker News, GitHub, and Google Trends RSS observations, expose the source trail, and publish its 45/35/20 scoring method.",
   quickAnswer:
-    "Use Google Trends when you want a free, direct read on known search terms. Use Exploding Topics when you want a prepared discovery workflow and forward-looking trend research. Use What's Happening only when source-level evidence and an explicit scoring trail matter more than current production coverage: its live data service is not connected yet.",
+    "Use Google Trends when you want a free, direct read on known search terms. Use Exploding Topics when you want a prepared discovery workflow and forward-looking trend research. Use What's Happening when source-level evidence and an explicit scoring trail matter most. Its live AI feed publishes up to 100 source-backed trends, with verified email signup and Google sign-in, within narrower coverage boundaries.",
   choiceGuidance: {
     competitor:
       "Choose Exploding Topics when you want the product to surface and organize emerging categories before you have a precise query.",
     alternative:
       "Choose Google Trends when you already know the terms to compare and want to inspect relative Google search interest by time and place.",
     whatsHappening:
-      "Follow What's Happening if you want individual source observations, country-attributed evidence, and a transparent breakout score in one inspection path. Treat it as an early-access method today, not a working replacement.",
+      "Choose What's Happening if you want individual source observations, country-attributed evidence, and a transparent breakout score in one live inspection path. It does not replace Google Trends search comparisons or Exploding Topics research breadth.",
   },
   axes: [
     {
@@ -121,7 +121,7 @@ export const googleTrendsComparison: ComparisonPageData = {
       axis: "Current readiness",
       competitor: "Established product with free and Pro surfaces.",
       alternative: "Working public Google product.",
-      whatsHappening: "Public interface is live; production trend data and account access are unavailable.",
+      whatsHappening: "Live AI feed with up to 100 source-backed trends; verified email signup and Google sign-in.",
     },
   ],
   faq: [
@@ -143,7 +143,7 @@ export const googleTrendsComparison: ComparisonPageData = {
     {
       question: "Can I use What's Happening as a live alternative today?",
       answer:
-        "Not yet. The public pages are available, but the production data service and authentication are not connected. The interface fails closed instead of showing demo records as live data.",
+        "Yes, for source-linked AI trend research. The live feed publishes up to 100 source-backed trends, and accounts support verified email signup and Google sign-in. It does not match every competitor workflow.",
     },
   ],
   sources: [
@@ -187,14 +187,14 @@ export const glimpseComparison: ComparisonPageData = {
   whatsHappeningSummary:
     "A narrower evidence-inspection product designed around official-source observations, explicit score weights, earliest country-tagged context, and direct source links.",
   quickAnswer:
-    "Choose Exploding Topics for a prepared, analyst-reviewed discovery database. Choose Glimpse for deep search-demand exploration and tracking around a topic or niche. What's Happening takes a different route: it is designed to show how a technology trend earned its score, but its production feed is not connected yet.",
+    "Choose Exploding Topics for a prepared, analyst-reviewed discovery database. Choose Glimpse for deep search-demand exploration and tracking around a topic or niche. Choose What's Happening to inspect how an AI trend earned its score. Its live feed publishes up to 100 source-backed trends within narrower coverage boundaries.",
   choiceGuidance: {
     competitor:
       "Choose Exploding Topics when broad, curated discovery across topics, products, companies, and channels is the main job.",
     alternative:
       "Choose Glimpse when you need absolute search volume, long-tail queries, seasonality, alerts, and forecast-oriented research around specific markets.",
     whatsHappening:
-      "Follow What's Happening when you want a technology-focused source trail and a score you can audit. It is not ready to replace either established product in a live workflow.",
+      "Choose What's Happening when you want a technology-focused source trail and a score you can audit in a live workflow. It does not replace Glimpse alerting or either competitor's broader research coverage.",
   },
   axes: [
     {
@@ -219,7 +219,7 @@ export const glimpseComparison: ComparisonPageData = {
       axis: "Monitoring",
       competitor: "Projects, reports, integrations, and API access are described on first-party product pages.",
       alternative: "Keyword tracking and alerts when followed search activity changes.",
-      whatsHappening: "No production alerting or working account workflow is available today.",
+      whatsHappening: "No production alerting today; verified email signup and Google sign-in are available.",
     },
     {
       axis: "Evidence trail",
@@ -231,7 +231,7 @@ export const glimpseComparison: ComparisonPageData = {
       axis: "Current readiness",
       competitor: "Established product with public and paid surfaces.",
       alternative: "Established product with a public signup path and product surfaces.",
-      whatsHappening: "Public interface is live; production trend data and account access are unavailable.",
+      whatsHappening: "Live AI feed with up to 100 source-backed trends; verified email signup and Google sign-in.",
     },
   ],
   faq: [
@@ -253,7 +253,7 @@ export const glimpseComparison: ComparisonPageData = {
     {
       question: "Is What's Happening live today?",
       answer:
-        "The public interface is live, but the production data service and authentication are not connected. It reports that limitation directly and does not substitute demo records.",
+        "Yes. Its production feed publishes up to 100 source-backed AI trends. Verified email signup and Google sign-in provide account access. Production alerting remains unavailable.",
     },
   ],
   sources: [

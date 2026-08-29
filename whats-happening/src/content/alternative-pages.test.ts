@@ -5,6 +5,9 @@ import {
 } from "./alternative-pages";
 import { SITE_URL } from "../lib/site";
 
+const staleAvailabilityClaim =
+  /live data service is not connected|production (?:trend )?data (?:and (?:account access|accounts) )?are unavailable|production (?:data|feed) and accounts are unavailable|production feed and account journeys are unavailable|production data service and authentication are not connected|live trend journey is not|no connected trend data service or authentication configuration|unavailable feed is reported|not a (?:working|live|production) (?:replacement|substitute)|not ready to replace/i;
+
 describe("alternative pages", () => {
   it("publishes the four validated alternative targets in priority order", () => {
     expect(alternativePages.map(({ slug }) => slug)).toEqual([
@@ -13,6 +16,22 @@ describe("alternative pages", () => {
       "glimpse",
       "trends-co",
     ]);
+  });
+
+  it.each(alternativePages)("describes the verified live feed and account paths on $slug", (page) => {
+    const availabilityCopy = [
+      page.quickAnswer,
+      page.bestFit.whatsHappening,
+      ...page.axes.flatMap(({ whatsHappening, decision }) => [whatsHappening, decision]),
+      ...page.faq.map(({ answer }) => answer),
+      ...page.related.map(({ note }) => note),
+    ].join(" ");
+
+    expect(availabilityCopy).not.toMatch(staleAvailabilityClaim);
+    expect(availabilityCopy).toContain("up to 100 source-backed");
+    expect(availabilityCopy).toContain("email signup");
+    expect(availabilityCopy).toContain("Google sign-in");
+    expect(availabilityCopy).not.toMatch(/(?:GitHub|Apple) sign-in/i);
   });
 
   it.each(alternativePages)("keeps $slug useful, candid, sourced, and internally connected", (page) => {

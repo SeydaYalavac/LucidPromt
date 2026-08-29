@@ -278,17 +278,17 @@ export function ComparisonPage({ data }: { data: ComparisonPageData }) {
             <CircleAlert size={22} className="mt-1 shrink-0 text-amber-100/80" aria-hidden="true" />
             <div>
               <p className="font-mono text-xs uppercase tracking-[0.18em] text-amber-100/70">
-                {data.productionStatus?.label ?? "Current production limit"}
+                {data.productionStatus?.label ?? "Current production boundaries"}
               </p>
               <h2 className="mt-4 text-balance text-2xl font-medium tracking-[-0.03em] text-white">
-                {data.productionStatus?.title ?? "The public interface is available. The live trend journey is not."}
+                {data.productionStatus?.title ?? "The live AI feed and verified account paths are available."}
               </h2>
               <p className="mt-4 max-w-[62rem] text-pretty text-sm leading-7 text-[#A1A1AA]">
-                {data.productionStatus?.body ?? "Production has no connected trend data service or authentication configuration. Trend results, source trails, accounts, and chat therefore cannot complete their real loop. The product reports that state directly instead of presenting fixtures as live activity."}
+                {data.productionStatus?.body ?? "Production publishes up to 100 source-backed AI trends. Email signup and Google sign-in are verified. Public research stays available at $0 without an account. Alerts and optional credentialed sources remain outside the default offer."}
               </p>
               <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm">
                 <Link href="/explore" className="text-white underline decoration-white/20 underline-offset-4 hover:decoration-white/60">
-                  See the public explore state
+                  Inspect the live feed
                 </Link>
                 <Link href="/pricing" className="text-[#A1A1AA] underline decoration-white/15 underline-offset-4 hover:text-white">
                   Check current access

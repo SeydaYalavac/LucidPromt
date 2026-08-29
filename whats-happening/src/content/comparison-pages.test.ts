@@ -6,6 +6,9 @@ import {
 } from "./comparison-pages";
 import { SITE_URL } from "../lib/site";
 
+const staleAvailabilityClaim =
+  /live data service is not connected|production (?:trend )?data (?:and (?:account access|accounts) )?are unavailable|production (?:data|feed) and accounts are unavailable|production feed and account journeys are unavailable|production data service and authentication are not connected|live trend journey is not|no connected trend data service or authentication configuration|not a (?:working|live|production) (?:replacement|substitute)|not ready to replace/i;
+
 describe("comparison pages", () => {
   it("publishes only the validated comparison targets", () => {
     expect(comparisonPages.map(({ slug }) => slug)).toEqual([
@@ -13,6 +16,23 @@ describe("comparison pages", () => {
       "exploding-topics-vs-glimpse",
       "trend-analysis-tools",
     ]);
+  });
+
+  it("describes the verified live feed and account paths on the two product comparisons", () => {
+    for (const page of comparisonPages.filter(({ slug }) => slug !== "trend-analysis-tools")) {
+      const availabilityCopy = [
+        page.quickAnswer,
+        page.choiceGuidance.whatsHappening,
+        ...page.axes.map(({ whatsHappening }) => whatsHappening),
+        ...page.faq.map(({ answer }) => answer),
+      ].join(" ");
+
+      expect(availabilityCopy).not.toMatch(staleAvailabilityClaim);
+      expect(availabilityCopy).toContain("up to 100 source-backed");
+      expect(availabilityCopy).toContain("email signup");
+      expect(availabilityCopy).toContain("Google sign-in");
+      expect(availabilityCopy).not.toMatch(/(?:GitHub|Apple) sign-in/i);
+    }
   });
 
   it.each(comparisonPages)("keeps $slug specific, sourced, and internally connected", (page) => {
