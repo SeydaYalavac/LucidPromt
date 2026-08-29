@@ -47,6 +47,8 @@ describe("evergreen evidence guides", () => {
     expect(evergreenGuideSlugsForText("NVIDIA presents a new AI chip system")).toEqual(["ai-chips-infrastructure"]);
     expect(evergreenGuideSlugsForText("The EU AI Act enters a new phase")).toEqual(["ai-governance"]);
     expect(evergreenGuideSlugsForText("A coding agent uses an MCP server")).toEqual(["ai-agents"]);
+    expect(evergreenGuideSlugsForText("Upcoming changes to GitHub Copilot policies and billing")).toEqual([]);
+    expect(evergreenGuideSlugsForText("NVIDIA insists it can keep printing money")).toEqual([]);
     expect(evergreenGuideSlugsForText("A company published an AI update")).toEqual([]);
   });
 
