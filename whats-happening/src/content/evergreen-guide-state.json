@@ -11,7 +11,7 @@
       "checkedAt": "2026-08-29"
     },
     "nist-agent-rfi": {
-      "fingerprint": "7d837dfb00228c47ce35b8d4ab59c8d9b6b36e596f60ba15ed54112fb42c9758",
+      "fingerprint": "7b12af38fa3bb898c30bc1a69e95e169d8863708afb8336bedc0161ddcc381e4",
       "checkedAt": "2026-08-29"
     },
     "mcp-architecture": {
@@ -65,13 +65,13 @@
   },
   "guides": {
     "ai-agents": {
-      "version": 1,
+      "version": 2,
       "lastVerified": "2026-08-29",
       "evidenceCheckedAt": "2026-08-29",
-      "reviewStatus": "verified",
+      "reviewStatus": "review-required",
       "changeSummary": {
-        "en": "Initial editorial and evidence review.",
-        "tr": "İlk editoryal ve kanıt incelemesi."
+        "en": "Linked official evidence changed; editorial review is required.",
+        "tr": "Bağlı resmî kanıt değişti; editoryal inceleme gerekiyor."
       }
     },
     "ai-chips-infrastructure": {
