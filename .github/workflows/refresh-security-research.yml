@@ -1,4 +1,4 @@
-name: Refresh AI security research evidence
+name: Refresh evidence-led guides
 
 on:
   schedule:
@@ -29,17 +29,19 @@ jobs:
           cache: npm
           cache-dependency-path: whats-happening/package-lock.json
       - run: npm ci
+      - name: Verify the currently published evidence state
+        run: npm test -- src/lib/security-research.test.ts src/content/evergreen-guides.test.ts
       - run: npm run research:refresh
-      - run: npm test -- src/lib/security-research.test.ts
-      - name: Publish the verified evidence state
+      - run: npm run guides:refresh
+      - name: Publish the current evidence state
         run: |
-          if git diff --quiet -- src/content/security-research-state.json; then
+          if git diff --quiet -- src/content/security-research-state.json src/content/evergreen-guide-state.json; then
             echo "Evidence state is already current."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add src/content/security-research-state.json
-          git commit -m "chore: refresh AI security evidence state"
+          git add src/content/security-research-state.json src/content/evergreen-guide-state.json
+          git commit -m "chore: refresh evidence guide state"
           git pull --rebase origin main
           git push origin HEAD:main

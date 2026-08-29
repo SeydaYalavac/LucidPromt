@@ -1,0 +1,98 @@
+{
+  "schemaVersion": 4,
+  "checkedAt": "2026-08-29",
+  "sources": {
+    "anthropic-agents": {
+      "fingerprint": "6e2249069ac0812fd0150d5ef0c1e83b6238ec779e37992eb12393ec224a3ccf",
+      "checkedAt": "2026-08-29"
+    },
+    "anthropic-trust": {
+      "fingerprint": "29c5665f9421d6d719ec2150cb17fe24303a8963ab0b9b7e2fbf7d61f2e703f4",
+      "checkedAt": "2026-08-29"
+    },
+    "nist-agent-rfi": {
+      "fingerprint": "7d837dfb00228c47ce35b8d4ab59c8d9b6b36e596f60ba15ed54112fb42c9758",
+      "checkedAt": "2026-08-29"
+    },
+    "mcp-architecture": {
+      "fingerprint": "1ca3298e520678a09f9b8f35d8343ed01edbe68184c8e2aa21dc9d3a8ff5d754",
+      "checkedAt": "2026-08-29"
+    },
+    "owasp-agency": {
+      "fingerprint": "dc88915eb4877265f0782d3c94a82dcf7406255bc8f06660ea3b3881423810ae",
+      "checkedAt": "2026-08-29"
+    },
+    "nist-genai": {
+      "fingerprint": "6e73620ab6b64e90ef2c04bf0e0d6246185a2f4b1b13cab0df494496cff89b6a",
+      "checkedAt": "2026-08-29"
+    },
+    "google-tpu": {
+      "fingerprint": "881ba6b087fe6832556ce52a95341b35d157d0cf339d79bdc73e146c01c46596",
+      "checkedAt": "2026-08-29"
+    },
+    "nvidia-dc": {
+      "fingerprint": "78365c040ed6fa55a6785a4c0b56d63b9038bbdb4198d5d56c854c19026963b0",
+      "checkedAt": "2026-08-29"
+    },
+    "doe-data-centers": {
+      "fingerprint": "14b8256964ab4d79bd600f3873634f147963903a724e26e1d82e0a8d2da71523",
+      "checkedAt": "2026-08-29"
+    },
+    "doe-powering-ai": {
+      "fingerprint": "8f5e9f3c3378a80c21f1dc7cf1899b065ecd4f0af75d849c645e820fa8379df8",
+      "checkedAt": "2026-08-29"
+    },
+    "bis-chips": {
+      "fingerprint": "a9411051c8df2d1acca5885c1c91bbcf6fd479230633bd3166bffb703753f9ac",
+      "checkedAt": "2026-08-29"
+    },
+    "eu-timeline": {
+      "fingerprint": "9a37bdb3b9af95655e7fbbb4168bbf5b9e7bac195c302b481d5b3284a59adaa5",
+      "checkedAt": "2026-08-29"
+    },
+    "eu-enforcement": {
+      "fingerprint": "c1b12b3e0b2b0e43c53b798ead9ed1cc3a773b8b3e58f7af6460dac797faa154",
+      "checkedAt": "2026-08-29"
+    },
+    "nist-rmf": {
+      "fingerprint": "caaf2825a66a5e33db89a28eeff5868792fb2c98e50552550c2612e46f845e1b",
+      "checkedAt": "2026-08-29"
+    },
+    "oecd-principles": {
+      "fingerprint": "c9164ce526ee705aad48d986cf81a6ee98aa9670f255d342dc7e99ad6dce9af0",
+      "checkedAt": "2026-08-29"
+    }
+  },
+  "guides": {
+    "ai-agents": {
+      "version": 1,
+      "lastVerified": "2026-08-29",
+      "evidenceCheckedAt": "2026-08-29",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial editorial and evidence review.",
+        "tr": "İlk editoryal ve kanıt incelemesi."
+      }
+    },
+    "ai-chips-infrastructure": {
+      "version": 1,
+      "lastVerified": "2026-08-29",
+      "evidenceCheckedAt": "2026-08-29",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial editorial and evidence review.",
+        "tr": "İlk editoryal ve kanıt incelemesi."
+      }
+    },
+    "ai-governance": {
+      "version": 1,
+      "lastVerified": "2026-08-29",
+      "evidenceCheckedAt": "2026-08-29",
+      "reviewStatus": "verified",
+      "changeSummary": {
+        "en": "Initial editorial and evidence review.",
+        "tr": "İlk editoryal ve kanıt incelemesi."
+      }
+    }
+  }
+}

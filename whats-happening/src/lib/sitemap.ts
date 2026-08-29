@@ -3,6 +3,7 @@ import type { CountryActivity, Trend } from "@/types/trends";
 import { SITE_URL } from "./site";
 import { absoluteUrl, categoryPath, countryPath, trendPath } from "./trend-page-graph";
 import researchState from "../content/security-research-state.json";
+import evergreenGuideState from "../content/evergreen-guide-state.json";
 
 export const staticSitemapEntries: MetadataRoute.Sitemap = [
   {
@@ -33,6 +34,12 @@ export const staticSitemapEntries: MetadataRoute.Sitemap = [
   ...["ai-security-vulnerabilities", "hallucination-detection"].map((slug) => ({
     url: `${SITE_URL}/guides/${slug}`,
     lastModified: researchState.checkedAt,
+    changeFrequency: "daily" as const,
+    priority: 0.8,
+  })),
+  ...["ai-agents", "ai-chips-infrastructure", "ai-governance"].map((slug) => ({
+    url: `${SITE_URL}/guides/${slug}`,
+    lastModified: evergreenGuideState.checkedAt,
     changeFrequency: "daily" as const,
     priority: 0.8,
   })),

@@ -33,6 +33,9 @@ describe("crawler metadata", () => {
       `${SITE_URL}/security-research`,
       `${SITE_URL}/guides/ai-security-vulnerabilities`,
       `${SITE_URL}/guides/hallucination-detection`,
+      `${SITE_URL}/guides/ai-agents`,
+      `${SITE_URL}/guides/ai-chips-infrastructure`,
+      `${SITE_URL}/guides/ai-governance`,
       `${SITE_URL}/compare/exploding-topics-vs-google-trends`,
       `${SITE_URL}/compare/exploding-topics-vs-glimpse`,
       `${SITE_URL}/compare/trend-analysis-tools`,
@@ -58,17 +61,20 @@ describe("crawler metadata", () => {
     const evidenceUrls = [
       `${SITE_URL}/guides/ai-security-vulnerabilities`,
       `${SITE_URL}/guides/hallucination-detection`,
+      `${SITE_URL}/guides/ai-agents`,
+      `${SITE_URL}/guides/ai-chips-infrastructure`,
+      `${SITE_URL}/guides/ai-governance`,
       `${SITE_URL}/security-research`,
     ];
 
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("text/plain; charset=utf-8");
     expect(await response.text()).toBe(llmsText);
-    expect(linkedUrls.length).toBe(19);
+    expect(linkedUrls.length).toBe(22);
     expect(linkedUrls.slice(0, evidenceUrls.length)).toEqual(evidenceUrls);
     expect(evidenceUrls.every((url) => linkedUrls.filter((linkedUrl) => linkedUrl === url).length === 1)).toBe(true);
     expect(linkedUrls.every((url) => url === SITE_URL || url.startsWith(`${SITE_URL}/`))).toBe(true);
-    expect(llmsText).toContain("Start with the two evergreen guides for durable evidence");
+    expect(llmsText).toContain("Start with the five evergreen guides for durable evidence");
     expect(llmsText).not.toContain(`${SITE_URL}/signin`);
     expect(llmsText).not.toContain(`${SITE_URL}/signup`);
     expect(llmsText).not.toContain(`${SITE_URL}/api/`);

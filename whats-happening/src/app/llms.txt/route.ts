@@ -6,12 +6,15 @@ export const llmsText = `# What's Happening
 
 > Source-linked trend intelligence for inspecting scored technology signals, source trails, and the earliest available country-tagged evidence.
 
-What's Happening is a public web product for founders and analysts tracking emerging technology. It uses official source feeds, a 45/35/20 breakout score, source links, concise explanations, and careful country attribution. Start with the two evergreen guides for durable evidence, then use the research hub for individual failure modes and source records.
+What's Happening is a public web product for founders and analysts tracking emerging technology. It uses official source feeds, a 45/35/20 breakout score, source links, concise explanations, and careful country attribution. Start with the five evergreen guides for durable evidence, then use the research hub for individual failure modes and source records.
 
 ## Evidence guides
 
 - [AI security vulnerabilities](${SITE_URL}/guides/ai-security-vulnerabilities): Seven source-linked defensive checkpoints for prompt injection, model supply chains, data poisoning, output handling, excessive agency, secrets and unbounded consumption.
 - [Hallucination detection](${SITE_URL}/guides/hallucination-detection): A source-linked detection stack for retrieval grounding, atomic claim checks, entailment, uncertainty, evaluation sets and human review.
+- [AI agents](${SITE_URL}/guides/ai-agents): A bilingual systems guide to agent loops, tools, memory, permissions, evaluation and production controls.
+- [AI chips and infrastructure](${SITE_URL}/guides/ai-chips-infrastructure): A bilingual systems guide to accelerators, memory, clusters, software, power, cooling and supply.
+- [AI governance](${SITE_URL}/guides/ai-governance): A bilingual operating guide to ownership, inventory, risk tiers, controls, evidence, incidents and changing rules.
 - [Defensive AI security research](${SITE_URL}/security-research): Searchable English and Turkish dossiers with risk models, controls, validation steps, limits and authoritative source records.
 
 ## Product
