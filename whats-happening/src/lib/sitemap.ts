@@ -84,13 +84,18 @@ function newestTimestamp(values: Array<string | undefined>) {
     .sort((left, right) => new Date(right).getTime() - new Date(left).getTime())[0];
 }
 
-export function buildSitemap(trends: Trend[], activities: CountryActivity[]): MetadataRoute.Sitemap {
+export function buildSitemap(
+  trends: Trend[],
+  activities: CountryActivity[],
+  collectionTrends: Trend[] = trends,
+): MetadataRoute.Sitemap {
   const eligibleTrends = trends.filter(hasSourcedBriefing);
-  const categoryEntries = [...new Set(eligibleTrends.map((trend) => trend.category.trim()).filter(Boolean))]
+  const eligibleCollectionTrends = collectionTrends.filter(hasSourcedBriefing);
+  const categoryEntries = [...new Set(eligibleCollectionTrends.map((trend) => trend.category.trim()).filter(Boolean))]
     .map((category) => ({
       category,
       path: categoryPath(category),
-      trends: eligibleTrends.filter((trend) => trend.category.trim() === category),
+      trends: eligibleCollectionTrends.filter((trend) => trend.category.trim() === category),
     }))
     .filter(({ path }) => path !== "/category/")
     .sort((left, right) => left.path.localeCompare(right.path))

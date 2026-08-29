@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { readMapActivity, readPublicTrendArchive } from "@/lib/server/trend-data";
+import { readMapActivity, readPublicTrendArchive, readTrendList } from "@/lib/server/trend-data";
 import { buildSitemap, staticSitemapEntries } from "@/lib/sitemap";
 
 export const dynamic = "force-dynamic";
@@ -7,11 +7,12 @@ export const dynamic = "force-dynamic";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   try {
-    const [publicTrends, mapPayload] = await Promise.all([
+    const [publicTrends, activeTrendPayload, mapPayload] = await Promise.all([
       readPublicTrendArchive(now),
+      readTrendList({ limit: 1_000, offset: 0, mode: "live", now }),
       readMapActivity(now),
     ]);
-    return buildSitemap(publicTrends, mapPayload.activities);
+    return buildSitemap(publicTrends, mapPayload.activities, activeTrendPayload.trends);
   } catch {
     return staticSitemapEntries;
   }
