@@ -5,6 +5,7 @@ import { Footer } from "@/components/Footer";
 import { StructuredData } from "@/components/StructuredData";
 import { TrendDetail } from "@/components/TrendDetail";
 import { readTrendDetail } from "@/lib/server/trend-data";
+import { trendMetadataOverride } from "@/lib/trend-metadata";
 import { trendPath, trendStructuredData } from "@/lib/trend-page-graph";
 
 export const dynamic = "force-dynamic";
@@ -14,14 +15,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const payload = await readTrendDetail(slug);
   if (!payload) return { robots: { index: false, follow: false } };
   const topic = payload.trend.title;
-  const description = payload.trend.brief?.what_it_is || payload.trend.summary || `Read the source-linked AI trend article for ${topic}.`;
+  const override = trendMetadataOverride(slug);
+  const title = override?.title || `${topic} trend article | What's Happening`;
+  const openGraphTitle = override?.title || `${topic} trend article`;
+  const description = override?.description || payload.trend.brief?.what_it_is || payload.trend.summary || `Read the source-linked AI trend article for ${topic}.`;
 
   return {
-    title: `${topic} trend article | What's Happening`,
+    title,
     description,
     alternates: { canonical: trendPath(slug) },
     openGraph: {
-      title: `${topic} trend article`,
+      title: openGraphTitle,
       description,
       type: "article",
       url: trendPath(slug),
