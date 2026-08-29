@@ -680,8 +680,8 @@ export function getEvergreenGuideAudit(guide: EvergreenGuide) {
 }
 
 const evergreenPatterns: Record<EvergreenGuideSlug, RegExp> = {
-  "ai-agents": /\b(ai agents?|agentic (?:ai|system|workflow)|autonomous ai|coding agents?|model context protocol|mcp server|github copilot|claude code)\b/i,
-  "ai-chips-infrastructure": /\b(ai chips?|ai infrastructure|gpus?|nvidia|tpus?|semiconductor|high[- ]bandwidth memory|hbm|nvlink|cuda|mtia|ai data cent(?:er|re))\b/i,
+  "ai-agents": /\b(ai agents?|agentic (?:ai|system|workflow)|autonomous ai|coding agents?|model context protocol|mcp server)\b/i,
+  "ai-chips-infrastructure": /\b(ai chips?|ai infrastructure|gpus?|tpus?|semiconductor|high[- ]bandwidth memory|hbm|nvlink|cuda|mtia|ai data cent(?:er|re))\b/i,
   "ai-governance": /\b(ai governance|ai regulation|ai policy|ai act|artificial intelligence (?:law|regulation|policy)|ai safety institute|ai copyright|chatgpt (?:court|lawsuit)|anthropic blacklist)\b/i,
 };
 
