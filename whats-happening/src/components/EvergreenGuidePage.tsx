@@ -9,9 +9,50 @@ import {
   getEvergreenGuideAudit,
   type EvergreenGuideSlug,
 } from "@/content/evergreen-guides";
+import { guidePath, type SecurityGuideSlug } from "@/content/security-guides";
 import { useLocale } from "@/i18n/locale";
 
 type LiveTrendLink = { slug: string; title: string; category: string; lastSeenAt: string };
+
+type ContextualSecurityLink = {
+  slug: SecurityGuideSlug;
+  label: Record<"en" | "tr", string>;
+  context: Record<"en" | "tr", string>;
+};
+
+const contextualSecurityLinks: Record<EvergreenGuideSlug, ContextualSecurityLink[]> = {
+  "ai-agents": [
+    {
+      slug: "ai-security-vulnerabilities",
+      label: { en: "how to reduce AI security vulnerabilities", tr: "yapay zeka güvenlik açıklarının nasıl azaltılacağını" },
+      context: { en: "Review this before granting an agent tools, credentials or approval authority.", tr: "Bir ajana araç, kimlik bilgisi veya onay yetkisi vermeden önce bunu inceleyin." },
+    },
+    {
+      slug: "hallucination-detection",
+      label: { en: "how to detect AI hallucinations", tr: "yapay zeka halüsinasyonlarının nasıl tespit edileceğini" },
+      context: { en: "Use this when an agent must produce factual answers or act on generated claims.", tr: "Bir ajan olgusal yanıt üretirken veya üretilen iddialarla işlem yaparken bunu kullanın." },
+    },
+  ],
+  "ai-chips-infrastructure": [
+    {
+      slug: "ai-security-vulnerabilities",
+      label: { en: "how to reduce AI security vulnerabilities", tr: "yapay zeka güvenlik açıklarının nasıl azaltılacağını" },
+      context: { en: "Apply these software and access controls above the infrastructure trust boundary.", tr: "Bu yazılım ve erişim kontrollerini altyapı güven sınırının üzerinde uygulayın." },
+    },
+  ],
+  "ai-governance": [
+    {
+      slug: "ai-security-vulnerabilities",
+      label: { en: "how to reduce AI security vulnerabilities", tr: "yapay zeka güvenlik açıklarının nasıl azaltılacağını" },
+      context: { en: "Use these controls to turn security policy into tested operating gates.", tr: "Güvenlik politikasını test edilmiş işletim kapılarına dönüştürmek için bu kontrolleri kullanın." },
+    },
+    {
+      slug: "hallucination-detection",
+      label: { en: "how to detect AI hallucinations", tr: "yapay zeka halüsinasyonlarının nasıl tespit edileceğini" },
+      context: { en: "Use this process to verify evidence-backed outputs and define review thresholds.", tr: "Kanıta dayalı çıktıları doğrulamak ve inceleme eşiklerini belirlemek için bu süreci kullanın." },
+    },
+  ],
+};
 
 const copy = {
   en: {
@@ -37,6 +78,7 @@ const copy = {
     related: "Other evidence guides",
     sourceDesk: "Official source record",
     unavailableAction: "Return to live AI trends",
+    securityResearch: "Related security research",
   },
   tr: {
     breadcrumb: "Kanıt rehberleri",
@@ -61,6 +103,7 @@ const copy = {
     related: "Diğer kanıt rehberleri",
     sourceDesk: "Resmî kaynak kaydı",
     unavailableAction: "Canlı yapay zeka trendlerine dön",
+    securityResearch: "İlgili güvenlik araştırması",
   },
 };
 
@@ -96,6 +139,7 @@ export function EvergreenGuidePage({ slug, liveTrends }: { slug: EvergreenGuideS
   const guide = evergreenGuides[slug];
   const audit = getEvergreenGuideAudit(guide);
   const companions = Object.values(evergreenGuides).filter((candidate) => candidate.slug !== slug);
+  const securityLinks = contextualSecurityLinks[slug];
 
   if (!audit.complete || audit.reviewRequired) {
     return <div className="mx-auto min-h-[70vh] max-w-3xl px-5 pb-24 pt-40 sm:px-8">
@@ -144,6 +188,15 @@ export function EvergreenGuidePage({ slug, liveTrends }: { slug: EvergreenGuideS
     </section>
 
     <aside className="mt-8 border-l-2 border-white/20 py-1 pl-5 text-sm leading-6 text-[#96969E]">{guide.disclaimer[language]}<SourceMarks sourceIds={guide.answerSourceIds} label={t.evidence} /></aside>
+
+    <aside className="mt-8 border-y border-white/[0.12] py-6" aria-label={t.securityResearch}>
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">{t.securityResearch}</p>
+      <ul className="mt-4 grid gap-4 lg:grid-cols-2">
+        {securityLinks.map((item) => <li key={item.slug} className="max-w-[68ch] text-sm leading-7 text-[#A5A5AC]">
+          <Link href={guidePath(item.slug)} className="font-medium text-[#E0E0DD] underline decoration-white/25 underline-offset-4 hover:text-white">{item.label[language]}</Link>. {item.context[language]}
+        </li>)}
+      </ul>
+    </aside>
 
     <div className="mt-14 grid items-start gap-14 lg:grid-cols-[minmax(0,1fr)_17rem]">
       <div className="divide-y divide-white/[0.12] border-y border-white/[0.12]">
