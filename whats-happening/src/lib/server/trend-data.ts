@@ -16,11 +16,12 @@ import {
   ACTIVE_TREND_WINDOW_HOURS,
   DAILY_TREND_TARGET,
   activeTrendCutoff,
+  buildPublicTrendArchive,
   buildTrendListPayload,
   type TrendFeedOptions,
   utcDayStart,
 } from "@/lib/trend-feed";
-import type { MapActivityPayload, Signal, TrendDetailPayload, TrendListPayload } from "@/types/trends";
+import type { MapActivityPayload, Signal, Trend, TrendDetailPayload, TrendListPayload } from "@/types/trends";
 
 function batches<T>(items: T[], size: number) {
   const groups: T[][] = [];
@@ -130,6 +131,35 @@ export async function readTrendList(options: TrendFeedOptions & {
   if (signalError) throw signalError;
   const signals = signalResults.flatMap((result) => result.data || []).map(sanitizeSignal) as Signal[];
   return buildTrendListPayload(candidates, signals, { ...options, now });
+}
+
+export async function readPublicTrendArchive(now = new Date()): Promise<Trend[]> {
+  if (isDemoMode()) return [];
+
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("trends")
+    .select("*, country:countries(*)")
+    .order("last_seen_at", { ascending: false })
+    .limit(1_000);
+  if (error) throw error;
+
+  const candidates = (data || []).map(sanitizeTrend);
+  const signalResults = await Promise.all(
+    batches(candidates.map((trend) => trend.id), 100).map((trendIds) =>
+      supabase
+        .from("signals")
+        .select("*, country:countries(*)")
+        .in("trend_id", trendIds)
+        .order("observed_at", { ascending: false })
+        .order("published_at", { ascending: false })
+        .limit(1_000),
+    ),
+  );
+  const signalError = signalResults.find((result) => result.error)?.error;
+  if (signalError) throw signalError;
+  const signals = signalResults.flatMap((result) => result.data || []).map(sanitizeSignal) as Signal[];
+  return buildPublicTrendArchive(candidates, signals, now);
 }
 
 export async function readMapActivity(now = new Date()): Promise<MapActivityPayload> {

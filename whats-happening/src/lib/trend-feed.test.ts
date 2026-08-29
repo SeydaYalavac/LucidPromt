@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { boundedInteger, buildTrendListPayload, MAX_TREND_PAGE_SIZE } from "./trend-feed";
+import { boundedInteger, buildPublicTrendArchive, buildTrendListPayload, MAX_TREND_PAGE_SIZE } from "./trend-feed";
 import type { Signal, Trend } from "@/types/trends";
 
 const now = new Date("2026-08-21T18:00:00.000Z");
@@ -142,5 +142,30 @@ describe("daily trend feed", () => {
     const payload = buildTrendListPayload(sportsTrends, signals, { limit: 100, offset: 0, mode: "live", now });
 
     expect(payload.trends).toEqual([]);
+  });
+});
+
+describe("public trend archive", () => {
+  it("keeps stale source-backed AI pages while excluding unsupported and off-scope records", () => {
+    const staleTimestamp = "2026-08-01T17:00:00.000Z";
+    const trends = [
+      trend(1, { slug: "squall01337-mixamo-llm-mocap", title: "Mixamo LLM AI mocap", last_seen_at: staleTimestamp }),
+      trend(2, { slug: "nateherkai-scroll-craft", title: "Scroll Craft Claude Code skill", last_seen_at: staleTimestamp }),
+      trend(3, { slug: "unsupported-ai-route", title: "Unsupported AI route", last_seen_at: staleTimestamp }),
+      trend(4, { slug: "football-transfer-update", title: "Football transfer update", last_seen_at: staleTimestamp }),
+      trend(5, { slug: "squall01337-mixamo-llm-mocap", title: "Duplicate AI route", last_seen_at: staleTimestamp }),
+    ];
+    const signals = [
+      signal(1, { title: "Mixamo LLM AI motion capture", observed_at: staleTimestamp, published_at: staleTimestamp }),
+      signal(2, { title: "Scroll Craft Claude Code AI website skill", observed_at: staleTimestamp, published_at: staleTimestamp }),
+      signal(3, { title: "Unsupported AI route", source_url: "not-a-url", observed_at: staleTimestamp, published_at: staleTimestamp }),
+      signal(4, { title: "Football transfer update", excerpt: "League fixtures", observed_at: staleTimestamp, published_at: staleTimestamp }),
+      signal(5, { title: "Duplicate AI route", observed_at: staleTimestamp, published_at: staleTimestamp }),
+    ];
+
+    expect(buildPublicTrendArchive(trends, signals, now).map((item) => item.slug)).toEqual([
+      "squall01337-mixamo-llm-mocap",
+      "nateherkai-scroll-craft",
+    ]);
   });
 });
