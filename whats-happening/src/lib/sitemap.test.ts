@@ -172,4 +172,16 @@ describe("live discovery sitemap", () => {
     expect(urls.some((url) => url.includes("/category/"))).toBe(false);
     expect(urls.some((url) => url.includes("/country/"))).toBe(false);
   });
+
+  it("keeps public archive articles without exposing inactive collection routes", () => {
+    const archivedTrend = eligibleTrend({
+      slug: "archived-ai-agent",
+      category: "Archived AI",
+      last_seen_at: "2026-08-01T10:00:00.000Z",
+    });
+    const urls = buildSitemap([archivedTrend], [], []).map(({ url }) => url);
+
+    expect(urls).toContain(`${SITE_URL}/trend/archived-ai-agent`);
+    expect(urls).not.toContain(`${SITE_URL}/category/archived-ai`);
+  });
 });
