@@ -137,14 +137,19 @@ export async function readPublicTrendArchive(now = new Date()): Promise<Trend[]>
   if (isDemoMode()) return [];
 
   const supabase = getSupabaseAdmin();
-  const { data, error } = await supabase
-    .from("trends")
-    .select("*, country:countries(*)")
-    .order("last_seen_at", { ascending: false })
-    .limit(1_000);
-  if (error) throw error;
+  const candidates: Trend[] = [];
+  const pageSize = 1_000;
+  for (let offset = 0; ; offset += pageSize) {
+    const { data, error } = await supabase
+      .from("trends")
+      .select("*, country:countries(*)")
+      .order("last_seen_at", { ascending: false })
+      .range(offset, offset + pageSize - 1);
+    if (error) throw error;
+    candidates.push(...(data || []).map(sanitizeTrend));
+    if (!data || data.length < pageSize) break;
+  }
 
-  const candidates = (data || []).map(sanitizeTrend);
   const signalResults = await Promise.all(
     batches(candidates.map((trend) => trend.id), 100).map((trendIds) =>
       supabase
