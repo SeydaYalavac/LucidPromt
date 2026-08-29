@@ -14,6 +14,8 @@ describe("security research discovery links", () => {
 
     expect(markup).toContain('href="/guides/ai-security-vulnerabilities"');
     expect(markup).toContain('href="/guides/hallucination-detection"');
+    expect(markup).toContain("How to reduce AI security vulnerabilities");
+    expect(markup).toContain("How to detect AI hallucinations");
   });
 
   it.each([

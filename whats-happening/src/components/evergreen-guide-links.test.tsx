@@ -11,4 +11,17 @@ describe("evergreen guide discovery links", () => {
     expect(markup).toContain("Evidence checked");
     expect(markup).not.toContain("guide is unavailable");
   });
+
+  it.each([
+    ["ai-agents", true],
+    ["ai-chips-infrastructure", false],
+    ["ai-governance", true],
+  ] as const)("adds only relevant contextual security links to %s", (slug, linksHallucinationGuide) => {
+    const markup = renderToStaticMarkup(<LocaleProvider><EvergreenGuidePage slug={slug} liveTrends={[]} /></LocaleProvider>);
+
+    expect(markup).toContain('href="/guides/ai-security-vulnerabilities"');
+    expect(markup).toContain("how to reduce AI security vulnerabilities");
+    expect(markup.includes('href="/guides/hallucination-detection"')).toBe(linksHallucinationGuide);
+    expect(markup.includes("how to detect AI hallucinations")).toBe(linksHallucinationGuide);
+  });
 });
