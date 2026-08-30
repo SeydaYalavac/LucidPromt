@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { LiveDataConfigurationError } from "@/lib/live-data-error";
 
 let admin: SupabaseClient | undefined;
 
@@ -6,7 +7,7 @@ function getSupabaseUrl(): string {
   const rawUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 
   if (!rawUrl) {
-    throw new Error("NEXT_PUBLIC_SUPABASE_URL is not configured");
+    throw new LiveDataConfigurationError("NEXT_PUBLIC_SUPABASE_URL is not configured");
   }
 
   // Supabase client'a yalnızca proje URL'sini ver.
@@ -16,7 +17,7 @@ function getSupabaseUrl(): string {
     .replace(/\/+$/, "");
 
   if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(url)) {
-    throw new Error(
+    throw new LiveDataConfigurationError(
       `Invalid Supabase project URL: ${url}. Expected format: https://<project-ref>.supabase.co`,
     );
   }
@@ -32,7 +33,7 @@ export function getSupabaseAdmin(): SupabaseClient {
     process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
   if (!key) {
-    throw new Error(
+    throw new LiveDataConfigurationError(
       "SUPABASE_SECRET_KEY or SUPABASE_SERVICE_ROLE_KEY is not configured",
     );
   }

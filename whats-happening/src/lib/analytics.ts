@@ -1,6 +1,7 @@
 import posthog from "posthog-js";
 import { scrubAutomaticAcquisitionProperties } from "@/lib/analytics-privacy";
 import { isCurrentSessionMarkedForProductionTest } from "@/lib/analytics-test-session";
+import { SITE_URL } from "@/lib/site";
 import {
   buildSignupSourceEventProperties,
   deriveFirstReferrerChannel,
@@ -52,8 +53,21 @@ let initialized = false;
 const capturedOnce = new Set<string>();
 const FIRST_REFERRER_CHANNEL_PROPERTY = "first_referrer_channel";
 
+export function isCanonicalAnalyticsLocation(href: string) {
+  try {
+    return new URL(href).origin === new URL(SITE_URL).origin;
+  } catch {
+    return false;
+  }
+}
+
 export function initProductAnalytics() {
   if (typeof window === "undefined") return false;
+
+  // Preview deployments can share the public ingestion key while lacking live
+  // data credentials. Keep their expected fail-closed states out of production
+  // analytics, and measure only the canonical customer-facing site.
+  if (!isCanonicalAnalyticsLocation(window.location.href)) return false;
 
   if (isCurrentSessionMarkedForProductionTest()) {
     if (initialized) posthog.stopSessionRecording();
