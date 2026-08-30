@@ -86,6 +86,20 @@ describe("analytics runtime test exclusion", () => {
     });
   });
 
+  it("does not send production analytics from a preview deployment", async () => {
+    installBrowser("https://whatshappeninginai-git-fix-example-seyda2.vercel.app/");
+    const analytics = await import("./analytics");
+
+    expect(analytics.initProductAnalytics()).toBe(false);
+    analytics.captureProductEvent("$pageview", {
+      route: "/",
+      $current_url: "https://whatshappeninginai-git-fix-example-seyda2.vercel.app/",
+    });
+
+    expect(posthog.init).not.toHaveBeenCalled();
+    expect(posthog.capture).not.toHaveBeenCalled();
+  });
+
   it("drops later SDK sends and stops recording if the session becomes marked", async () => {
     const sessionStorage = installBrowser("https://www.whatshappeninginai.com/");
     const analytics = await import("./analytics");

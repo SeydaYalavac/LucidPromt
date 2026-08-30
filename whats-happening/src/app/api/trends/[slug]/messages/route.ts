@@ -4,7 +4,7 @@ import { demoMessages, demoTrends } from "@/lib/demo-data";
 import { isDemoMode } from "@/lib/env";
 import { moderateChatMessage } from "@/lib/moderation";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
-import { unavailable } from "@/lib/api";
+import { dataReadFailure } from "@/lib/api";
 import { isAiTrend, isEligibleEvidenceSignal, sanitizeSignal } from "@/lib/trend-content";
 import {
   isChatRateLimitError,
@@ -55,7 +55,7 @@ export async function GET(_request: Request, context: { params: Promise<{ slug: 
       mode: "live",
     });
   } catch (error) {
-    return unavailable(error);
+    return dataReadFailure(error);
   }
 }
 
@@ -152,6 +152,6 @@ export async function POST(request: NextRequest, context: { params: Promise<{ sl
         { status: 429, headers: { "Retry-After": "60" } },
       );
     }
-    return unavailable(error);
+    return dataReadFailure(error);
   }
 }

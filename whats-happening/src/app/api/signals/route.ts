@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { demoSignals } from "@/lib/demo-data";
-import { edgeReadHeaders, unavailable } from "@/lib/api";
+import { dataReadFailure, edgeReadHeaders } from "@/lib/api";
 import { isDemoMode } from "@/lib/env";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { isEligibleEvidenceSignal, sanitizeSignal } from "@/lib/trend-content";
@@ -20,6 +20,6 @@ export async function GET(request: NextRequest) {
     const signals = (data || []).map(sanitizeSignal).filter(isEligibleEvidenceSignal).slice(0, limit);
     return NextResponse.json({ signals, mode: "live" }, { headers: edgeReadHeaders });
   } catch (error) {
-    return unavailable(error);
+    return dataReadFailure(error);
   }
 }

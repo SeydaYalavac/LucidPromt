@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { edgeReadHeaders, unavailable } from "@/lib/api";
+import { dataReadFailure, edgeReadHeaders } from "@/lib/api";
 import {
   boundedInteger,
   MAX_TREND_PAGE_SIZE,
@@ -18,6 +18,6 @@ export async function GET(request: NextRequest) {
     const payload = await readTrendList({ limit, offset, mode: "live", now, globalPulse, category, country });
     return NextResponse.json(payload, { headers: edgeReadHeaders });
   } catch (error) {
-    return unavailable(error);
+    return dataReadFailure(error);
   }
 }
