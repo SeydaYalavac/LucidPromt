@@ -26,5 +26,6 @@ describe("security research discovery links", () => {
 
     expect(markup).toContain('href="/security-research"');
     expect(markup).toContain(`href="${companionPath}"`);
+    expect(markup).toContain('href="/category/artificial-intelligence"');
   });
 });

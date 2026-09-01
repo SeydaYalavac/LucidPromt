@@ -1,7 +1,14 @@
 import type { MetadataRoute } from "next";
 import type { CountryActivity, Trend } from "@/types/trends";
 import { SITE_URL } from "./site";
-import { absoluteUrl, categoryPath, countryPath, trendPath } from "./trend-page-graph";
+import { absoluteUrl, countryPath, trendPath } from "./trend-page-graph";
+import {
+  MIN_RETAINED_HUB_ARTICLES,
+  retainedCategoryHubs,
+  retainedHubForCategory,
+  retainedHubPageCount,
+  retainedHubPath,
+} from "./trend-hubs";
 import researchState from "../content/security-research-state.json";
 import evergreenGuideState from "../content/evergreen-guide-state.json";
 
@@ -91,23 +98,25 @@ export function buildSitemap(
 ): MetadataRoute.Sitemap {
   const eligibleTrends = trends.filter(hasSourcedBriefing);
   const eligibleCollectionTrends = collectionTrends.filter(hasSourcedBriefing);
-  const categoryEntries = [...new Set(eligibleCollectionTrends.map((trend) => trend.category.trim()).filter(Boolean))]
-    .map((category) => ({
-      category,
-      path: categoryPath(category),
-      trends: eligibleCollectionTrends.filter((trend) => trend.category.trim() === category),
-    }))
-    .filter(({ path }) => path !== "/category/")
-    .sort((left, right) => left.path.localeCompare(right.path))
-    .map(({ path, trends: categoryTrends }) => ({
-      url: absoluteUrl(path),
-      lastModified: newestTimestamp(categoryTrends.map((trend) => trend.brief?.article.last_updated_at || trend.updated_at || trend.last_seen_at)),
-      changeFrequency: "daily" as const,
-      priority: 0.7,
-    }));
+  const categoryGroups = new Map(retainedCategoryHubs.map((hub) => [hub.slug, { hub, trends: [] as Trend[] }]));
+  for (const trend of eligibleCollectionTrends) {
+    categoryGroups.get(retainedHubForCategory(trend.category).slug)?.trends.push(trend);
+  }
+  const categoryEntries = [...categoryGroups.values()]
+    .filter(({ trends: categoryTrends }) => categoryTrends.length >= MIN_RETAINED_HUB_ARTICLES)
+    .flatMap(({ hub, trends: categoryTrends }) => Array.from(
+      { length: retainedHubPageCount(categoryTrends.length) },
+      (_, index) => ({
+        url: absoluteUrl(retainedHubPath(hub, index + 1)),
+        lastModified: newestTimestamp(categoryTrends.map((trend) => trend.brief?.article.last_updated_at || trend.updated_at || trend.last_seen_at)),
+        changeFrequency: "daily" as const,
+        priority: 0.7,
+      }),
+    ))
+    .sort((left, right) => left.url.localeCompare(right.url));
 
   const countryEntries = activities
-    .filter((activity) => activity.country.slug.trim() && activity.rising_topics.length && activity.developments.length)
+    .filter((activity) => activity.country.slug.trim() && activity.rising_topics.length >= MIN_RETAINED_HUB_ARTICLES && activity.developments.length)
     .map((activity) => ({
       url: absoluteUrl(countryPath(activity.country.slug)),
       lastModified: activity.latest_observed_at,

@@ -1,5 +1,6 @@
 import { countryAttributionFromMetadata } from "./country-attribution";
 import { SITE_NAME, SITE_URL } from "./site";
+import { retainedHubPathForTrend } from "./trend-hubs";
 import type { Country, CountryActivity, Signal, Trend } from "../types/trends";
 
 export type InternalPageLink = {
@@ -50,7 +51,7 @@ export function evidenceBackedCountries(trend: Trend, signals: Signal[]) {
 }
 
 export function trendInternalLinks(trend: Trend, signals: Signal[]) {
-  const category: InternalPageLink = { href: categoryPath(trend.category), label: trend.category };
+  const category: InternalPageLink = { href: retainedHubPathForTrend(trend), label: trend.category };
   const countries = evidenceBackedCountries(trend, signals).map((country) => ({
     href: countryPath(country.slug),
     label: country.name,
@@ -108,9 +109,13 @@ export function trendStructuredData(trend: Trend, signals: Signal[]) {
   };
 }
 
-export function categoryStructuredData(category: string, trends: Trend[]) {
+export function categoryStructuredData(
+  category: string,
+  trends: Trend[],
+  options: { path?: string; positionOffset?: number; total?: number } = {},
+) {
   if (!trends.length) return null;
-  const path = categoryPath(category);
+  const path = options.path || categoryPath(category);
   const canonical = absoluteUrl(path);
   return {
     "@context": "https://schema.org",
@@ -123,10 +128,10 @@ export function categoryStructuredData(category: string, trends: Trend[]) {
         description: `Current source-linked ${category} trends with evidence trails and scored attention signals.`,
         mainEntity: {
           "@type": "ItemList",
-          numberOfItems: trends.length,
+          numberOfItems: options.total || trends.length,
           itemListElement: trends.map((trend, index) => ({
             "@type": "ListItem",
-            position: index + 1,
+            position: (options.positionOffset || 0) + index + 1,
             name: trend.title,
             url: absoluteUrl(trendPath(trend.slug)),
           })),

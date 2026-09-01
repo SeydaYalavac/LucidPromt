@@ -1,25 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import { localeCategoryLabel, useLocale } from "@/i18n/locale";
-import { trendPath } from "@/lib/trend-page-graph";
-import type { CountryActivity } from "@/types/trends";
+import { useLocale } from "@/i18n/locale";
+import type { RetainedCountryPagePayload } from "@/types/trends";
 import { CollectionHeader } from "./CollectionHeader";
+import { NewsCard } from "./NewsCard";
 
-function observedLabel(value: string, locale: "en" | "tr") {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return locale === "tr" ? "Zaman bilgisi yok" : "Time unavailable";
-  return new Intl.DateTimeFormat(locale === "tr" ? "tr-TR" : "en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "UTC",
-  }).format(date);
+function pagePath(slug: string, page: number) {
+  const path = `/country/${encodeURIComponent(slug)}`;
+  return page > 1 ? `${path}?page=${page}` : path;
 }
 
-export function CountryEvidenceView({ activity }: { activity: CountryActivity }) {
+export function CountryEvidenceView({ data }: { data: RetainedCountryPagePayload }) {
   const { locale } = useLocale();
-  const countryName = activity.country.name;
+  const countryName = data.country.name;
 
   return <>
     <CollectionHeader kind="country" value={countryName} />
@@ -35,28 +29,16 @@ export function CountryEvidenceView({ activity }: { activity: CountryActivity })
           {locale === "tr" ? "Kaynakla doğrulanan trendler" : "Source-backed trends"}
         </h2>
         <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">
-          {activity.evidence_count} {locale === "tr" ? "coğrafi kanıt" : "geographic evidence items"}
+          {locale === "tr" ? `Sayfa ${data.pagination.page} / ${data.pagination.page_count}` : `Page ${data.pagination.page} of ${data.pagination.page_count}`} · {data.evidence_count} {locale === "tr" ? "coğrafi kanıt" : "geographic evidence items"}
         </p>
       </div>
-      <ol className="mt-6 divide-y divide-white/[0.1] border-y border-white/[0.1]">
-        {activity.rising_topics.map((trend, index) => <li key={trend.id} className="min-w-0">
-          <Link href={trendPath(trend.slug)} className="group grid min-w-0 gap-4 py-7 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:grid-cols-[2rem_minmax(0,1fr)_auto]">
-            <span className="font-mono text-xs tabular-nums text-white/30">{String(index + 1).padStart(2, "0")}</span>
-            <span className="min-w-0">
-              <span className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-[0.12em] text-white/40">
-                <span>{localeCategoryLabel(trend.category, locale)}</span>
-                <span>{locale === "tr" ? `${trend.evidence_count} kanıt` : `${trend.evidence_count} evidence`}</span>
-                <time dateTime={trend.latest_observed_at}>{observedLabel(trend.latest_observed_at, locale)}</time>
-              </span>
-              <span className="mt-3 block break-words text-balance text-2xl font-medium tracking-[-0.03em] text-white">{trend.title}</span>
-              {trend.summary && <span className="mt-3 block max-w-[68ch] break-words text-pretty text-sm leading-6 text-[#A8A8AF]">{trend.summary}</span>}
-            </span>
-            <span className="inline-flex min-h-11 items-center gap-2 self-end text-sm font-medium text-white/60 group-hover:text-white">
-              {locale === "tr" ? "Makaleyi oku" : "Read article"} <ArrowUpRight size={16} />
-            </span>
-          </Link>
-        </li>)}
-      </ol>
+      <div className="mt-6 grid gap-5 lg:grid-cols-2">
+        {data.trends.map((trend, index) => <NewsCard key={trend.id} trend={trend} rank={(data.pagination.page - 1) * data.pagination.page_size + index + 1} analyticsSource="country" />)}
+      </div>
+      <nav aria-label={`${countryName} archive pagination`} className="mt-12 flex gap-3 border-y border-white/[0.1] py-5">
+        {data.pagination.has_previous && <Link href={pagePath(data.country.slug, data.pagination.page - 1)} className="inline-flex min-h-11 items-center border border-white/[0.12] px-4 text-sm text-white hover:border-white/30">{locale === "tr" ? "Önceki" : "Previous"}</Link>}
+        {data.pagination.has_next && <Link href={pagePath(data.country.slug, data.pagination.page + 1)} className="inline-flex min-h-11 items-center border border-white/[0.12] px-4 text-sm text-white hover:border-white/30">{locale === "tr" ? "Sonraki" : "Next"}</Link>}
+      </nav>
     </section>
   </>;
 }

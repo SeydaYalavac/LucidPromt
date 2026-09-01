@@ -30,6 +30,7 @@ const copy = {
     nextAction: "Open the full research desk",
     related: "Related guide",
     otherGuide: "Read the companion guide",
+    categoryArchive: "Browse retained Artificial Intelligence trends",
   },
   tr: {
     breadcrumb: "Yapay zeka güvenlik araştırması",
@@ -54,6 +55,7 @@ const copy = {
     nextAction: "Tam araştırma masasını aç",
     related: "İlgili rehber",
     otherGuide: "Tamamlayıcı rehberi oku",
+    categoryArchive: "Kalıcı Yapay Zeka trendlerine göz at",
   },
 };
 
@@ -179,7 +181,10 @@ export function SecurityGuidePage({ slug }: { slug: SecurityGuideSlug }) {
 
     <section className="mt-20 grid gap-8 border-y border-white/[0.12] py-10 sm:grid-cols-[1fr_auto] sm:items-center">
       <div><p className="font-mono text-[10px] uppercase tracking-[0.16em] text-white/40">{t.next}</p><p className="mt-3 max-w-[62ch] text-base leading-7 text-[#A9A9AF]">{t.nextBody}</p></div>
-      <Link href="/security-research" className="secondary-action gap-2">{t.nextAction}<ArrowRight size={15} /></Link>
+      <div className="flex flex-wrap items-center gap-4">
+        <Link href="/category/artificial-intelligence" className="text-sm text-white/55 underline decoration-white/20 underline-offset-4 hover:text-white">{t.categoryArchive}</Link>
+        <Link href="/security-research" className="secondary-action gap-2">{t.nextAction}<ArrowRight size={15} /></Link>
+      </div>
     </section>
   </article>;
 }

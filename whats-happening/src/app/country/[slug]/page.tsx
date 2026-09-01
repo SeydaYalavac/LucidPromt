@@ -4,43 +4,50 @@ import { GlobalNavbar } from "@/components/GlobalNavbar";
 import { Footer } from "@/components/Footer";
 import { CountryEvidenceView } from "@/components/CountryEvidenceView";
 import { StructuredData } from "@/components/StructuredData";
-import { readMapActivity } from "@/lib/server/trend-data";
-import { countryPath, countryStructuredData } from "@/lib/trend-page-graph";
+import { readRetainedCountryPage } from "@/lib/server/trend-data";
+import { categoryStructuredData } from "@/lib/trend-page-graph";
+import { retainedHubPage } from "@/lib/trend-hubs";
 
 export const dynamic = "force-dynamic";
 
-async function loadCountry(slug: string) {
-  const payload = await readMapActivity();
-  return payload.activities.find((activity) => activity.country.slug === slug) || null;
+async function loadCountry(slug: string, page: number) {
+  return readRetainedCountryPage(slug, page);
 }
 
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ page?: string | string[] }> }): Promise<Metadata> {
   const { slug } = await params;
-  const activity = await loadCountry(slug);
-  if (!activity) return { robots: { index: false, follow: false } };
-  const description = `Current AI trends with source evidence explicitly attributed to ${activity.country.name}. Geography is observed evidence, not event origin.`;
+  const page = retainedHubPage((await searchParams).page);
+  const data = await loadCountry(slug, page);
+  if (!data) return { robots: { index: false, follow: false } };
+  const description = `Retained AI trends with source evidence explicitly attributed to ${data.country.name}. Geography is observed evidence, not event origin.`;
+  const canonical = page > 1 ? `/country/${slug}?page=${page}` : `/country/${slug}`;
   return {
-    title: `AI trends observed in ${activity.country.name} | What's Happening`,
+    title: `AI trends observed in ${data.country.name}, page ${page} | What's Happening`,
     description,
-    alternates: { canonical: countryPath(activity.country.slug) },
-    openGraph: { title: `AI trends observed in ${activity.country.name}`, description, url: countryPath(activity.country.slug) },
+    alternates: { canonical },
+    openGraph: { title: `AI trends observed in ${data.country.name}`, description, url: canonical },
   };
 }
 
-export default async function CountryPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function CountryPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ page?: string | string[] }> }) {
   const { slug } = await params;
-  const activity = await loadCountry(slug);
-  if (!activity) notFound();
-  const schema = countryStructuredData(activity);
-  if (!schema) notFound();
+  const page = retainedHubPage((await searchParams).page);
+  const data = await loadCountry(slug, page);
+  if (!data) notFound();
+  const path = page > 1 ? `/country/${slug}?page=${page}` : `/country/${slug}`;
+  const schema = categoryStructuredData(`AI trends observed in ${data.country.name}`, data.trends, {
+    path,
+    positionOffset: (page - 1) * data.pagination.page_size,
+    total: data.pagination.total,
+  });
   
   return (
     <div className="relative min-h-screen bg-[#050505] selection:bg-white/10">
-      <StructuredData data={schema} />
+      {schema && <StructuredData data={schema} />}
       <GlobalNavbar />
       
       <main className="mx-auto max-w-4xl px-6 pt-32 pb-24">
-        <CountryEvidenceView activity={activity} />
+        <CountryEvidenceView data={data} />
       </main>
 
       <Footer />
