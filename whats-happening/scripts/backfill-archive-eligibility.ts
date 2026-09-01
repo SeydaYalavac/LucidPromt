@@ -23,15 +23,34 @@ async function readAllRows<T>(
   }
 }
 
+async function readTrends(apply: boolean) {
+  const supabase = getSupabaseAdmin();
+  try {
+    return await readAllRows<BackfillTrend>(async (from, to) => supabase
+      .from("trends")
+      .select("id,slug,title,summary,last_seen_at,updated_at,archive_eligible")
+      .order("id")
+      .range(from, to));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (apply || !message.includes("archive_eligible")) throw error;
+
+    // A pre-migration dry run must still prove the expected eligible total.
+    // Apply mode always fails closed until the durable column exists.
+    const rows = await readAllRows<Omit<BackfillTrend, "archive_eligible">>(async (from, to) => supabase
+      .from("trends")
+      .select("id,slug,title,summary,last_seen_at,updated_at")
+      .order("id")
+      .range(from, to));
+    return rows.map((trend) => ({ ...trend, archive_eligible: false }));
+  }
+}
+
 async function run() {
   const apply = process.argv.includes("--apply");
   const expected = Number(argument("expected"));
   const supabase = getSupabaseAdmin();
-  const trends = await readAllRows<BackfillTrend>(async (from, to) => supabase
-    .from("trends")
-    .select("id,slug,title,summary,last_seen_at,updated_at,archive_eligible")
-    .order("id")
-    .range(from, to));
+  const trends = await readTrends(apply);
   const signals = await readAllRows<Signal>(async (from, to) => supabase
     .from("signals")
     .select("*")
