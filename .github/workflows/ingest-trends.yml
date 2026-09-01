@@ -4,6 +4,21 @@ on:
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
+    inputs:
+      operation:
+        description: Operation to run
+        required: true
+        default: ingest
+        type: choice
+        options:
+          - ingest
+          - archive_backfill_dry_run
+          - archive_backfill_apply
+      expected_archive_total:
+        description: Expected eligible archive total before any write
+        required: true
+        default: "1845"
+        type: string
 
 concurrency:
   group: live-trend-ingestion
@@ -11,6 +26,7 @@ concurrency:
 
 jobs:
   ingest:
+    if: ${{ github.event_name == 'schedule' || inputs.operation == 'ingest' }}
     runs-on: ubuntu-latest
     timeout-minutes: 9
     defaults:
@@ -40,3 +56,33 @@ jobs:
           X_WATCH_QUERIES: ${{ vars.X_WATCH_QUERIES }}
           TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
+
+  archive-backfill:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.operation != 'ingest' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    defaults:
+      run:
+        working-directory: whats-happening
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: whats-happening/package-lock.json
+      - run: npm ci
+      - name: Calculate archive eligibility without writes
+        if: ${{ inputs.operation == 'archive_backfill_dry_run' }}
+        run: npm run archive:backfill -- --expected="$EXPECTED_ARCHIVE_TOTAL"
+        env:
+          EXPECTED_ARCHIVE_TOTAL: ${{ inputs.expected_archive_total }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+      - name: Apply validated archive eligibility
+        if: ${{ inputs.operation == 'archive_backfill_apply' }}
+        run: npm run archive:backfill -- --apply --expected="$EXPECTED_ARCHIVE_TOTAL"
+        env:
+          EXPECTED_ARCHIVE_TOTAL: ${{ inputs.expected_archive_total }}
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}

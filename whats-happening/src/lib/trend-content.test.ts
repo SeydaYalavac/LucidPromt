@@ -3,6 +3,7 @@ import {
   hasAiRelevance,
   buildTrendBrief,
   isAiSignal,
+  isArchiveEligibleTrend,
   isAiTrend,
   isEligibleEvidenceSignal,
   resolveTrendContent,
@@ -71,6 +72,22 @@ describe("AI-only scope", () => {
     expect(isEligibleEvidenceSignal({ source: "hacker_news", external_id: "123", title: "AI agent safety benchmark", source_url })).toBe(true);
     expect(isEligibleEvidenceSignal({ source: "hacker_news", external_id: "124", title: "Show HN: a CSS framework", source_url })).toBe(false);
     expect(isEligibleEvidenceSignal({ source: "github", external_id: "125", title: "small-org/unknown-tool", source_url: "https://github.com/small-org/unknown-tool" })).toBe(false);
+  });
+
+  it("stores archive eligibility only for a slugged trend with valid AI evidence", () => {
+    const trend = { id: "ai", slug: "ai-agent-safety", title: "AI agent safety", summary: "A source-backed summary." };
+    const signal = {
+      trend_id: "ai",
+      source: "hacker_news",
+      external_id: "123",
+      title: "AI agent safety benchmark",
+      source_url: "https://news.ycombinator.com/item?id=123",
+    };
+
+    expect(isArchiveEligibleTrend(trend, [signal])).toBe(true);
+    expect(isArchiveEligibleTrend({ ...trend, slug: "" }, [signal])).toBe(false);
+    expect(isArchiveEligibleTrend(trend, [{ ...signal, source_url: "https://example.com/unsupported" }])).toBe(false);
+    expect(isArchiveEligibleTrend(trend, [{ ...signal, title: "Football transfer update" }])).toBe(false);
   });
 
   it("hides stored non-AI trends from public reads without deleting them", () => {
