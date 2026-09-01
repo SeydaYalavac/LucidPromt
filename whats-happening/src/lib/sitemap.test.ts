@@ -134,16 +134,28 @@ function activity(overrides: Partial<CountryActivity> = {}): CountryActivity {
 }
 
 describe("live discovery sitemap", () => {
-  it("adds every eligible trend, live category, and evidence-backed country once on the canonical host", () => {
-    const trends = [
-      eligibleTrend(),
-      eligibleTrend({ id: "trend-2", slug: "ai-sports-analysis", category: "Sports" }),
-      eligibleTrend(),
-    ];
-    const sitemap = buildSitemap(trends, [activity(), activity()]);
+  it("adds eligible retained trends, substantial category hubs, and verified country hubs once", () => {
+    const aiTrends = Array.from({ length: 10 }, (_, index) => eligibleTrend({
+      id: `ai-${index}`,
+      slug: index ? `agent-evaluation-${index}` : "agent-evaluation",
+    }));
+    const sportsTrends = Array.from({ length: 10 }, (_, index) => eligibleTrend({
+      id: `sports-${index}`,
+      slug: index ? `ai-sports-analysis-${index}` : "ai-sports-analysis",
+      category: "Sports",
+    }));
+    const countryActivity = activity({
+      trend_count: 10,
+      rising_topics: Array.from({ length: 10 }, (_, index) => ({
+        ...activity().rising_topics[0],
+        id: `country-${index}`,
+        slug: `country-trend-${index}`,
+      })),
+    });
+    const sitemap = buildSitemap([...aiTrends, ...sportsTrends], [countryActivity, countryActivity]);
     const urls = sitemap.map(({ url }) => url);
 
-    expect(urls).toHaveLength(staticSitemapEntries.length + 2 + 1 + 2);
+    expect(urls).toHaveLength(staticSitemapEntries.length + 20 + 2 + 1);
     expect(urls).toContain(`${SITE_URL}/trend/agent-evaluation`);
     expect(urls).toContain(`${SITE_URL}/trend/ai-sports-analysis`);
     expect(urls).toContain(`${SITE_URL}/category/artificial-intelligence`);
@@ -151,6 +163,17 @@ describe("live discovery sitemap", () => {
     expect(urls).toContain(`${SITE_URL}/country/united-kingdom`);
     expect(new Set(urls).size).toBe(urls.length);
     expect(urls.every((url) => url === SITE_URL || url.startsWith(`${SITE_URL}/`))).toBe(true);
+  });
+
+  it("lists one canonical category URL for each 30-record archive page", () => {
+    const trends = Array.from({ length: 31 }, (_, index) => eligibleTrend({
+      id: `ai-${index}`,
+      slug: `agent-evaluation-${index}`,
+    }));
+    const urls = buildSitemap(trends, []).map(({ url }) => url);
+
+    expect(urls).toContain(`${SITE_URL}/category/artificial-intelligence`);
+    expect(urls).toContain(`${SITE_URL}/category/artificial-intelligence?page=2`);
   });
 
   it("fails closed for thin trends and unsupported collection routes", () => {

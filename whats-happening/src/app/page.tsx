@@ -5,9 +5,13 @@ import { GlobalPulse } from "@/components/GlobalPulse";
 import { NextBigThing } from "@/components/NextBigThing";
 import { LiveFeed } from "@/components/LiveFeed";
 import { HomepageFaq } from "@/components/HomepageFaq";
+import { RetainedHubDirectory } from "@/components/RetainedHubDirectory";
 import { Footer } from "@/components/Footer";
 import { homepageFaqs } from "@/content/homepage-faq";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
+import { readRetainedHubDirectory } from "@/lib/server/trend-data";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -53,7 +57,8 @@ const pageJsonLd = {
   ],
 };
 
-export default function Home() {
+export default async function Home() {
+  const retainedHubs = await readRetainedHubDirectory();
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-background selection:bg-white/10">
       <script
@@ -69,6 +74,7 @@ export default function Home() {
         <GlobalPulse />
         <NextBigThing />
         <LiveFeed />
+        <RetainedHubDirectory hubs={retainedHubs} />
         <HomepageFaq />
       </main>
 

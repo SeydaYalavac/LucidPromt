@@ -182,6 +182,36 @@ export interface TrendListPayload {
   };
 }
 
+export interface RetainedTrendPagePayload {
+  trends: Trend[];
+  mode: "live" | "demo";
+  collection: {
+    kind: "category" | "country";
+    slug: string;
+    label: string;
+  };
+  pagination: {
+    page: number;
+    page_size: number;
+    total: number;
+    page_count: number;
+    has_previous: boolean;
+    has_next: boolean;
+  };
+}
+
+export interface RetainedHubDirectoryItem {
+  slug: string;
+  label: string;
+  total: number;
+  page_count: number;
+}
+
+export interface RetainedCountryPagePayload extends RetainedTrendPagePayload {
+  country: Country;
+  evidence_count: number;
+}
+
 export interface MapEvidenceLink {
   id: string;
   provider: SourceName;
