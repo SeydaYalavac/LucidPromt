@@ -50,6 +50,7 @@ function batches<T>(items: T[], size: number) {
 }
 
 export const TREND_DETAIL_CACHE_SECONDS = 60;
+export const ARCHIVE_CACHE_SECONDS = 60;
 
 async function readTrendDetailFromSource(slug: string): Promise<TrendDetailPayload | null> {
   if (isDemoMode()) {
@@ -163,7 +164,8 @@ export async function readTrendList(options: TrendFeedOptions & {
   return buildTrendListPayload(candidates, signals, { ...options, now });
 }
 
-export async function readPublicTrendArchive(now = new Date()): Promise<Trend[]> {
+async function readPublicTrendArchiveFromSource(): Promise<Trend[]> {
+  const now = new Date();
   if (isDemoMode()) return [];
 
   const supabase = getSupabaseAdmin();
@@ -197,6 +199,14 @@ export async function readPublicTrendArchive(now = new Date()): Promise<Trend[]>
   return buildPublicTrendArchive(candidates, signals, now);
 }
 
+const readTimedPublicTrendArchive = unstable_cache(
+  readPublicTrendArchiveFromSource,
+  ["public-trend-archive-v1"],
+  { revalidate: ARCHIVE_CACHE_SECONDS },
+);
+
+export const readPublicTrendArchive = cache(readTimedPublicTrendArchive);
+
 async function readRetainedCategoryCount(hub: RetainedHubDefinition) {
   if (isDemoMode()) {
     return demoTrends.filter((trend) => hub.categories.includes(trend.category)).length;
@@ -221,11 +231,11 @@ export async function readRetainedHubDirectory(): Promise<RetainedHubDirectoryIt
   });
 }
 
-export async function readRetainedCategoryPage(
+async function readRetainedCategoryPageFromSource(
   slug: string,
   page: number,
-  now = new Date(),
 ): Promise<RetainedTrendPagePayload | null> {
+  const now = new Date();
   const hub = retainedHubForSlug(slug);
   if (!hub) return null;
   const total = await readRetainedCategoryCount(hub);
@@ -255,18 +265,15 @@ export async function readRetainedCategoryPage(
       .range(offset, offset + RETAINED_HUB_PAGE_SIZE - 1);
     if (error) throw error;
     const candidates = (data || []).map(sanitizeTrend);
-    const signalResults = await Promise.all(candidates.map((trend) =>
-      supabase
-        .from("signals")
-        .select("*, country:countries(*)")
-        .eq("trend_id", trend.id)
-        .order("observed_at", { ascending: false })
-        .order("published_at", { ascending: false })
-        .limit(30),
-    ));
-    const signalError = signalResults.find((result) => result.error)?.error;
+    const { data: signalData, error: signalError } = await supabase
+      .from("signals")
+      .select("*, country:countries(*)")
+      .in("trend_id", candidates.map((trend) => trend.id))
+      .order("observed_at", { ascending: false })
+      .order("published_at", { ascending: false })
+      .limit(RETAINED_HUB_PAGE_SIZE * 30);
     if (signalError) throw signalError;
-    const signals = signalResults.flatMap((result) => result.data || []).map(sanitizeSignal) as Signal[];
+    const signals = (signalData || []).map(sanitizeSignal) as Signal[];
     trends = buildPublicTrendArchive(candidates, signals, now);
   }
 
@@ -284,6 +291,14 @@ export async function readRetainedCategoryPage(
     },
   };
 }
+
+const readTimedRetainedCategoryPage = unstable_cache(
+  readRetainedCategoryPageFromSource,
+  ["retained-category-page-v1"],
+  { revalidate: ARCHIVE_CACHE_SECONDS },
+);
+
+export const readRetainedCategoryPage = cache(readTimedRetainedCategoryPage);
 
 export async function readRetainedCountryPage(
   slug: string,

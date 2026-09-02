@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
   try {
     const [publicTrends, mapPayload] = await Promise.all([
-      readPublicTrendArchive(now),
+      readPublicTrendArchive(),
       readMapActivity(now),
     ]);
     return buildSitemap(publicTrends, mapPayload.activities, publicTrends);
