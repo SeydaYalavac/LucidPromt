@@ -14,3 +14,6 @@ export function getSafeRedirect(value: string | null | undefined, fallback = DEF
   }
 }
 
+export function getSignupHref(currentPath: string | null | undefined) {
+  return `/signup?next=${encodeURIComponent(getSafeRedirect(currentPath))}`;
+}
