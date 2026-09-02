@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getSafeRedirect } from "./auth-redirect";
+import { getSafeRedirect, getSignupHref } from "./auth-redirect";
 
 describe("getSafeRedirect", () => {
   it("keeps local paths, queries, and fragments", () => {
@@ -22,3 +22,16 @@ describe("getSafeRedirect", () => {
   });
 });
 
+describe("getSignupHref", () => {
+  it("preserves the current trend as the post-signup destination", () => {
+    expect(getSignupHref("/trend/roblox")).toBe(
+      "/signup?next=%2Ftrend%2Froblox",
+    );
+  });
+
+  it("falls back to the homepage for an unsafe destination", () => {
+    expect(getSignupHref("https://evil.example/phish")).toBe(
+      "/signup?next=%2F",
+    );
+  });
+});
