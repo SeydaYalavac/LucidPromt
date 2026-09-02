@@ -24,6 +24,10 @@ import {
 } from "@/lib/signup-attribution";
 import { useLocale } from "@/i18n/locale";
 import { getAuthAvailabilityCopy, getAuthModeCopy, type AuthCopyMode } from "@/lib/auth-copy";
+import {
+  createPendingAuthRedirect,
+  PENDING_AUTH_REDIRECT_KEY,
+} from "@/lib/pending-auth-redirect";
 
 export type AuthMode = AuthCopyMode;
 type SocialProvider = Extract<Provider, "google" | "github" | "apple">;
@@ -185,12 +189,18 @@ export function AuthPanel({
           password,
           options: {
             emailRedirectTo,
-            data: { display_name: displayName.trim() || email.split("@")[0] },
+            data: {
+              display_name: displayName.trim() || email.split("@")[0],
+              [PENDING_AUTH_REDIRECT_KEY]: createPendingAuthRedirect(next),
+            },
           },
         });
         if (authError) throw authError;
         captureProductEvent("auth_completed", { mode, provider: "email", success: true, requires_email_verification: !data.session });
         if (data.session) {
+          await supabase.auth.updateUser({
+            data: { [PENDING_AUTH_REDIRECT_KEY]: null },
+          });
           window.location.assign(next);
           return;
         }
