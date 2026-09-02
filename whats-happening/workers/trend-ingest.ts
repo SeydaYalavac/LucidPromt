@@ -1,6 +1,6 @@
 import { adapters } from "./sources";
 import { clusterSignals, earliestAttributedSignal, scoreSignals, slugifyTitle } from "../src/lib/scoring";
-import { sanitizeExcerpt, summarizeEvidenceSignal } from "../src/lib/trend-content";
+import { isArchiveEligibleTrend, sanitizeExcerpt, sanitizeSignal, summarizeEvidenceSignal } from "../src/lib/trend-content";
 import { getSupabaseAdmin } from "../src/lib/supabase/admin";
 import { generateWhyLayer } from "../src/lib/why-layer";
 import { activeTrendCutoff, DAILY_TREND_TARGET } from "../src/lib/trend-feed";
@@ -24,6 +24,37 @@ type StoredSignal = {
   source_url: string;
   metadata: Record<string, unknown> | null;
 };
+
+async function syncTrendArchiveEligibility(
+  supabase: ReturnType<typeof getSupabaseAdmin>,
+  trendId: string,
+) {
+  const [{ data: trend, error: trendError }, { data: signals, error: signalError }] = await Promise.all([
+    supabase
+      .from("trends")
+      .select("id,slug,title,summary,last_seen_at,updated_at,archive_eligible")
+      .eq("id", trendId)
+      .single(),
+    supabase
+      .from("signals")
+      .select("*")
+      .eq("trend_id", trendId),
+  ]);
+  if (trendError) throw trendError;
+  if (signalError) throw signalError;
+
+  const eligible = isArchiveEligibleTrend(
+    trend,
+    (signals || []).map(sanitizeSignal),
+  );
+  if (trend.archive_eligible === eligible) return false;
+  const { error: updateError } = await supabase
+    .from("trends")
+    .update({ archive_eligible: eligible })
+    .eq("id", trendId);
+  if (updateError) throw updateError;
+  return true;
+}
 
 function batches<T>(items: T[], size: number) {
   const groups: T[][] = [];
@@ -149,6 +180,7 @@ async function run() {
   let signals: SourceSignal[] = [];
   let insertedSignals = 0;
   let createdTrends = 0;
+  let archiveEligibilityUpdates = 0;
 
   const results = await Promise.allSettled(sourceNames.map((name) => adapters[name].fetchSignals()));
   results.forEach((result, index) => {
@@ -245,6 +277,14 @@ async function run() {
     if (signalError) errors.push({ source: lead.source, message: signalError.message });
     insertedSignals += inserted?.length || 0;
 
+    if (!signalError) {
+      try {
+        if (await syncTrendArchiveEligibility(supabase, trend.id)) archiveEligibilityUpdates += 1;
+      } catch (error) {
+        errors.push({ source: "archive_eligibility", message: error instanceof Error ? error.message : String(error) });
+      }
+    }
+
     if (!existing) {
       const whySignals = (inserted || signalRows).map((item) => ({ ...item, id: "", observed_at: item.observed_at || new Date().toISOString() })) as Signal[];
       await generateWhyLayer(trend.id, trend.title, whySignals).catch((error) =>
@@ -279,6 +319,7 @@ async function run() {
     runSupplyStatus: qualifiedClustersSeen >= DAILY_TREND_TARGET ? "target_met" : "under_supply",
     upsertedSignals: insertedSignals,
     createdTrends,
+    archiveEligibilityUpdates,
     countryAttributions,
     countriesDiscoveredFromEvidence: discoveredCountries.length,
     briefingCoverage,

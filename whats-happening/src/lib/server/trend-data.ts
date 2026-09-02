@@ -11,6 +11,7 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import {
   MIN_RETAINED_HUB_ARTICLES,
   RETAINED_HUB_PAGE_SIZE,
+  applyRetainedArchiveEligibility,
   retainedCategoryHubs,
   retainedHubForSlug,
   retainedHubPageCount,
@@ -202,12 +203,11 @@ async function readRetainedCategoryCount(hub: RetainedHubDefinition) {
     return demoTrends.filter((trend) => hub.categories.includes(trend.category)).length;
   }
   const supabase = getSupabaseAdmin();
-  const { count, error } = await supabase
+  const query = supabase
     .from("trends")
     .select("id", { count: "exact", head: true })
-    .in("category", [...hub.categories])
-    .neq("slug", "")
-    .not("summary", "is", null);
+    .in("category", [...hub.categories]);
+  const { count, error } = await applyRetainedArchiveEligibility(query);
   if (error) throw error;
   return count || 0;
 }
@@ -244,12 +244,11 @@ export async function readRetainedCategoryPage(
       .slice(offset, offset + RETAINED_HUB_PAGE_SIZE);
   } else {
     const supabase = getSupabaseAdmin();
-    const { data, error } = await supabase
+    const query = supabase
       .from("trends")
       .select("*, country:countries(*)")
-      .in("category", [...hub.categories])
-      .neq("slug", "")
-      .not("summary", "is", null)
+      .in("category", [...hub.categories]);
+    const { data, error } = await applyRetainedArchiveEligibility(query)
       .order("last_seen_at", { ascending: false })
       .order("score", { ascending: false })
       .range(offset, offset + RETAINED_HUB_PAGE_SIZE - 1);

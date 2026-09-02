@@ -2,6 +2,15 @@ import type { Trend } from "@/types/trends";
 
 export const RETAINED_HUB_PAGE_SIZE = 30;
 export const MIN_RETAINED_HUB_ARTICLES = 10;
+export const RETAINED_ARCHIVE_ELIGIBILITY_COLUMN = "archive_eligible";
+
+type ArchiveEligibilityQuery<T> = {
+  eq(column: typeof RETAINED_ARCHIVE_ELIGIBILITY_COLUMN, value: true): T;
+};
+
+export function applyRetainedArchiveEligibility<T>(query: ArchiveEligibilityQuery<T>) {
+  return query.eq(RETAINED_ARCHIVE_ELIGIBILITY_COLUMN, true);
+}
 
 export type RetainedHubDefinition = {
   slug: string;
