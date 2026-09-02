@@ -1,5 +1,7 @@
 import "server-only";
 
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { demoMapCountries, demoMapSignals, demoSignals, demoTrends } from "@/lib/demo-data";
 import { canonicalCategoryQuery } from "@/lib/discovery";
 import { countryAttributionFromMetadata } from "@/lib/country-attribution";
@@ -47,7 +49,9 @@ function batches<T>(items: T[], size: number) {
   return groups;
 }
 
-export async function readTrendDetail(slug: string): Promise<TrendDetailPayload | null> {
+export const TREND_DETAIL_CACHE_SECONDS = 60;
+
+async function readTrendDetailFromSource(slug: string): Promise<TrendDetailPayload | null> {
   if (isDemoMode()) {
     const trend = demoTrends.find((item) => item.slug === slug && isAiTrend(item));
     if (!trend) return null;
@@ -79,6 +83,14 @@ export async function readTrendDetail(slug: string): Promise<TrendDetailPayload 
   if (!responseTrend.summary || !responseTrend.summary_source) return null;
   return { trend: responseTrend, signals: safeSignals, mode: "live" };
 }
+
+const readTimedTrendDetail = unstable_cache(
+  readTrendDetailFromSource,
+  ["trend-detail-v1"],
+  { revalidate: TREND_DETAIL_CACHE_SECONDS },
+);
+
+export const readTrendDetail = cache(readTimedTrendDetail);
 
 export async function readTrendList(options: TrendFeedOptions & {
   category?: string | null;
