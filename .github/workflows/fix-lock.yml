@@ -10,6 +10,7 @@ permissions:
 jobs:
   fix-lock:
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: whats-happening
@@ -22,18 +23,33 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: whats-happening/package.json
 
-      - name: Regenerate lockfile
-        run: npm install --package-lock-only --ignore-scripts
+      - name: Check project files
+        run: |
+          test -f package.json || {
+            echo "HATA: whats-happening/package.json bulunamadi."
+            exit 1
+          }
+
+      - name: Regenerate package lock
+        run: |
+          rm -f package-lock.json
+          npm install --package-lock-only --ignore-scripts
 
       - name: Validate dependencies
         run: npm ci
 
-      - name: Commit lockfile
+      - name: Commit regenerated lockfile
         working-directory: .
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add whats-happening/package-lock.json
-          git diff --cached --quiet || git commit -m "Regenerate npm lockfile"
-          git push
+          if git diff --cached --quiet; then
+            echo "Lock dosyasinda yeni bir degisiklik yok."
+          else
+            git commit -m "Fix npm lockfile integrity"
+            git push
+          fi
