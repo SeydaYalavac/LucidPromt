@@ -5,7 +5,6 @@ import { GlobalPulse } from "@/components/GlobalPulse";
 import { NextBigThing } from "@/components/NextBigThing";
 import { LiveFeed } from "@/components/LiveFeed";
 import { HomepageFaq } from "@/components/HomepageFaq";
-import { NextBigThing as RetainedHubDirectory } from "@/components/NextBigThing";
 import { Footer } from "@/components/Footer";
 import { homepageFaqs } from "@/content/homepage-faq";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
@@ -39,7 +38,9 @@ const pageJsonLd = {
         priceCurrency: "USD",
         url: `${SITE_URL}/pricing`,
       },
-      publisher: { "@id": `${SITE_URL}/#organization` },
+      publisher: {
+        "@id": `${SITE_URL}/#organization`,
+      },
     },
     {
       "@type": "FAQPage",
@@ -65,6 +66,7 @@ export default function Home() {
           __html: JSON.stringify(pageJsonLd).replace(/</g, "\\u003c"),
         }}
       />
+
       <GlobalNavbar />
 
       <main>
