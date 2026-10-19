@@ -706,6 +706,20 @@ export function selectAiScopedTrends<T extends EvidenceTrend & { id: string }>(t
     .filter((trend) => trend.summary && trend.summary_source);
 }
 
+export function isArchiveEligibleTrend(
+  trend: EvidenceTrend & { id: string; slug?: string | null; title?: unknown },
+  signals: EvidenceSignal[],
+  now = new Date(),
+) {
+  if (!String(trend.slug || "").trim() || !sanitizeExcerpt(trend.title)) return false;
+  const resolved = resolveTrendContent(
+    trend,
+    signals.filter((signal) => signal.trend_id === trend.id),
+    now,
+  );
+  return Boolean(resolved.summary && resolved.summary_source);
+}
+
 export function isAiTrend(trend: { title?: unknown; summary?: unknown }) {
   return hasAiRelevance(trend.title, trend.summary);
 }

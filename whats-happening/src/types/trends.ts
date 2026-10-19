@@ -49,6 +49,7 @@ export interface Trend {
   why_now: string | null;
   where_started: string | null;
   updated_at?: string;
+  archive_eligible?: boolean;
   summary_source?: TrendSummarySource | null;
   brief?: TrendBrief | null;
   evidence_status?: "single_source" | "multi_source";
